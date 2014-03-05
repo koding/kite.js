@@ -11,7 +11,7 @@ module.exports = class Kite extends EventEmitter
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
-  uniqueId = "#{ Math.random() }"
+  uniqueId = "#{ Math.random() }" 
 
   constructor: (options) ->
     return new Kite options  unless this instanceof Kite
@@ -35,19 +35,19 @@ module.exports = class Kite extends EventEmitter
 
   # connection state:
   connect: ->
-    addr = @options.url
-    @ws = new WebSocket addr
+    { url } = @options
+    @ws = new WebSocket url
     @ws.onopen    = @bound 'onOpen'
     @ws.onclose   = @bound 'onClose'
     @ws.onmessage = @bound 'onMessage'
     @ws.onerror   = @bound 'onError'
-    @emit 'info', "Trying to connect to #{ addr }"
+    @emit 'info', "Trying to connect to #{ url }"
     return this
 
   disconnect: (reconnect = true) ->
     @autoReconnect = !!reconnect  if reconnect?
     @ws.close()
-    @emit 'info', "Disconnecting from #{ addr }"
+    @emit 'info', "Disconnecting from #{ @options.url }"
     return this
 
   # event handlers:
