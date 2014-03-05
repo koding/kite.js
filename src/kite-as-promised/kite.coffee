@@ -16,5 +16,3 @@ module.exports = class Kite extends BasicKite
       return
     .timeout @options.timeout ? 5000
     .nodeify callback
-
-      
