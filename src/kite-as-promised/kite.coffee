@@ -9,8 +9,8 @@ module.exports = class Kite extends BasicKite
     super options
 
   tell: (method, params, callback) ->
-    new Promise (resolve, reject) =>
-      super method, params, (err, result) =>
+    new Promise (resolve, reject) ->
+      super method, params, (err, result) ->
         return reject err  if err?
         return resolve result
       return
