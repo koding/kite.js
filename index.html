@@ -1,7 +1,13 @@
 <!doctype html>
 <head>
-    <title>Browserify v2 with CoffeeScript Source Maps</title>
-    <script src="bundle.js"></script>
+    <title>Kite</title>
+    <script>
+    var log, warn, error;
+    log = console.log.bind(console);
+    warn = console.warn.bind(console);
+    error = console.error.bind(console);
+    </script>
+    <script src="bundle-promises.js"></script>
 </head>
 <body>
     <p>Open debugger :)</p>
