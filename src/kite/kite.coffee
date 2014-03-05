@@ -96,7 +96,7 @@ module.exports = class Kite extends EventEmitter
 
   # tell:
   tell: (method, params, callback) ->
-
+    debugger unless callback
     # by default, remove this callback after it is called once.
     callback.times ?= 1
 
