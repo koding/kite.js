@@ -80,6 +80,14 @@ module.exports = class Kite extends EventEmitter
       responseCallback  : (response) ->
         { withArgs:[{ error: err, result }]} = response
         callback err, result
+      kite             :
+        username       : "#{KD.nick()}"
+        environment    : "#{KD.config.environment}"
+        name           : "browser"
+        version        : "1.0.#{KD.config.version}"
+        region         : "browser"
+        hostname       : "browser"
+        id             : uniqueID
 
     # by default, remove this callback after it is called once.
     callback.times ?= 1
