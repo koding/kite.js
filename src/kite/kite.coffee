@@ -34,41 +34,43 @@ module.exports = class Kite extends EventEmitter
   # connection state:
   connect: ->
     addr = @options.url
-    @emit 'info', "Trying to connect to #{addr}"
+    @emit 'info', "Trying to connect to #{ addr }"
     @ws = new WebSocket addr
     @ws.onopen    = @bound 'onOpen'
     @ws.onclose   = @bound 'onClose'
     @ws.onmessage = @bound 'onMessage'
     @ws.onerror   = @bound 'onError'
+    return this
 
-  disconnect: (reconnect=true) ->
+  disconnect: (reconnect = true) ->
     @autoReconnect = !!reconnect  if reconnect?
     @ws.close()
+    return this
 
   # event handlers:
   onOpen: ->
-    @emit 'info', "Connected to Kite: #{@options.url}"
+    @emit 'info', "Connected to Kite: #{ @options.url }"
     @clearBackoffTimeout()
     @readyState = READY
     @emit 'connected', @name
     @emit 'ready'
 
-  onClose: (evt)->
-    @emit 'info', "#{@options.url}: disconnected, trying to reconnect..."
+  onClose: ->
+    @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
     @readyState = CLOSED
     @emit 'disconnected'
     # enable below to autoReconnect when the socket has been closed
     if @autoReconnect
-      KD.utils.defer => @setBackoffTimeout @bound "connect"
+      process.nextTick => @setBackoffTimeout @bound "connect"
 
-  onMessage: (evt)->
-    data = evt.data
-    @emit 'info', "onMessage", data
-    req = JSON.parse data
-    @proto.handle(req)
+  onMessage: ({ data }) ->
+    req = try JSON.parse data
+    if req?
+      @proto.handle req
+      @emit 'info', "onMessage", data
 
-  onError: (evt)->
-    @emit 'info', "#{@options.url} error: #{evt.data}"
+  onError: ({ data }) ->
+    @emit 'info', "#{ @options.url } error: #{ data }"
 
   # tell:
   tell: (method, params, callback) ->
