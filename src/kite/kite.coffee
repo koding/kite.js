@@ -1,10 +1,11 @@
 "use strict"
 
-EventEmitter = require 'events'
+{ EventEmitter } = require 'events'
 
 module.exports = class Kite extends EventEmitter
 
   dnodeProtocol = require 'dnode-protocol'
+  WebSocket     = require 'ws'
 
   wrapApi = require './wrap-api.coffee'
 
@@ -37,10 +38,10 @@ module.exports = class Kite extends EventEmitter
   connect: ->
     { url } = @options
     @ws = new WebSocket url
-    @ws.onopen    = @bound 'onOpen'
-    @ws.onclose   = @bound 'onClose'
-    @ws.onmessage = @bound 'onMessage'
-    @ws.onerror   = @bound 'onError'
+    @ws.addEventListener 'open',    @bound 'onOpen'
+    @ws.addEventListener 'close',   @bound 'onClose'
+    @ws.addEventListener 'message', @bound 'onMessage'
+    @ws.addEventListener 'error',   @bound 'onError'
     @emit 'info', "Trying to connect to #{ url }"
     return this
 
