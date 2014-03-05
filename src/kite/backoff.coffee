@@ -1,3 +1,5 @@
+"use strict"
+
 module.exports = (options = {}) ->
   backoff = options.backoff ? {}
   totalReconnectAttempts = 0
@@ -6,10 +8,10 @@ module.exports = (options = {}) ->
   maxDelayMs = backoff.maxDelayMs ? 1000 * 15 # 15 seconds
   maxReconnectAttempts = backoff.maxReconnectAttempts ? 50
 
-  @clearBackoffTimeout =->
+  @clearBackoffTimeout = ->
     totalReconnectAttempts = 0
 
-  @setBackoffTimeout = (fn)=>
+  @setBackoffTimeout = (fn) =>
     if totalReconnectAttempts < maxReconnectAttempts
       timeout = Math.min initalDelayMs * Math.pow(
         multiplyFactor, totalReconnectAttempts
@@ -17,4 +19,4 @@ module.exports = (options = {}) ->
       setTimeout fn, timeout
       totalReconnectAttempts++
     else
-      @emit "connectionFailed"
+      @emit "backoffFailed"

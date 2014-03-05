@@ -1,10 +1,9 @@
+"use strict"
+
 module.exports = (userlandApi = {}) ->
-  api =
-    log: ->
-      console.log arguments
-    warn: ->
-      console.warn arguments
-    error: ->
-      console.error arguments
+  api = ['error', 'info', 'log', 'warn'].reduce (api, method) ->
+    api[method] = console[method].bind console
+    api
+  , {}
   api[method] = fn  for own method, fn of userlandApi
   api

@@ -1,3 +1,5 @@
+"use strict"
+
 EventEmitter = require 'events'
 
 module.exports = class Kite extends EventEmitter
@@ -9,7 +11,14 @@ module.exports = class Kite extends EventEmitter
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
-  constructor: (@options) ->
+  constructor: (options) ->
+    return new Kite options  unless this instanceof Kite
+
+    @options =
+      if 'string' is typeof options
+      then url: options
+      else options
+
     @options.autoReconnect ?= yes
 
     @readyState = NOTREADY
@@ -87,4 +96,3 @@ module.exports = class Kite extends EventEmitter
     if @readyState is READY
     then process.nextTick callback
     else @once 'ready', callback
-
