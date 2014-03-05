@@ -22,55 +22,59 @@ module.exports = class Kite extends EventEmitter
     @options.autoReconnect ?= yes
 
     @readyState = NOTREADY
+    
     @initBackoff()  if @options.autoReconnect
 
     @proto = dnodeProtocol (wrapApi @options.api)
-
+    
     @proto.on 'request', (req) =>
+      @ready => @ws.send JSON.stringify req
       @emit 'info', "proto request", req
-      @ready => 
-        @ws.send JSON.stringify req
 
   # connection state:
   connect: ->
     addr = @options.url
-    @emit 'info', "Trying to connect to #{ addr }"
     @ws = new WebSocket addr
     @ws.onopen    = @bound 'onOpen'
     @ws.onclose   = @bound 'onClose'
     @ws.onmessage = @bound 'onMessage'
     @ws.onerror   = @bound 'onError'
+    @emit 'info', "Trying to connect to #{ addr }"
     return this
 
   disconnect: (reconnect = true) ->
     @autoReconnect = !!reconnect  if reconnect?
     @ws.close()
+    @emit 'info', "Disconnecting from #{ addr }"
     return this
 
   # event handlers:
   onOpen: ->
-    @emit 'info', "Connected to Kite: #{ @options.url }"
-    @clearBackoffTimeout()
     @readyState = READY
     @emit 'connected', @name
     @emit 'ready'
+    @emit 'info', "Connected to Kite: #{ @options.url }"
+    @clearBackoffTimeout()
+    return
 
   onClose: ->
-    @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
     @readyState = CLOSED
     @emit 'disconnected'
     # enable below to autoReconnect when the socket has been closed
     if @autoReconnect
       process.nextTick => @setBackoffTimeout @bound "connect"
+    @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
+    return
 
   onMessage: ({ data }) ->
+    @emit 'info', "onMessage", data
     req = try JSON.parse data
-    if req?
-      @proto.handle req
-      @emit 'info', "onMessage", data
+    @proto.handle req  if req?
+    return
 
   onError: ({ data }) ->
     @emit 'info', "#{ @options.url } error: #{ data }"
+    return
 
   # tell:
   tell: (method, params, callback) ->
@@ -96,6 +100,8 @@ module.exports = class Kite extends EventEmitter
     scrubbed.method = method
     
     @proto.emit 'request', scrubbed
+
+    return
 
   # util:
   bound: require './bound.coffee'
