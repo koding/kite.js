@@ -11,6 +11,8 @@ module.exports = class Kite extends EventEmitter
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
+  uniqueId = "#{ Math.random() }"
+
   constructor: (options) ->
     return new Kite options  unless this instanceof Kite
 
@@ -91,7 +93,7 @@ module.exports = class Kite extends EventEmitter
         version        : "1.0.#{ @options.version ? '0' }"
         region         : "browser"
         hostname       : "browser"
-        id             : uniqueID
+        id             : uniqueId
 
     # by default, remove this callback after it is called once.
     callback.times ?= 1
