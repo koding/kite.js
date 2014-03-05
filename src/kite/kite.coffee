@@ -85,10 +85,10 @@ module.exports = class Kite extends EventEmitter
         { withArgs:[{ error: err, result }]} = response
         callback err, result
       kite             :
-        username       : "#{KD.nick()}"
-        environment    : "#{KD.config.environment}"
+        username       : "#{ @options.username ? 'anonymous' }"
+        environment    : "#{ @options.environment ? 'browser' }"
         name           : "browser"
-        version        : "1.0.#{KD.config.version}"
+        version        : "1.0.#{ @options.version ? '0' }"
         region         : "browser"
         hostname       : "browser"
         id             : uniqueID
