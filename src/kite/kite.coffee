@@ -78,27 +78,28 @@ module.exports = class Kite extends EventEmitter
     @emit 'info', "#{ @options.url } error: #{ data }"
     return
 
+  wrapMessage: (method, params, callback) ->
+    authentication    : @authentication
+    withArgs          : params
+    responseCallback  : (response) ->
+      { withArgs:[{ error: err, result }]} = response
+      callback err, result
+    kite              :
+      username        : "#{ @options.username ? 'anonymous' }"
+      environment     : "#{ @options.environment ? 'browser' }"
+      name            : "browser"
+      version         : "1.0.#{ @options.version ? '0' }"
+      region          : "browser"
+      hostname        : "browser"
+      id              : uniqueId
+
   # tell:
   tell: (method, params, callback) ->
-    options =
-      authentication    : @authentication
-      withArgs          : params
-      responseCallback  : (response) ->
-        { withArgs:[{ error: err, result }]} = response
-        callback err, result
-      kite             :
-        username       : "#{ @options.username ? 'anonymous' }"
-        environment    : "#{ @options.environment ? 'browser' }"
-        name           : "browser"
-        version        : "1.0.#{ @options.version ? '0' }"
-        region         : "browser"
-        hostname       : "browser"
-        id             : uniqueId
 
     # by default, remove this callback after it is called once.
     callback.times ?= 1
 
-    scrubbed = @proto.scrubber.scrub [options]
+    scrubbed = @proto.scrubber.scrub [@wrapMessage method, params, callback]
     scrubbed.method = method
     
     @proto.emit 'request', scrubbed
