@@ -29,7 +29,8 @@
   "license": "MIT",
   "dependencies": {
     "dnode-protocol": "~0.2.2",
-    "ws": "~0.4.31"
+    "ws": "~0.4.31",
+    "bluebird": "~1.0.8"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
