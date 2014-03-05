@@ -6,7 +6,25 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Christopher Thorn <chris@koding.com>",
+  "author": {
+    "name": "Koding Team",
+    "email": "team@koding.com",
+    "website": "https://koding.com"
+  },
+  "contributors": [
+    {
+      "name": "Fatih Arslan",
+      "email": "fatih@koding.com"
+    },
+    {
+      "name": "Cenk Alti",
+      "email": "cenk@koding.com"
+    },
+    {
+      "name": "Christopher Thorn",
+      "email": "chris@koding.com"
+    }
+  ],
   "repository": "https://github.com/koding/kite.js.git",
   "license": "MIT",
   "dependencies": {
