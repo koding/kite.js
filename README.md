@@ -41,9 +41,9 @@ After which point the global symbol `Kite` will be exposed.
 you can use the `Kite` constructor with a URL:
 
 ``` js
-var Kite = require('kite')
-k = new Kite('ws://my-math-service.com')
-k.connect()
+var Kite = require('kite');
+k = new Kite('ws://my-math-service.com');
+k.connect();
 k.tell('square', [4], console.log.bind(console));
 // logs "null 16"
 ```
