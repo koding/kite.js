@@ -33,6 +33,7 @@ module.exports = class Kite extends EventEmitter
     @proto.on 'request', (req) =>
       @ready => @ws.send JSON.stringify req
       @emit 'info', "proto request", req
+      return
 
   # connection state:
   connect: ->
@@ -43,13 +44,13 @@ module.exports = class Kite extends EventEmitter
     @ws.addEventListener 'message', @bound 'onMessage'
     @ws.addEventListener 'error',   @bound 'onError'
     @emit 'info', "Trying to connect to #{ url }"
-    return this
+    return
 
   disconnect: (reconnect = true) ->
     @autoReconnect = !!reconnect  if reconnect?
     @ws.close()
     @emit 'info', "Disconnecting from #{ @options.url }"
-    return this
+    return
 
   # event handlers:
   onOpen: ->
@@ -104,7 +105,6 @@ module.exports = class Kite extends EventEmitter
     scrubbed.method = method
     
     @proto.emit 'request', scrubbed
-
     return
 
   # util:
@@ -116,3 +116,4 @@ module.exports = class Kite extends EventEmitter
     if @readyState is READY
     then process.nextTick callback
     else @once 'ready', callback
+    return
