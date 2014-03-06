@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Kite client library",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "./bluebird.sh"
