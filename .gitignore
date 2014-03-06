@@ -1,4 +1,8 @@
 node_modules
 bundle.js
 bundle-promises.js
+bundle-dev.js
+bundle-promises-dev.js
+bundle.min.js
+bundle-promises.min.js
 lib
