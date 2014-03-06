@@ -38,7 +38,7 @@ After which point the global symbol `Kite` will be exposed.
 
 ## Kite(url)
 
-you can use the kite constructor with a URL:
+you can use the `Kite` constructor with a URL:
 
 ``` js
 var Kite = require('kite')
