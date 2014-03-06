@@ -35,6 +35,8 @@ module.exports = class Kite extends EventEmitter
       @emit 'info', "proto request", req
       return
 
+    @connect()
+
   # connection state:
   connect: ->
     { url } = @options
