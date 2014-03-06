@@ -32,7 +32,7 @@ Or:
 ``` html
 <script src="./bundle-promises.js"></script>
 ```
-After which point the global symbol `Kite` will be exposed.
+After which point the global variable `Kite` will be exposed.
 
 # api
 
