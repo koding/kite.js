@@ -5,8 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "./bluebird.sh"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": {
     "name": "Koding Team",
@@ -31,7 +30,8 @@
   "license": "MIT",
   "dependencies": {
     "dnode-protocol": "~0.2.2",
-    "ws": "~0.4.31"
+    "ws": "~0.4.31",
+    "then-array": "~1.0.0"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
