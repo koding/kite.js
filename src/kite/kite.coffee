@@ -57,7 +57,7 @@ module.exports = class Kite extends EventEmitter
   # event handlers:
   onOpen: ->
     @readyState = READY
-    @emit 'connected', @name
+    @emit 'connected'
     @emit 'ready'
     @emit 'info', "Connected to Kite: #{ @options.url }"
     @clearBackoffTimeout()
