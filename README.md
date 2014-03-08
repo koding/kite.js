@@ -43,18 +43,17 @@ you can use the `Kite` constructor with a URL:
 ``` js
 var Kite = require('kite');
 k = new Kite('ws://my-math-service.com');
-k.connect();
 k.tell('square', [4], console.log.bind(console));
 // logs "null 16"
 ```
 
 ## kite.connect()
 
-Open a connection to the remote service
+Open a connection to the remote service.  Called the first time in the constructor.
 
 ## kite.disconnect()
 
-Close the connection, if it is open
+Close the connection, if it is open.
 
 ## kite.tell(method, params, callback)
 
