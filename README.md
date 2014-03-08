@@ -12,11 +12,11 @@ npm install kite.js
 
 In node:
 ``` js
-var Kite = require('kite');
+var Kite = require('kite.js');
 ```
 Or, alternatively, if you want to use the promises-based api:
 ``` js
-var Kite = require('kite/promises');
+var Kite = require('kite.js/promises');
 ```
 
 In the browser:
