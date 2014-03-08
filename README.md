@@ -4,13 +4,8 @@ a kite client library for the browser and node.js
 
 # installation
 
-For the time being, installation can be accomplished like this:
-
 ``` sh
-git clone git@github.com:koding/kite.js.git
-cd kite.js
-npm install
-make
+npm install kite.js
 ```
 
 # requiring kite.js
