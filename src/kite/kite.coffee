@@ -7,8 +7,7 @@ module.exports = class Kite extends EventEmitter
   dnodeProtocol = require 'dnode-protocol'
   WebSocket     = require 'ws'
 
-  wrapApi   = require './wrap-api.coffee'
-  timedout  = require './timedout.coffee'
+  wrapApi = require './wrap-api.coffee'
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
@@ -84,22 +83,19 @@ module.exports = class Kite extends EventEmitter
     return
 
   wrapMessage: (method, params, callback) ->
-    kallback = timedout @options.timeout ? 5000, callback
-    {
-      @authentication
-      withArgs          : params
-      responseCallback  : (response) ->
-        { withArgs:[{ error: err, result }]} = response
-        kallback err, result
-      kite              :
-        username        : "#{ @options.username ? 'anonymous' }"
-        environment     : "#{ @options.environment ? 'browser' }"
-        name            : "browser"
-        version         : "1.0.#{ @options.version ? '0' }"
-        region          : "browser"
-        hostname        : "browser"
-        id              : uniqueId
-    }
+    authentication    : @authentication
+    withArgs          : params
+    responseCallback  : (response) ->
+      { withArgs:[{ error: err, result }]} = response
+      callback err, result
+    kite              :
+      username        : "#{ @options.username ? 'anonymous' }"
+      environment     : "#{ @options.environment ? 'browser' }"
+      name            : "browser"
+      version         : "1.0.#{ @options.version ? '0' }"
+      region          : "browser"
+      hostname        : "browser"
+      id              : uniqueId
 
   # tell:
   tell: (method, params, callback) ->
