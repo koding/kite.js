@@ -1,4 +1,6 @@
 node_modules
+bluebird.js
+bluebird.min.js
 bundle.js
 bundle-promises.js
 bundle-dev.js
