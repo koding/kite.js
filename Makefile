@@ -9,24 +9,24 @@ uglify-bluebird:
 	node_modules/.bin/uglifyjs bluebird.js -c -m -o bluebird.min.js 2>/dev/null
 
 build:
-	node_modules/.bin/coffee --bare -o ./lib/kite -c ./src/kite/*.coffee
+	node_modules/.bin/coffee -b -o ./lib/kite -c ./src/kite/*.coffee
 	find ./lib/kite/*.js -type f -exec sed -i "" -e 's/\.coffee/\.js/g' {} \;
 
 build-promises:
-	node_modules/.bin/coffee --bare -o ./lib/kite-as-promised -c ./src/kite-as-promised/*.coffee
+	node_modules/.bin/coffee -b -o ./lib/kite-as-promised -c ./src/kite-as-promised/*.coffee
 	find ./lib/kite-as-promised/*.js -type f -exec sed -i "" -e 's/\.coffee/\.js/g' {} \;
 
 browserify:
-	node_modules/.bin/browserify --standalone Kite -x bluebird -t coffeeify src/kite/kite.coffee > bundle.js
+	node_modules/.bin/browserify -s Kite -x bluebird -t coffeeify src/kite/kite.coffee > bundle.js
 
 browserify-promises:
-	node_modules/.bin/browserify --standalone Kite -x bluebird -t coffeeify src/kite-as-promised/kite.coffee > bundle-promises.js
+	node_modules/.bin/browserify -s Kite -x bluebird -t coffeeify src/kite-as-promised/kite.coffee > bundle-promises.js
 
 browserify-dev:
-	node_modules/.bin/browserify --standalone Kite -d -x bluebird -t coffeeify src/kite/kite.coffee > bundle-dev.js
+	node_modules/.bin/browserify -s Kite -d -x bluebird -t coffeeify src/kite/kite.coffee > bundle-dev.js
 
 browserify-promises-dev:
-	node_modules/.bin/browserify --standalone Kite -d -x bluebird -t coffeeify src/kite-as-promised/kite.coffee > bundle-promises-dev.js
+	node_modules/.bin/browserify -s Kite -d -x bluebird -t coffeeify src/kite-as-promised/kite.coffee > bundle-promises-dev.js
 
 uglify:
 	node_modules/.bin/uglifyjs bundle.js -c -m -o bundle.min.js 2>/dev/null
