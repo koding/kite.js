@@ -92,7 +92,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   wrapMessage: (method, params, callback) ->
-    auth              : @options.auth
+    authentication    : @options.auth
     withArgs          : params
     responseCallback  : (response) ->
       { withArgs:[{ error: err, result }]} = response
