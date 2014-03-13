@@ -12,6 +12,9 @@ module.exports = class Kite extends EventEmitter
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
+  # error states:
+  [ OKAY, ERROR ] = [0,1]
+
   uniqueId = "#{ Math.random() }" 
 
   constructor: (options) ->
@@ -69,6 +72,11 @@ module.exports = class Kite extends EventEmitter
     # enable below to autoReconnect when the socket has been closed
     if @autoReconnect
       process.nextTick => @setBackoffTimeout @bound "connect"
+
+    if @errState is ERROR
+      @emit 'error', "Websocket error!"
+      @errState = OKAY
+
     @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
     return
 
@@ -78,12 +86,13 @@ module.exports = class Kite extends EventEmitter
     @proto.handle req  if req?
     return
 
-  onError: ({ data }) ->
-    @emit 'info', "#{ @options.url } error: #{ data }"
+  onError: (err) ->
+    @errState = ERROR
+    @emit 'info', "#{ @options.url } error: #{ err.data }"
     return
 
   wrapMessage: (method, params, callback) ->
-    authentication    : @authentication
+    authentication    : @options.authentication
     withArgs          : params
     responseCallback  : (response) ->
       { withArgs:[{ error: err, result }]} = response
