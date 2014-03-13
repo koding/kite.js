@@ -25,6 +25,8 @@ module.exports = class Kite extends EventEmitter
       then url: options
       else options
 
+    # user-friendly defaults:
+    @options.autoConnect   ?= yes
     @options.autoReconnect ?= yes
 
     @readyState = NOTREADY
@@ -38,7 +40,7 @@ module.exports = class Kite extends EventEmitter
       @emit 'info', "proto request", req
       return
 
-    @connect()
+    @connect()  if @options.autoConnect
 
   # connection state:
   connect: ->
