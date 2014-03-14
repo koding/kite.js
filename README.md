@@ -23,11 +23,11 @@ var Kite = require('kite.js/promises');
 
 In the browser:
 ``` html
-<script src="./bundle.js"></script>
+<script src="./browser/kite-bundle.js"></script>
 ```
 Or:
 ``` html
-<script src="./bundle-promises.js"></script>
+<script src="./browser/kite-bundle-promises.js"></script>
 ```
 After which point the global variable `Kite` will be exposed.
 
