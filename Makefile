@@ -48,7 +48,7 @@ build-kontrol:
 
 build-kontrol-promises:
 	node_modules/.bin/coffee -b -o ./lib/kontrol-as-promised -c ./src/kontrol-as-promised/*.coffee
-	find ./lib/kite-as-promised/*.js -type f -exec sed -i "" -e 's/\.coffee/\.js/g' {} \;
+	find ./lib/kontrol-as-promised/*.js -type f -exec sed -i "" -e 's/\.coffee/\.js/g' {} \;
 
 browserify-kontrol:
 	node_modules/.bin/browserify -s Kontrol -t coffeeify -x bluebird src/kontrol/kontrol.coffee > browser/kontrol-bundle.js
