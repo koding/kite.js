@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postpublish": "./bluebird.sh && make"
+    "postpublish": "make"
   },
   "author": {
     "name": "Koding Team",
@@ -29,6 +29,7 @@
   "repository": "https://github.com/koding/kite.js.git",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "1.1.0",
     "dnode-protocol": "~0.2.2",
     "ws": "~0.4.31"
   },
