@@ -36,18 +36,18 @@ module.exports = class Kontrol extends EventEmitter
         type      : 'token'
         key       : token
 
-  fetchKites: (selector = {}, callback) ->
-    @kite.tell 'getKites', [selector], (err, { kites }) =>
+  fetchKites: (query = {}, callback) ->
+    @kite.tell 'getKites', [query], (err, { kites: kiteDescriptors }) =>
       if err?
         callback err
         return
 
-      callback null, (@createKite k for k in kites)
+      callback null, @kiteify kiteDescriptors
       return
     return
 
-  fetchKite: (selector = {}, callback) ->
-    @fetchKites selector, (err, kites) ->
+  fetchKite: (query = {}, callback) ->
+    @fetchKites query, (err, kites) ->
       if err?
         callback err
         return
@@ -60,14 +60,37 @@ module.exports = class Kontrol extends EventEmitter
       return
     return
 
-  watchKites: (selector = {}, callback) ->
+  watchKites: (query = {}, callback) ->
     changes = new EventEmitter
-    onEvent = @createUpdateHandler changes, callback
+    handler = @createUpdateHandler changes
+    @kite.tell 'getKites', [query, handler], (err, result) =>
+      if err?
+        callback err
+        return
+
+      { kites: kiteDescriptors, watcherID } = result
+
+      callback null, {
+        action    : @constructor.actions.REGISTER
+        kites     : @kiteify kiteDescriptors
+        changes
+        watcherID
+      }
 
   cancelWatcher: (id, callback) ->
 
-  createUpdateHandler: (changes, callback) -> (err, change) =>
-    # TODO: implement
+  createUpdateHandler: (changes) -> (err, { action, kite: kiteDescriptor, token }) =>
+    debugger  # this is not reliable AFAICT
+    if err
+      changes.emit 'error', err
+      return
+
+    [kite] = @kiteify [kiteDescriptor]
+
+    eventName = @constructor.actions[action]
+    changes.emit eventName, kite
+
+  kiteify: (kiteDescriptors) -> (@createKite k for k in kiteDescriptors)
 
   @actions      =
     REGISTER    : 'register'
