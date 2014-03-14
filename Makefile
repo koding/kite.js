@@ -11,6 +11,7 @@ kite-dev: bluebird browserify-kite-dev browserify-kite-promises-dev
 kontrol-dev: bluebird browserify-kontrol-dev browserify-kontrol-promises-dev
 
 browserify-bluebird:
+	mkdir -p browser
 	node_modules/.bin/browserify -r ./node_modules/bluebird/js/main/bluebird.js > browser/bluebird.js
 
 uglify-bluebird:
