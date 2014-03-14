@@ -1,3 +1,5 @@
+"use strict"
+
 { EventEmitter } = require 'events'
 
 module.exports = class Kontrol extends EventEmitter

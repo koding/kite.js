@@ -1,3 +1,5 @@
+"use strict"
+
 BasicKontrol = require '../kontrol/kontrol.coffee'
 
 module.exports = class Kontrol extends BasicKontrol
