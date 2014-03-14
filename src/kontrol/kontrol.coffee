@@ -39,12 +39,16 @@ module.exports = class Kontrol extends EventEmitter
         key       : token
 
   fetchKites: (query = {}, callback) ->
-    @kite.tell 'getKites', [query], (err, { kites: kiteDescriptors }) =>
+    @kite.tell 'getKites', [query], (err, result) =>
       if err?
         callback err
         return
 
-      callback null, @kiteify kiteDescriptors
+      unless result?
+        callback new Error "No kite found!"
+        return
+
+      callback null, @kiteify result.kites
       return
     return
 
@@ -78,13 +82,16 @@ module.exports = class Kontrol extends EventEmitter
 
   cancelWatcher: (id, callback) ->
 
-  createUpdateHandler: (changes) -> (err, { action, kite: kiteDescriptor, token }) =>
-    debugger  # this is not reliable AFAICT
+  createUpdateHandler: (changes) -> (response) =>
+    { err, result } = @kite.unwrapMessage response
+
     if err
       changes.emit 'error', err
       return
 
-    kite = @createKite kiteDescriptor
+    { action, kite, token } = result
+
+    kite = @createKite { kite, token }
 
     eventName = @constructor.actions[action]
     changes.emit eventName, kite
