@@ -82,7 +82,7 @@ module.exports = class Kontrol extends EventEmitter
       changes.emit 'error', err
       return
 
-    [kite] = @kiteify [kiteDescriptor]
+    kite = @createKite kiteDescriptor
 
     eventName = @constructor.actions[action]
     changes.emit eventName, kite
