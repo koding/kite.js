@@ -70,12 +70,9 @@ module.exports = class Kontrol extends EventEmitter
 
       { kites: kiteDescriptors, watcherID } = result
 
-      callback null, {
-        action    : @constructor.actions.REGISTER
-        kites     : @kiteify kiteDescriptors
-        changes
-        watcherID
-      }
+      callback null, { changes, watcherID }
+
+      changes.emit 'register', kite for kite in @kiteify kiteDescriptors
 
   cancelWatcher: (id, callback) ->
 
