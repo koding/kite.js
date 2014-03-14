@@ -58,3 +58,34 @@ Send an RPC to the remote service, and receive the response.
 
 If you are using the promisified library, the callback is optional.  Of course, you should use promises instead of passing callbacks if you choose to use the promisified library.
 
+# kontrol api
+
+getKites Calls the callback function with the list of NewKite instances.
+The returned kites are not connected. You must connect with
+NewKite.connect().
+
+Query parameters are below from general to specific:
+
+``` go
+type KontrolQuery struct {
+  username    string
+  environment string
+  name        string
+  version     string
+  region      string
+  hostname    string
+  id          string
+}
+```
+
+## k.fetchKites(selector, callback)
+
+## k.fetchKite(selector, callback)
+
+## k.watchKites(selector, callback)
+
+## k.cancelWatcher(id, callback)
+
+## k.createKite(kiteDescriptor) : Kite
+
+
