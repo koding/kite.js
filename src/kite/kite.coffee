@@ -93,11 +93,15 @@ module.exports = class Kite extends EventEmitter
     @emit 'info', "#{ @options.url } error: #{ err.data }"
     return
 
+  unwrapMessage: (message) ->
+    { withArgs:[{ error: err, result }]} = message
+    { err, result }
+
   wrapMessage: (method, params, callback) ->
     authentication    : @options.auth
     withArgs          : params
-    responseCallback  : (response) ->
-      { withArgs:[{ error: err, result }]} = response
+    responseCallback  : (response) =>
+      { err, result } = @unwrapMessage response
       callback err, result
     kite              :
       username        : "#{ @options.username ? 'anonymous' }"
