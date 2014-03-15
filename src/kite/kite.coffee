@@ -44,6 +44,7 @@ module.exports = class Kite extends EventEmitter
 
   # connection state:
   connect: ->
+    return  if @readyState is READY
     { url } = @options
     @ws = new WebSocket url
     @ws.addEventListener 'open',    @bound 'onOpen'
@@ -112,7 +113,6 @@ module.exports = class Kite extends EventEmitter
       hostname        : "browser"
       id              : uniqueId
 
-  # tell:
   tell: (method, params, callback) ->
     # by default, remove this callback after it is called once.
     callback.times ?= 1
