@@ -41,8 +41,17 @@
     "gulp": "^3.5.6",
     "gulp-coffee": "^1.4.1",
     "gulp-uglify": "^0.2.1",
-    "gulp-browserify": "^0.5.0",
+    "gulp-browserify": "~0.5.0",
     "gulp-if": "0.0.5",
-    "gulp-rename": "^1.2.0"
+    "gulp-rename": "^1.2.0",
+    "browserify-shim": "~3.3.1"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "bluebird": "global:Promise"
   }
 }
