@@ -29,7 +29,7 @@ module.exports = class Kontrol extends EventEmitter
       url   : url
       auth  : { type, key }
 
-  createKite: ({ kite: { name, url }, token }) ->
+  createKite: ({ kite: { name }, token, url }) ->
     new @constructor.Kite
       autoConnect : no
       name        : name
@@ -37,6 +37,8 @@ module.exports = class Kontrol extends EventEmitter
       auth        :
         type      : 'token'
         key       : token
+
+  createKites: (kiteDescriptors) -> (@createKite k for k in kiteDescriptors)
 
   fetchKites: (query = {}, callback) ->
     @kite.tell 'getKites', [query], (err, result) =>
@@ -48,7 +50,7 @@ module.exports = class Kontrol extends EventEmitter
         callback new Error "No kite found!"
         return
 
-      callback null, @kiteify result.kites
+      callback null, @createKites result.kites
       return
     return
 
@@ -78,25 +80,24 @@ module.exports = class Kontrol extends EventEmitter
 
       callback null, { changes, watcherID }
 
-      changes.emit 'register', kite for kite in @kiteify kiteDescriptors
+      changes.emit 'register', kite for kite in @createKites kiteDescriptors
 
   cancelWatcher: (id, callback) ->
+    @kite.tell 'cancelWatcher', [id], callback
 
   createUpdateHandler: (changes) -> (response) =>
     { err, result } = @kite.unwrapMessage response
 
-    if err
+    if err?
       changes.emit 'error', err
       return
 
-    { action, kite, token } = result
+    { action, kite, token, url } = result
 
-    kite = @createKite { kite, token }
+    kite = @createKite { kite, token, url }
 
     eventName = @constructor.actions[action]
     changes.emit eventName, kite
-
-  kiteify: (kiteDescriptors) -> (@createKite k for k in kiteDescriptors)
 
   @actions      =
     REGISTER    : 'register'
