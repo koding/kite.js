@@ -38,7 +38,8 @@ module.exports = class Kontrol extends EventEmitter
         type      : 'token'
         key       : token
 
-  createKites: (kiteDescriptors) -> (@createKite k for k in kiteDescriptors)
+  createKites: (kiteDescriptors) ->
+    (@createKite k for k in kiteDescriptors)
 
   fetchKites: (query = {}, callback) ->
     @kite.tell 'getKites', [query], (err, result) =>
@@ -80,7 +81,9 @@ module.exports = class Kontrol extends EventEmitter
 
       callback null, { changes, watcherID }
 
-      changes.emit 'register', kite for kite in @createKites kiteDescriptors
+      changes.emit 'register', kite  for kite in @createKites kiteDescriptors
+      return
+    return
 
   cancelWatcher: (id, callback) ->
     @kite.tell 'cancelWatcher', [id], callback
@@ -98,6 +101,7 @@ module.exports = class Kontrol extends EventEmitter
 
     eventName = @constructor.actions[action]
     changes.emit eventName, kite
+    return
 
   @actions      =
     REGISTER    : 'register'

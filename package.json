@@ -37,6 +37,22 @@
     "browserify": "~3.32.0",
     "coffee-script": "~1.7.1",
     "coffeeify": "~0.6.0",
-    "uglify-js": "~2.4.12"
+    "gulp": "^3.5.6",
+    "gulp-coffee": "^1.4.1",
+    "gulp-uglify": "^0.2.1",
+    "gulp-browserify": "~0.5.0",
+    "gulp-if": "0.0.5",
+    "gulp-rename": "^1.2.0",
+    "browserify-shim": "^3.3.1",
+    "gulp-util": "^2.2.14",
+    "gulp-replace": "^0.2.0"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "bluebird": "global:Promise"
   }
 }
