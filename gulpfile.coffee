@@ -8,12 +8,32 @@ replace     = require 'gulp-replace'
 
 coffee4Node = -> (coffee bare: yes, sourceMap: yes).on 'error', util.log
 
+# Build for node
 gulp.task 'build kite', ->
   gulp.src 'src/kite/*.coffee'
     .pipe coffee4Node()
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kite'
 
+gulp.task 'build kite as promised', ->
+  gulp.src 'src/kite-as-promised/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/kite-as-promised'
+
+gulp.task 'build kontrol', ->
+  gulp.src 'src/kontrol/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/kontrol'
+
+gulp.task 'build kontrol as promised', ->
+  gulp.src 'src/kontrol-as-promised/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/kontrol-as-promised'
+
+# Build for the browser
 gulp.task 'browserify kite', ->
   gulp.src 'src/kite/kite.coffee', read: no
     .pipe browserify
@@ -22,12 +42,6 @@ gulp.task 'browserify kite', ->
       standalone  : 'Kite'
     .pipe rename 'kite-bundle.js'
     .pipe gulp.dest 'browser'
-
-gulp.task 'build kite as promised', ->
-  gulp.src 'src/kite-as-promised/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite-as-promised'
 
 gulp.task 'browserify kite as promised', ->
   gulp.src 'src/kite-as-promised/kite.coffee', read: no
@@ -39,12 +53,6 @@ gulp.task 'browserify kite as promised', ->
     .pipe rename 'kite-promises-bundle.js'
     .pipe gulp.dest 'browser'
 
-gulp.task 'build kontrol', ->
-  gulp.src 'src/kontrol/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kontrol'
-
 gulp.task 'browserify kontrol', ->
   gulp.src 'src/kontrol/kontrol.coffee', read: no
     .pipe browserify
@@ -53,12 +61,6 @@ gulp.task 'browserify kontrol', ->
       standalone  : 'Kontrol'
     .pipe rename 'kontrol-bundle.js'
     .pipe gulp.dest 'browser'
-
-gulp.task 'build kontrol as promised', ->
-  gulp.src 'src/kontrol-as-promised/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kontrol-as-promised'
 
 gulp.task 'browserify kontrol as promised', ->
   gulp.src 'src/kontrol-as-promised/kontrol.coffee', read: no
@@ -83,4 +85,10 @@ gulp.task 'browserify', [
   'browserify kontrol as promised'
 ]
 
-gulp.task 'default', ['build', 'browserify']
+gulp.task 'uglify', ['browserify'], ->
+  gulp.src 'browser/*.js'
+    .pipe uglify()
+    .pipe rename extname: '.min.js'
+    .pipe gulp.dest 'browser-min'
+
+gulp.task 'default', ['build', 'browserify', 'uglify']

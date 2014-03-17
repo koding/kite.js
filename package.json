@@ -43,7 +43,9 @@
     "gulp-browserify": "~0.5.0",
     "gulp-if": "0.0.5",
     "gulp-rename": "^1.2.0",
-    "browserify-shim": "~3.3.1"
+    "browserify-shim": "^3.3.1",
+    "gulp-util": "^2.2.14",
+    "gulp-replace": "^0.2.0"
   },
   "browserify": {
     "transform": [
