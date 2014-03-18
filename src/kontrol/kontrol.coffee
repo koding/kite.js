@@ -7,8 +7,6 @@ module.exports = class Kontrol extends EventEmitter
   @Kite = require '../kite/kite.coffee'
 
   constructor: (options) ->
-    throw new Error "Missing option: auth"  unless options.auth
-
     return new Kontrol options  unless this instanceof Kontrol
 
     @options = options
@@ -20,14 +18,12 @@ module.exports = class Kontrol extends EventEmitter
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
 
   authenticate: ->
-    { url, auth: { type, key }} = @options
-
-    type ?= 'sessionID'
+    { url, auth } = @options
 
     @kite = new @constructor.Kite
       name  : 'kontrol'
       url   : url
-      auth  : { type, key }
+      auth  : auth
 
   createKite: ({ kite: { name }, token, url }) ->
     new @constructor.Kite
