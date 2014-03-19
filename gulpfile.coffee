@@ -1,12 +1,19 @@
 gulp        = require 'gulp'
-browserify  = require 'gulp-browserify'
+browserify  = require 'browserify'
 uglify      = require 'gulp-uglify'
 rename      = require 'gulp-rename'
 coffee      = require 'gulp-coffee'
 util        = require 'gulp-util'
 replace     = require 'gulp-replace'
+source      = require 'vinyl-source-stream'
+coffeeify   = require 'coffeeify'
 
 coffee4Node = -> (coffee bare: yes, sourceMap: yes).on 'error', util.log
+
+browserifyStream = ({ mainOptions, bundleOptions }) ->
+  stream = browserify mainOptions
+  stream.transform coffeeify
+  stream.bundle bundleOptions
 
 # Build for node
 gulp.task 'build kite', ->
@@ -33,43 +40,54 @@ gulp.task 'build kontrol as promised', ->
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kontrol-as-promised'
 
+
+
+
+
 # Build for the browser
-gulp.task 'browserify kite', ->
-  gulp.src 'src/kite/kite.coffee', read: no
-    .pipe browserify
+gulp.task 'browserify kite', ['build kite'], ->
+  browserifyStream
+    mainOptions   :
+      entries     : ['./src/kite/kite.coffee']
       debug       : no
-      transform   : ['coffeeify']
+    bundleOptions :
       standalone  : 'Kite'
-    .pipe rename 'kite-bundle.js'
-    .pipe gulp.dest 'browser'
+  .pipe source 'kite.coffee'
+  .pipe rename 'kite-bundle.js'
+  .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kite as promised', ->
-  gulp.src 'src/kite-as-promised/kite.coffee', read: no
-    .pipe browserify
+  browserifyStream
+    mainOptions   :
+      entries     : ['./src/kite-as-promised/kite.coffee']
       debug       : no
-      transform   : ['coffeeify']
+    bundleOptions :
       standalone  : 'Kite'
-      external    : ['bluebird']
-    .pipe rename 'kite-promises-bundle.js'
-    .pipe gulp.dest 'browser'
+  .pipe source 'kite.coffee'
+  .pipe rename 'kite-promises-bundle.js'
+  .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kontrol', ->
-  gulp.src 'src/kontrol/kontrol.coffee', read: no
-    .pipe browserify
+  browserifyStream
+    mainOptions   :
+      entries     : ['./src/kontrol/kontrol.coffee']
       debug       : no
-      transform   : ['coffeeify']
+    bundleOptions :
       standalone  : 'Kontrol'
-    .pipe rename 'kontrol-bundle.js'
-    .pipe gulp.dest 'browser'
+  .pipe source 'kontrol.coffee'
+  .pipe rename 'kontrol-bundle.js'
+  .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kontrol as promised', ->
-  gulp.src 'src/kontrol-as-promised/kontrol.coffee', read: no
-    .pipe browserify
+  browserifyStream
+    mainOptions   :
+      entries     : ['./src/kontrol-as-promised/kontrol.coffee']
       debug       : no
-      transform   : ['coffeeify']
+    bundleOptions :
       standalone  : 'Kontrol'
-    .pipe rename 'kontrol-promises-bundle.js'
-    .pipe gulp.dest 'browser'
+  .pipe source 'kontrol.coffee'
+  .pipe rename 'kontrol-promises-bundle.js'
+  .pipe gulp.dest 'browser'
 
 gulp.task 'build', [
   'build kite'
