@@ -96,6 +96,11 @@ module.exports = class Kite extends EventEmitter
 
   unwrapMessage: (message) ->
     { withArgs:[{ error: err, result }]} = message
+
+    # we will get a plain object as an error, but it's important for debugging
+    # that we send a proper error object.
+    err = makeProperError err  if err?
+
     { err, result }
 
   wrapMessage: (method, params, callback) ->
@@ -124,6 +129,11 @@ module.exports = class Kite extends EventEmitter
     return
 
   # util:
+  makeProperError = ({ type, message }) ->
+    err = new Error message
+    err.type = type
+    err
+
   bound: require './bound.coffee'
 
   initBackoff: require './backoff.coffee'
