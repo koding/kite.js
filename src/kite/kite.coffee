@@ -54,7 +54,7 @@ module.exports = class Kite extends EventEmitter
     @emit 'info', "Trying to connect to #{ url }"
     return
 
-  disconnect: (reconnect = true) ->
+  disconnect: (reconnect = false) ->
     @autoReconnect = !!reconnect
     @ws.close()
     @emit 'info', "Disconnecting from #{ @options.url }"
