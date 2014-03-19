@@ -99,6 +99,10 @@ module.exports = class Kontrol extends EventEmitter
     changes.emit eventName, kite
     return
 
+  connect: -> @kite.connect()
+
+  disconnect: -> @kite.disconnect()
+
   @actions      =
     REGISTER    : 'register'
     DEREGISTER  : 'deregister'
