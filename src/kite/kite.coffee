@@ -143,3 +143,8 @@ module.exports = class Kite extends EventEmitter
     then process.nextTick callback
     else @once 'ready', callback
     return
+
+  # static helpers:
+  @disconnect = (kites...) ->
+    kite.disconnect()  for kite in kites
+    return
