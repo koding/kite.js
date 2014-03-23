@@ -76,7 +76,7 @@ gulp.task 'browserify kontrol as promised', ->
   browserify
     entries     : ['./src/kontrol-as-promised/kontrol.coffee']
     debug       : no
-  .external './src/kite/kite.coffee'
+  .external './src/kite-as-promised/kite.coffee'
   .require './src/kontrol-as-promised/kontrol.coffee', expose: 'kontrol'
   .transform coffeeify
   .bundle()
