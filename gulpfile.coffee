@@ -10,11 +10,6 @@ coffeeify   = require 'coffeeify'
 
 coffee4Node = -> (coffee bare: yes, sourceMap: yes).on 'error', util.log
 
-browserifyStream = ({ mainOptions, bundleOptions }) ->
-  stream = browserify mainOptions
-  stream.transform coffeeify
-  stream.bundle bundleOptions
-
 # Build for node
 gulp.task 'build kite', ->
   gulp.src 'src/kite/*.coffee'
@@ -40,51 +35,51 @@ gulp.task 'build kontrol as promised', ->
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kontrol-as-promised'
 
-
-
-
-
 # Build for the browser
-gulp.task 'browserify kite', ['build kite'], ->
-  browserifyStream
-    mainOptions   :
-      entries     : ['./src/kite/kite.coffee']
-      debug       : no
-    bundleOptions :
-      standalone  : 'Kite'
+gulp.task 'browserify kite', ->
+  browserify
+    entries     : ['./src/kite/kite.coffee']
+    extensions  : ['./coffee']
+    debug       : no
+  .require './src/kite/kite.coffee', expose: 'kite'
+  .transform coffeeify
+  .bundle()
   .pipe source 'kite.coffee'
   .pipe rename 'kite-bundle.js'
   .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kite as promised', ->
-  browserifyStream
-    mainOptions   :
-      entries     : ['./src/kite-as-promised/kite.coffee']
-      debug       : no
-    bundleOptions :
-      standalone  : 'Kite'
+  browserify
+    entries     : ['./src/kite-as-promised/kite.coffee']
+    extensions  : ['./coffee']
+    debug       : no
+  .require './src/kite-as-promised/kite.coffee', expose: 'kite'
+  .transform coffeeify
+  .bundle()
   .pipe source 'kite.coffee'
   .pipe rename 'kite-promises-bundle.js'
   .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kontrol', ->
-  browserifyStream
-    mainOptions   :
-      entries     : ['./src/kontrol/kontrol.coffee']
-      debug       : no
-    bundleOptions :
-      standalone  : 'Kontrol'
+  browserify
+    entries     : ['./src/kontrol/kontrol.coffee']
+    debug       : no
+  .external './src/kite/kite.coffee'
+  .require './src/kontrol/kontrol.coffee', expose: 'kontrol'
+  .transform coffeeify
+  .bundle()
   .pipe source 'kontrol.coffee'
   .pipe rename 'kontrol-bundle.js'
   .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kontrol as promised', ->
-  browserifyStream
-    mainOptions   :
-      entries     : ['./src/kontrol-as-promised/kontrol.coffee']
-      debug       : no
-    bundleOptions :
-      standalone  : 'Kontrol'
+  browserify
+    entries     : ['./src/kontrol-as-promised/kontrol.coffee']
+    debug       : no
+  .external './src/kite/kite.coffee'
+  .require './src/kontrol-as-promised/kontrol.coffee', expose: 'kontrol'
+  .transform coffeeify
+  .bundle()
   .pipe source 'kontrol.coffee'
   .pipe rename 'kontrol-promises-bundle.js'
   .pipe gulp.dest 'browser'
