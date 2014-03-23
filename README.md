@@ -29,8 +29,10 @@ Or:
 ``` html
 <script src="./browser/kite-bundle-promises.js"></script>
 ```
-After which point the global variable `Kite` will be exposed.
-
+After which point you can require it like this:
+``` javascript
+var Kite = require('kite');
+```
 # api
 
 ## Kite(url)
