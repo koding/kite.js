@@ -20,6 +20,8 @@ module.exports = class Kite extends EventEmitter
   constructor: (options) ->
     return new Kite options  unless this instanceof Kite
 
+    @id = uniqueId()
+
     @options =
       if 'string' is typeof options
       then url: options
@@ -116,7 +118,7 @@ module.exports = class Kite extends EventEmitter
       version         : "#{ @options.version ? '1.0.0' }"
       region          : "browser"
       hostname        : "browser"
-      id              : uniqueId
+      id              : @id
 
   tell: (method, params, callback) ->
     # by default, remove this callback after it is called once.
