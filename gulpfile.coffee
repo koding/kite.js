@@ -55,6 +55,7 @@ gulp.task 'browserify kite as promised', ->
     extensions  : ['./coffee']
     debug       : no
   .require 'events'
+  .require './src/kite/kite.coffee'
   .require './src/kite-as-promised/kite.coffee', expose: 'kite'
   .transform coffeeify
   .bundle()
@@ -80,6 +81,7 @@ gulp.task 'browserify kontrol as promised', ->
     entries     : ['./src/kontrol-as-promised/kontrol.coffee']
     debug       : no
   .external 'events'
+  .external './src/kite/kite.coffee' 
   .external './src/kite-as-promised/kite.coffee'
   .require './src/kontrol-as-promised/kontrol.coffee', expose: 'kontrol'
   .transform coffeeify
