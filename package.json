@@ -1,6 +1,6 @@
 {
   "name": "kite.js",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "Kite client library",
   "main": "index.js",
   "scripts": {
