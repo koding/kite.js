@@ -41,6 +41,7 @@ gulp.task 'browserify kite', ->
     entries     : ['./src/kite/kite.coffee']
     extensions  : ['./coffee']
     debug       : no
+  .require 'events'
   .require './src/kite/kite.coffee', expose: 'kite'
   .transform coffeeify
   .bundle()
@@ -53,6 +54,7 @@ gulp.task 'browserify kite as promised', ->
     entries     : ['./src/kite-as-promised/kite.coffee']
     extensions  : ['./coffee']
     debug       : no
+  .require 'events'
   .require './src/kite-as-promised/kite.coffee', expose: 'kite'
   .transform coffeeify
   .bundle()
@@ -64,6 +66,7 @@ gulp.task 'browserify kontrol', ->
   browserify
     entries     : ['./src/kontrol/kontrol.coffee']
     debug       : no
+  .external 'events'
   .external './src/kite/kite.coffee'
   .require './src/kontrol/kontrol.coffee', expose: 'kontrol'
   .transform coffeeify
@@ -76,6 +79,7 @@ gulp.task 'browserify kontrol as promised', ->
   browserify
     entries     : ['./src/kontrol-as-promised/kontrol.coffee']
     debug       : no
+  .external 'events'
   .external './src/kite-as-promised/kite.coffee'
   .require './src/kontrol-as-promised/kontrol.coffee', expose: 'kontrol'
   .transform coffeeify
