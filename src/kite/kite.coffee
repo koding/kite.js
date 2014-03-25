@@ -113,7 +113,7 @@ module.exports = class Kite extends EventEmitter
       username        : "#{ @options.username ? 'anonymous' }"
       environment     : "#{ @options.environment ? 'browser' }"
       name            : "browser"
-      version         : "1.0.#{ @options.version ? '0' }"
+      version         : "#{ @options.version ? '1.0.0' }"
       region          : "browser"
       hostname        : "browser"
       id              : uniqueId
