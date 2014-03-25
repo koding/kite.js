@@ -53,6 +53,7 @@
     ]
   },
   "browserify-shim": {
-    "bluebird": "global:Promise"
+    "bluebird": "global:Promise",
+    "ws":       "global:WebSocket"
   }
 }
