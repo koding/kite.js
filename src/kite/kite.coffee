@@ -15,7 +15,7 @@ module.exports = class Kite extends EventEmitter
   # error states:
   [ OKAY, ERROR ] = [0,1]
 
-  uniqueId = "#{ Math.random() }" 
+  { v4: uniqueId } = require 'node-uuid'
 
   constructor: (options) ->
     return new Kite options  unless this instanceof Kite
