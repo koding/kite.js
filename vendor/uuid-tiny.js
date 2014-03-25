@@ -1,6 +1,6 @@
 // adapted from this crazy gist: https://gist.github.com/jed/982883
 // note: this is not cryptographically secure, but it should do well enough
-// for most applciations.  If you want a more secure UUID, you can use another
+// for most applications.  If you want a more secure UUID, you can use another
 // module to generate one.
 (function (global) {
 
