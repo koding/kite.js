@@ -150,3 +150,6 @@ module.exports = class Kite extends EventEmitter
   @disconnect = (kites...) ->
     kite.disconnect()  for kite in kites
     return
+
+  @random = (kites) ->
+    kites[Math.floor Math.random() * kites.length] 
