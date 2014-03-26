@@ -10,8 +10,13 @@ module.exports = class Kite extends BasicKite
     return new Kite options  unless this instanceof Kite
     super options
 
-  [
-    'tell'
-    'ready'
-  ].forEach (method) ->
-    Kite::[method] = Promise.promisify BasicKite::[method]
+  tell: (method, params, callback) ->
+    new Promise (resolve, reject) =>
+      super method, params, (err, result) ->
+        return reject err  if err
+        return resolve result
+    .nodeify callback
+
+  ready: ->
+    new Promise (resolve) =>
+      super resolve
