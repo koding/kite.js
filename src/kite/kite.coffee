@@ -114,10 +114,10 @@ module.exports = class Kite extends EventEmitter
     kite              :
       username        : "#{ @options.username ? 'anonymous' }"
       environment     : "#{ @options.environment ? 'browser' }"
-      name            : "browser"
+      name            : "browser" # TODO: don't know where to get this value for now
       version         : "#{ @options.version ? '1.0.0' }"
-      region          : "browser"
-      hostname        : "browser"
+      region          : "#{ @options.region ? 'browser' }"
+      hostname        : "#{ @options.hostname ? 'browser' }"
       id              : @id
 
   tell: (method, params, callback) ->

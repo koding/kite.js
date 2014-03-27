@@ -27,6 +27,11 @@ module.exports = class Kontrol extends EventEmitter
 
   createKite: ({ kite: { name }, token, url }) ->
     new @constructor.Kite
+      username    : @options.username
+      environment : @options.environment
+      version     : @options.version
+      region      : @options.region
+      hostname    : @options.hostname
       autoConnect : no
       name        : name
       url         : url
