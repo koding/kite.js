@@ -90,7 +90,7 @@ module.exports = class Kontrol extends EventEmitter
     @kite.tell 'cancelWatcher', [id], callback
 
   createUpdateHandler: (changes) -> (response) =>
-    { err, result } = @kite.unwrapMessage response
+    { err, result } = response
 
     if err?
       changes.emit 'error', err
