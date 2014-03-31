@@ -21,3 +21,4 @@ module.exports = class Kite extends BasicKite
     new Promise (resolve) =>
       super resolve
     .nodeify callback
+
