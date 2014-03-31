@@ -109,7 +109,7 @@ module.exports = class Kite extends EventEmitter
     authentication    : @options.auth
     withArgs          : params
     responseCallback  : (response) =>
-      { err, result } = @unwrapMessage response
+      { err, result } = response
       callback err, result
     kite              :
       username        : "#{ @options.username ? 'anonymous' }"
