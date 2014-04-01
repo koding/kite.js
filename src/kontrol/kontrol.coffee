@@ -63,7 +63,7 @@ module.exports = class Kontrol extends EventEmitter
         return
 
       unless kites?[0]?
-        callback new Error "no kite found!"
+        callback new Error "No kite found!"
         return
 
       callback null, kites[0]
@@ -72,8 +72,8 @@ module.exports = class Kontrol extends EventEmitter
 
   watchKites: (args = {}, callback) ->
     changes = new EventEmitter
-    handler = @createUpdateHandler changes
-    @kite.tell 'getKites', [args, handler], (err, result) =>
+    args.watchHandler = @createUpdateHandler changes
+    @kite.tell 'getKites', [args], (err, result) =>
       if err?
         callback err
         return
