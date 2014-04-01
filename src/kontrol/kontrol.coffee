@@ -42,8 +42,8 @@ module.exports = class Kontrol extends EventEmitter
   createKites: (kiteDescriptors) ->
     (@createKite k for k in kiteDescriptors)
 
-  fetchKites: (query = {}, callback) ->
-    @kite.tell 'getKites', [query], (err, result) =>
+  fetchKites: (args = {}, callback) ->
+    @kite.tell 'getKites', [args], (err, result) =>
       if err?
         callback err
         return
@@ -56,8 +56,8 @@ module.exports = class Kontrol extends EventEmitter
       return
     return
 
-  fetchKite: (query = {}, callback) ->
-    @fetchKites query, (err, kites) ->
+  fetchKite: (args = {}, callback) ->
+    @fetchKites args, (err, kites) ->
       if err?
         callback err
         return
@@ -70,10 +70,10 @@ module.exports = class Kontrol extends EventEmitter
       return
     return
 
-  watchKites: (query = {}, callback) ->
+  watchKites: (args = {}, callback) ->
     changes = new EventEmitter
     handler = @createUpdateHandler changes
-    @kite.tell 'getKites', [query, handler], (err, result) =>
+    @kite.tell 'getKites', [args, handler], (err, result) =>
       if err?
         callback err
         return
