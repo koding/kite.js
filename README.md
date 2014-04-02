@@ -64,12 +64,17 @@ If you are using the promisified library, the callback is optional.  Of course, 
 
 # kontrol api
 
-getKites Calls the callback function with the list of NewKite instances.
-The returned kites are not connected. You must connect with
-NewKite.connect().
+## params
+``` javascript
+var params = {
+  query: { /* kontrol query */ }
+  who: { /* kite.who query */  }
+}
+```
 
-Query parameters are below from general to specific:
+## kontrol query
 
+The kontrol query is used by kontrol to select matching kites by the following criteria, which are order from general to specific:
 ``` go
 type KontrolQuery struct {
   username    string
@@ -81,15 +86,49 @@ type KontrolQuery struct {
   id          string
 }
 ```
+The order matters, and more general criteria cannot be omitted.  In other words, if you want to query by `name`, you must also provide values for `username` and `environment`; if you want to query by region, you need to provide values for all of `username`, `environment`, `name` and `version`.
 
-## k.fetchKites(selector, callback)
+## kite descriptors
 
-## k.fetchKite(selector, callback)
+Kite descriptors are provided by kontrol, and look like this:
 
-## k.watchKites(selector, callback)
+``` javascript
+var kiteDescriptor = {
+  kite: {
+    name: "A Kite Name",
+    version: "1.0.0"
+  },
+  token: "A token provided by kontrol",
+  url: "wss://example.com/sample-kite"
+};
+```
+
+## kite.who query
+
+Kites can implement custom load-balancing strategies for other instances of their kind.  This works by delegation: First kontrol will query for any kite matching the given criteria; If it matches one, it will forward the kite.who query to the `kite.who` method a matching kite.  The contents of the kite.who query are application-layer concerns, and are not scrutinized by kontrol, which merely forwards them along to the target kite.  The target kite can treat this information however it likes, but is required to respond to the `kite.who` method with a new query that will match the kite which is designated to be the new target kite.  It is acceptable for the kite to respond with a query matching itself.
+
+This can be useful if the kite is using some kind of session state.  If a given kite has already allocated resources or has some state stored locally, the user can be reconnected to that instance via this mechanism.
+
+## k.fetchKites(params, callback)
+
+This method will respond with any kites that matched the query, after any potential load balancing negotiation.
+
+The matching kites will not be connected.  You can connect to one by calling its `.connect()` method.
+
+## k.fetchKite(params, callback)
+
+This works by querying using fetchKites, and then simply choosing one of the kites matching the given query, after load balancing negotiation.
+
+## k.watchKites(params, callback)
+
+This works like `fetchKites`, but will also stream through any updates matching the query as they occur.  It will respond with an additional parameter, the `watcherID` which is a numeric handle that can be used to cancel that `watchKites` operation.
+
+This feature won't work in conjunction with `kite.who`
 
 ## k.cancelWatcher(id, callback)
 
+Given the numeric `watcherID` handle provided by `watchKites`, `cancelWatcher` can be used to clear the associated watch operation.
+
 ## k.createKite(kiteDescriptor) : Kite
 
-
+Given a kite descriptor, this method will instantiate a proper `Kite` instance.
