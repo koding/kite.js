@@ -2,7 +2,7 @@
 
 _Warning:_ This is not yet stable, and should not be depended upon at this time.
 
-a kite client library for the browser and node.js
+A [Kite](https://github.com/koding/kite) client library for the browser and node.js
 
 # installation
 
