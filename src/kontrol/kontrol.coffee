@@ -12,12 +12,12 @@ module.exports = class Kontrol extends EventEmitter
     @options = options
 
     @options.autoReconnect ?= yes
-    
+
     @authenticate()
-    
+
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
 
-  authenticate: ->
+  authenticate: (@options = @options) ->
     { url, auth } = @options
 
     @kite = new @constructor.Kite
