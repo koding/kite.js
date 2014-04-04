@@ -32,11 +32,11 @@ module.exports = class Kite extends EventEmitter
     @options.autoReconnect ?= yes
 
     @readyState = NOTREADY
-    
+
     @initBackoff()  if @options.autoReconnect
 
     @proto = dnodeProtocol (wrapApi @options.api)
-    
+
     @proto.on 'request', (req) =>
       @ready => @ws.send JSON.stringify req
       @emit 'info', "proto request", req
@@ -113,11 +113,11 @@ module.exports = class Kite extends EventEmitter
       callback err, result
     kite              :
       username        : "#{ @options.username ? 'anonymous' }"
-      environment     : "#{ @options.environment ? 'browser' }"
-      name            : "browser" # TODO: don't know where to get this value for now
+      environment     : "#{ @options.environment ? 'browser-environment' }"
+      name            : "browser-kite" # TODO: don't know where to get this value for now
       version         : "#{ @options.version ? '1.0.0' }"
-      region          : "#{ @options.region ? 'browser' }"
-      hostname        : "#{ @options.hostname ? 'browser' }"
+      region          : "#{ @options.region ? 'browser-region' }"
+      hostname        : "#{ @options.hostname ? 'browser-hostname' }"
       id              : @id
 
   tell: (method, params, callback) ->
@@ -126,7 +126,7 @@ module.exports = class Kite extends EventEmitter
 
     scrubbed = @proto.scrubber.scrub [@wrapMessage method, params, callback]
     scrubbed.method = method
-    
+
     @proto.emit 'request', scrubbed
     return
 
@@ -152,4 +152,4 @@ module.exports = class Kite extends EventEmitter
     return
 
   @random = (kites) ->
-    kites[Math.floor Math.random() * kites.length] 
+    kites[Math.floor Math.random() * kites.length]
