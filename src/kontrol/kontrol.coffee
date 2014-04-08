@@ -40,24 +40,35 @@ module.exports = class Kontrol extends EventEmitter
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
     @kite.on 'connected', @emit.bind this, 'connected'
 
-  createKite: ({ kite: { name }, token, url }) ->
-    new @constructor.Kite
-      username        : @options.username
-      environment     : @options.environment
-      version         : @options.version
-      region          : @options.region
-      hostname        : @options.hostname
-      autoConnect     : no
-      name            : name
-      url             : url
-      auth            :
-        type          : 'token'
-        key           : token
-      logLevel        : @options.logLevel
-      transportClass  : @options.transportClass
-      transportOptions: @options.transportOptions
+  createKite: ({ kite: kiteDescriptor, token, url }) ->
+    kite = new @constructor.Kite
+      username         : kiteDescriptor.username
+      environment      : kiteDescriptor.environment
+      version          : kiteDescriptor.version
+      region           : kiteDescriptor.region
+      hostname         : kiteDescriptor.hostname
+      autoConnect      : no
+      name             : kiteDescriptor.name
+      url              : url
+      auth             :
+        type           : 'token'
+        key            : token
+      transportClass   : @options.transportClass
+      transportOptions : @options.transportOptions
+    .on 'tokenExpired', =>
+      @renewToken kite, kiteDescriptor
 
-  createKites: (kiteDescriptors) ->
+    return kite
+
+  renewToken: (kite, query) ->
+    @kite.tell 'getToken', [query], (err, token) ->
+      if err
+        # FIXME: what should happen to this error?
+        console.error err
+        return
+      kite.setToken token
+
+  createKites: (kiteDescriptors, query) ->
     (@createKite k for k in kiteDescriptors)
 
   fetchKites: (args = {}, callback) ->
