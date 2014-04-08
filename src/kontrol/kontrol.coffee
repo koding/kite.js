@@ -38,7 +38,10 @@ module.exports = class Kontrol extends EventEmitter
       auth        :
         type      : 'token'
         key       : token
-    .on 'tokenExpired', => @renewToken kite, query
+    .on 'tokenExpired', =>
+      @renewToken kite, query
+
+    return kite
 
   renewToken: (kite, query) ->
     # TODO: need to implement #renewToken
