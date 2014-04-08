@@ -141,6 +141,7 @@ module.exports = class Kite extends EventEmitter
     return  unless @options.auth?.type is 'token'
 
     { auth: { key: token }} = @options
+
     [ _, claimsA ] = token.split '.'
 
     claims = try JSON.parse atob claimsA
