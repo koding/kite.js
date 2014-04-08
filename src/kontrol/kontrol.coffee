@@ -25,8 +25,8 @@ module.exports = class Kontrol extends EventEmitter
       url   : url
       auth  : auth
 
-  createKite: ({ kite: { name }, token, url }) ->
-    new @constructor.Kite
+  createKite: ({ kite: { name }, token, url }, query) ->
+    kite = new @constructor.Kite
       username    : @options.username
       environment : @options.environment
       version     : @options.version
@@ -38,9 +38,14 @@ module.exports = class Kontrol extends EventEmitter
       auth        :
         type      : 'token'
         key       : token
+    .on 'tokenExpired', => @renewToken kite, query
 
-  createKites: (kiteDescriptors) ->
-    (@createKite k for k in kiteDescriptors)
+  renewToken: (kite, query) ->
+    # TODO: need to implement #renewToken
+    throw new Error 'Kontrol#renewToken is not implemented'
+
+  createKites: (kiteDescriptors, query) ->
+    (@createKite k, query for k in kiteDescriptors)
 
   fetchKites: (args = {}, callback) ->
     @kite.tell 'getKites', [args], (err, result) =>
@@ -52,7 +57,7 @@ module.exports = class Kontrol extends EventEmitter
         callback new Error "No kite found!"
         return
 
-      callback null, @createKites result.kites
+      callback null, @createKites result.kites, args.query
       return
     return
 

@@ -6,6 +6,7 @@ module.exports = class Kite extends EventEmitter
 
   dnodeProtocol = require 'dnode-protocol'
   WebSocket     = require 'ws'
+  atob          = require 'atob'
 
   wrapApi = require './wrap-api.coffee'
 
@@ -31,6 +32,9 @@ module.exports = class Kite extends EventEmitter
     @options.autoConnect   ?= yes
     @options.autoReconnect ?= yes
 
+    # refresh expired tokens
+    @expireTokenOnExpiry()  if @options.auth?.type is 'token'
+
     @readyState = NOTREADY
 
     @initBackoff()  if @options.autoReconnect
@@ -43,6 +47,22 @@ module.exports = class Kite extends EventEmitter
       return
 
     @connect()  if @options.autoConnect
+
+  expireTokenOnExpiry: ->
+    { auth: { key: token }} = @options
+    [ _, claimsA ] = token.split '.'
+
+    claims = try JSON.parse atob claimsA
+
+    if claims?.exp
+      # the `exp` is measured in seconds since the UNIX epoch; convert to ms
+      expDate = claims.exp * 1000
+      # renew token before it expires:
+      earlyMs = (5 * 60 * 1000) # 5 min
+      renewMs = expDate - Date.now() - earlyMs
+      setTimeout (@bound 'expireToken'), renewMs
+
+  expireToken: -> @emit 'tokenExpired'
 
   # connection state:
   connect: ->
