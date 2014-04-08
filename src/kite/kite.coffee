@@ -56,10 +56,20 @@ module.exports = class Kite extends EventEmitter
 
     if claims?.exp
       # the `exp` is measured in seconds since the UNIX epoch; convert to ms
-      expDate = claims.exp * 1000
+      expMs = claims.exp * 1000
+      # get the ms of the current UTC:
+      now = new Date
+      nowMs = +new Date(
+        now.getUTCFullYear()
+        now.getUTCMonth()
+        now.getUTCDate()
+        now.getUTCHours()
+        now.getUTCMinutes()
+        now.getUTCSeconds()
+      )
       # renew token before it expires:
       earlyMs = (5 * 60 * 1000) # 5 min
-      renewMs = expDate - Date.now() - earlyMs
+      renewMs = expMs - nowMs - earlyMs
       setTimeout (@bound 'expireToken'), renewMs
 
   expireToken: -> @emit 'tokenExpired'
