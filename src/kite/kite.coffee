@@ -57,16 +57,7 @@ module.exports = class Kite extends EventEmitter
     if claims?.exp
       # the `exp` is measured in seconds since the UNIX epoch; convert to ms
       expMs = claims.exp * 1000
-      # get the ms of the current UTC:
-      now = new Date
-      nowMs = +new Date(
-        now.getUTCFullYear()
-        now.getUTCMonth()
-        now.getUTCDate()
-        now.getUTCHours()
-        now.getUTCMinutes()
-        now.getUTCSeconds()
-      )
+      nowMs = +now()
       # renew token before it expires:
       earlyMs = (5 * 60 * 1000) # 5 min
       renewMs = expMs - nowMs - earlyMs
@@ -175,6 +166,18 @@ module.exports = class Kite extends EventEmitter
     then process.nextTick callback
     else @once 'ready', callback
     return
+
+  # helpers:
+  now = ->
+    now = new Date
+    new Date(
+      now.getUTCFullYear()
+      now.getUTCMonth()
+      now.getUTCDate()
+      now.getUTCHours()
+      now.getUTCMinutes()
+      now.getUTCSeconds()
+    )
 
   # static helpers:
   @disconnect = (kites...) ->
