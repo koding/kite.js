@@ -9,6 +9,7 @@ module.exports = class Kite extends EventEmitter
   atob          = require 'atob'
 
   wrapApi = require './wrap-api.coffee'
+  { now } = require '../util.coffee'
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
@@ -33,7 +34,7 @@ module.exports = class Kite extends EventEmitter
     @options.autoReconnect ?= yes
 
     # refresh expired tokens
-    @expireTokenOnExpiry()  if @options.auth?.type is 'token'
+    @expireTokenOnExpiry()
 
     @readyState = NOTREADY
 
@@ -47,23 +48,6 @@ module.exports = class Kite extends EventEmitter
       return
 
     @connect()  if @options.autoConnect
-
-  expireTokenOnExpiry: ->
-    { auth: { key: token }} = @options
-    [ _, claimsA ] = token.split '.'
-
-    claims = try JSON.parse atob claimsA
-
-    if claims?.exp
-      # the `exp` is measured in seconds since the UNIX epoch; convert to ms
-      expMs = claims.exp * 1000
-      nowMs = +now()
-      # renew token before it expires:
-      earlyMs = 5 * 60 * 1000 # 5 min
-      renewMs = expMs - nowMs - earlyMs
-      setTimeout (@bound 'expireToken'), renewMs
-
-  expireToken: -> @emit 'tokenExpired'
 
   # connection state:
   connect: ->
@@ -151,6 +135,34 @@ module.exports = class Kite extends EventEmitter
     @proto.emit 'request', scrubbed
     return
 
+  # token expiry:
+
+  expireTokenOnExpiry: ->
+    return  unless @options.auth?.type is 'token'
+
+    { auth: { key: token }} = @options
+    [ _, claimsA ] = token.split '.'
+
+    claims = try JSON.parse atob claimsA
+
+    if claims?.exp
+      # the `exp` is measured in seconds since the UNIX epoch; convert to ms
+      expMs = claims.exp * 1000
+      nowMs = +now()
+      # renew token before it expires:
+      earlyMs = 5 * 60 * 1000 # 5 min
+      renewMs = expMs - nowMs - earlyMs
+      handle = setTimeout (@bound 'expireToken'), renewMs
+      @expiryHandle = handle
+    return
+
+  expireToken: ->
+    @emit 'tokenExpired'
+    if @expiryHandle
+      clearTimeout @expiryHandle
+      @expiryHandle = null
+    return
+
   # util:
   makeProperError = ({ type, message }) ->
     err = new Error message
@@ -166,18 +178,6 @@ module.exports = class Kite extends EventEmitter
     then process.nextTick callback
     else @once 'ready', callback
     return
-
-  # helpers:
-  now = ->
-    now = new Date
-    new Date(
-      now.getUTCFullYear()
-      now.getUTCMonth()
-      now.getUTCDate()
-      now.getUTCHours()
-      now.getUTCMinutes()
-      now.getUTCSeconds()
-    )
 
   # static helpers:
   @disconnect = (kites...) ->
