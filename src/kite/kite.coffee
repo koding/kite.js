@@ -152,8 +152,7 @@ module.exports = class Kite extends EventEmitter
       # renew token before it expires:
       earlyMs = 5 * 60 * 1000 # 5 min
       renewMs = expMs - nowMs - earlyMs
-      handle = setTimeout (@bound 'expireToken'), renewMs
-      @expiryHandle = handle
+      @expiryHandle = setTimeout (@bound 'expireToken'), renewMs
     return
 
   expireToken: ->
