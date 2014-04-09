@@ -11,9 +11,10 @@ module.exports = class Kontrol extends EventEmitter
 
     @options = options
 
-    @options.autoReconnect ?= yes
+    @options.autoConnect    ?= yes
+    @options.autoReconnect  ?= yes
 
-    @authenticate()
+    @authenticate()  if @autoConnect
 
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
 
