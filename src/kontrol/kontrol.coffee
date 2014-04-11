@@ -6,6 +6,8 @@ module.exports = class Kontrol extends EventEmitter
 
   @Kite = require '../kite/kite.coffee'
 
+  KiteError = require '../error.coffee'
+
   constructor: (options) ->
     return new Kontrol options  unless this instanceof Kontrol
 
@@ -50,7 +52,7 @@ module.exports = class Kontrol extends EventEmitter
         return
 
       unless result?
-        callback new Error "No kite found!"
+        callback @createKiteNotFoundError args.query
         return
 
       callback null, @createKites result.kites
@@ -64,7 +66,7 @@ module.exports = class Kontrol extends EventEmitter
         return
 
       unless kites?[0]?
-        callback new Error "No kite found!"
+        callback @createKiteNotFoundError args.query
         return
 
       callback null, kites[0]
@@ -104,6 +106,17 @@ module.exports = class Kontrol extends EventEmitter
     eventName = @constructor.actions[action]
     changes.emit eventName, kite
     return
+
+  createKiteNotFoundError: (query) ->
+    { username, environment, name, version, region, hostname, id } = query
+    new KiteError "No kite found! query: #{
+      username }/#{
+      environment }/#{
+      name }/#{
+      version }/#{
+      region }/#{
+      hostname }/#{
+      id }"
 
   connect: -> @kite.connect()
 
