@@ -60,7 +60,7 @@ module.exports = class Kontrol extends EventEmitter
     return
 
   fetchKite: (args = {}, callback) ->
-    @fetchKites args, (err, kites) ->
+    @fetchKites args, (err, kites) =>
       if err?
         callback err
         return
