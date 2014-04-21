@@ -4,4 +4,6 @@ module.exports = class ServerHandler
 
   onConnection: ->
 
+  onHeaders: ->
+
   onMessage: ->
