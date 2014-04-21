@@ -9,6 +9,9 @@ module.exports = class Kite extends EventEmitter
 
   wrapApi = require './wrap-api.coffee'
 
+  ClientHandler = require './client-handler.coffee'
+  ServerHandler = require './server-handler.coffee'
+
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
@@ -27,6 +30,24 @@ module.exports = class Kite extends EventEmitter
       then url: options
       else options
 
+    if @options.port?
+      @connectServer()
+      return
+
+    @connectClient()
+
+  connectServer: ->
+    throw new Error "Unsupported platform!"  unless WebSocket.Server
+
+    @handler = new ServerHandler this
+
+    @wss = new WebSocket.Server @options.port
+    @wss.on 'connection',  @handler.bound 'onConnection'
+    @wss.on 'headers',     @handler.bound 'onHeaders'
+    @wss.on 'message',     @handler.bound 'onMessage'
+
+  connectClient: ->
+    @handler = new ClientHandler this
     # user-friendly defaults:
     @options.autoConnect   ?= yes
     @options.autoReconnect ?= yes
@@ -49,10 +70,10 @@ module.exports = class Kite extends EventEmitter
     return  if @readyState is READY
     { url } = @options
     @ws = new WebSocket url
-    @ws.addEventListener 'open',    @bound 'onOpen'
-    @ws.addEventListener 'close',   @bound 'onClose'
-    @ws.addEventListener 'message', @bound 'onMessage'
-    @ws.addEventListener 'error',   @bound 'onError'
+    @ws.addEventListener 'open',    @handler.bound 'onOpen'
+    @ws.addEventListener 'close',   @handler.bound 'onClose'
+    @ws.addEventListener 'message', @handler.bound 'onMessage'
+    @ws.addEventListener 'error',   @handler.bound 'onError'
     @emit 'info', "Trying to connect to #{ url }"
     return
 
@@ -60,40 +81,6 @@ module.exports = class Kite extends EventEmitter
     @autoReconnect = !!reconnect
     @ws.close()
     @emit 'info', "Disconnecting from #{ @options.url }"
-    return
-
-  # event handlers:
-  onOpen: ->
-    @readyState = READY
-    @emit 'connected'
-    @emit 'ready'
-    @emit 'info', "Connected to Kite: #{ @options.url }"
-    @clearBackoffTimeout()
-    return
-
-  onClose: ->
-    @readyState = CLOSED
-    @emit 'disconnected'
-    # enable below to autoReconnect when the socket has been closed
-    if @autoReconnect
-      process.nextTick => @setBackoffTimeout @bound "connect"
-
-    if @errState is ERROR
-      @emit 'error', "Websocket error!"
-      @errState = OKAY
-
-    @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
-    return
-
-  onMessage: ({ data }) ->
-    @emit 'info', "onMessage", data
-    req = try JSON.parse data
-    @proto.handle req  if req?
-    return
-
-  onError: (err) ->
-    @errState = ERROR
-    @emit 'info', "#{ @options.url } error: #{ err.data }"
     return
 
   unwrapMessage: (message) ->
