@@ -10,6 +10,10 @@ module.exports = class KiteServer extends EventEmitter
 
   KiteError = require '../error.coffee'
 
+  Kontrol = require '../kontrol-as-promised/kontrol.coffee'
+
+  Kite = require '../kite-as-promised/kite.coffee'
+
   wrapApi = require './wrap-api.coffee'
 
   constructor: (api) ->
@@ -22,6 +26,17 @@ module.exports = class KiteServer extends EventEmitter
     throw new Error "Already listening!"  if @server?
     @server = new WebSocketServer { port }
     @server.on 'connection', @bound 'onConnection'
+
+  register: (kontrolUri, kiteKey) ->
+    @kontrol = new Kontrol
+      url: kontrolUri
+      auth:
+        type: 'token'
+        key: kiteKey
+
+    @kontrol
+      .register kiteKey
+      .then console.log, console.warn
 
   onConnection: (ws) ->
     proto = dnodeProtocol @api

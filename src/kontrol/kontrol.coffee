@@ -16,7 +16,7 @@ module.exports = class Kontrol extends EventEmitter
     @options.autoConnect    ?= yes
     @options.autoReconnect  ?= yes
 
-    @authenticate()  if @autoConnect
+    @authenticate()  if @options.autoConnect
 
   authenticate: (@options = @options) ->
     { url, auth } = @options
@@ -121,6 +121,8 @@ module.exports = class Kontrol extends EventEmitter
   connect: -> @kite.connect()
 
   disconnect: -> @kite.disconnect()
+
+  register: (kiteKey, callback) -> @kite?.tell 'register', [kiteKey], callback
 
   @actions      =
     REGISTER    : 'register'
