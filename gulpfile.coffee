@@ -48,12 +48,6 @@ gulp.task 'build kite server', ->
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kite-server'
 
-gulp.task 'build kite server as promised', ->
-  gulp.src 'src/kite-server-as-promised/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite-server-as-promised'
-
 # Build for the browser
 gulp.task 'browserify kite', ->
   browserify
@@ -116,7 +110,6 @@ gulp.task 'build', [
   'build kontrol'
   'build kontrol as promised'
   'build kite server'
-  'build kite server as promised'
 ]
 
 gulp.task 'browserify', [
