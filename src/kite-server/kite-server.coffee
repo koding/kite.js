@@ -19,6 +19,7 @@ module.exports = class KiteServer extends EventEmitter
     @server = null
 
   listen: (port) ->
+    throw new Error "Already listening!"  if @server?
     @server = new WebSocketServer { port }
     @server.on 'connection', @bound 'onConnection'
 
