@@ -132,7 +132,7 @@ module.exports = class Kite extends EventEmitter
     err.type = type
     err
 
-  bound: require './bound.coffee'
+  bound: require '../bound.coffee'
 
   initBackoff: require './backoff.coffee'
 

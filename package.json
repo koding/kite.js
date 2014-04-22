@@ -32,7 +32,10 @@
     "bluebird": "1.1.0",
     "dnode-protocol": "~0.2.2",
     "ws": "~0.4.31",
-    "node-uuid": "^1.4.1"
+    "node-uuid": "^1.4.1",
+    "jwt-simple": "^0.2.0",
+    "gulp": "^3.6.1",
+    "lodash.assign": "^2.4.1"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
@@ -56,6 +59,6 @@
   "browserify-shim": {
     "bluebird": "global:Promise",
     "ws": "global:WebSocket",
-    "node-uuid": "global:uuid" 
+    "node-uuid": "global:uuid"
   }
 }

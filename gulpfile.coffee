@@ -11,6 +11,13 @@ coffeeify   = require 'coffeeify'
 coffee4Node = -> (coffee bare: yes, sourceMap: yes).on 'error', util.log
 
 # Build for node
+
+gulp.task 'build commons', ->
+  gulp.src 'src/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib'
+
 gulp.task 'build kite', ->
   gulp.src 'src/kite/*.coffee'
     .pipe coffee4Node()
@@ -34,6 +41,18 @@ gulp.task 'build kontrol as promised', ->
     .pipe coffee4Node()
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kontrol-as-promised'
+
+gulp.task 'build kite server', ->
+  gulp.src 'src/kite-server/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/kite-server'
+
+gulp.task 'build kite server as promised', ->
+  gulp.src 'src/kite-server-as-promised/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/kite-server-as-promised'
 
 # Build for the browser
 gulp.task 'browserify kite', ->
@@ -91,10 +110,13 @@ gulp.task 'browserify kontrol as promised', ->
   .pipe gulp.dest 'browser'
 
 gulp.task 'build', [
+  'build commons'
   'build kite'
   'build kite as promised'
   'build kontrol'
   'build kontrol as promised'
+  'build kite server'
+  'build kite server as promised'
 ]
 
 gulp.task 'browserify', [
