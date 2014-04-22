@@ -142,6 +142,9 @@ module.exports = class Kite extends EventEmitter
     else @once 'ready', callback
     return
 
+  ping: (callback) ->
+    tell 'kite.ping', callback
+
   # static helpers:
   @disconnect = (kites...) ->
     kite.disconnect()  for kite in kites

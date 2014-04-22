@@ -38,6 +38,8 @@ module.exports = class KiteServer extends EventEmitter
 
     [{ withArgs, responseCallback, kite }] = args
 
+    withArgs ?= []
+
     withArgs = [withArgs]  unless Array.isArray withArgs
 
     # FIXME: this is an ugly hack; there must be a better way to implement it:
