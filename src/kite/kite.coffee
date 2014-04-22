@@ -78,10 +78,6 @@ module.exports = class Kite extends EventEmitter
     if @autoReconnect
       process.nextTick => @setBackoffTimeout @bound "connect"
 
-    if @errState is ERROR
-      @emit 'error', "Websocket error!"
-      @errState = OKAY
-
     @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
     return
 
@@ -92,7 +88,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   onError: (err) ->
-    @errState = ERROR
+    @emit 'error', "Websocket error!"
     @emit 'info', "#{ @options.url } error: #{ err.data }"
     return
 
