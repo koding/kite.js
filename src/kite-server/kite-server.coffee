@@ -4,9 +4,11 @@
 
 module.exports = class KiteServer extends EventEmitter
 
+  Promise = require 'bluebird'
   { Server: WebSocketServer } = require 'ws'
   dnodeProtocol = require 'dnode-protocol'
   jwt = require 'jwt-simple'
+  toArray = Promise.promisify require 'stream-to-array'
 
   KiteError = require '../error.coffee'
 
@@ -28,15 +30,24 @@ module.exports = class KiteServer extends EventEmitter
     @server.on 'connection', @bound 'onConnection'
 
   register: (kontrolUri, kiteKey) ->
-    @kontrol = new Kontrol
-      url: kontrolUri
-      auth:
-        type: 'token'
-        key: kiteKey
+    @fetchKiteKey(kiteKey).then (key) =>
 
-    @kontrol
-      .register kiteKey
-      .then console.log, console.warn
+      @kontrol = new Kontrol
+        url: kontrolUri
+        auth: { type: 'token', key }
+
+      @kontrol
+        .register kiteKey
+        .then console.log, console.warn
+
+  fetchKiteKey: (src) ->
+    new Promise (resolve, reject) -> switch
+      when 'string' is typeof src
+        resolve src
+      when src.pipe?
+        resolve toArray(src).then (arr) -> arr.join '\n'
+      else
+        reject new Error "Don't know how to get the kite key: #{ src }"
 
   onConnection: (ws) ->
     proto = dnodeProtocol @api

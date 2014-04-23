@@ -1,4 +1,3 @@
-var Promise = require('bluebird');
 var fs = require('fs');
 var joinPath = require('path').join;
 
@@ -14,6 +13,6 @@ var math = new KiteServer({
 
 math.listen(5647);
 
-fs.readFile(joinPath(__dirname, './kite.key'), 'utf-8', function (err, kiteKey) {
-  math.register('ws://localhost:4000', kiteKey);
-});
+math.register('ws://localhost:4000',
+  fs.createReadStream(joinPath(__dirname, './kite.key'), 'utf-8')
+);
