@@ -9,11 +9,11 @@ module.exports = (proto, message) ->
 
   { arguments: args, links, callbacks, method, authentication: auth } = req
 
-  [{ withArgs, responseCallback, kite, authentication: auth }] = args
+  if args.length?
+    [{ withArgs, responseCallback, kite, authentication: auth }] = args
 
   handleAuth(auth, @key).then (token) ->
 
-    console.log token
     if !withArgs? and !responseCallback?
       # it's a normal dnode protocol message.
       proto.handle req
