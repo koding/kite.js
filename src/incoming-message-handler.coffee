@@ -9,7 +9,7 @@ module.exports = (proto, message) ->
 
   { arguments: args, links, callbacks, method, authentication: auth } = req
 
-  if args.length?
+  if args.length > 0
     [{ withArgs, responseCallback, kite, authentication: auth }] = args
 
   handleAuth(auth, @key).then (token) ->
