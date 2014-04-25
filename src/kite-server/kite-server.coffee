@@ -7,79 +7,72 @@ module.exports = class KiteServer extends EventEmitter
   Promise = require 'bluebird'
   { Server: WebSocketServer } = require 'ws'
   dnodeProtocol = require 'dnode-protocol'
-  jwt = require 'jwt-simple'
   toArray = Promise.promisify require 'stream-to-array'
+  fs = Promise.promisifyAll require 'fs'
 
   KiteError = require '../error.coffee'
-
   Kontrol = require '../kontrol-as-promised/kontrol.coffee'
-
-  Kite = require '../kite-as-promised/kite.coffee'
 
   wrapApi = require './wrap-api.coffee'
 
-  constructor: (api) ->
-    return new KiteServer api  unless this instanceof KiteServer
+  { v4: createId } = require 'node-uuid'
 
-    @api = wrapApi api
+  constructor: (options) ->
+    return new KiteServer api  unless this instanceof KiteServer
+    @options = options
+
+    @options.hostname ?= require('os').hostname();
+
+    @id = createId()
+    @api = wrapApi options.api
     @server = null
 
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
+    @port = port
     @server = new WebSocketServer { port }
     @server.on 'connection', @bound 'onConnection'
 
-  register: (kontrolUri, kiteKey) ->
-    @fetchKiteKey(kiteKey).then (key) =>
+  register: (kontrolUri, kiteUri, kiteKey) ->
+    throw new Error "Already registered!"  if @kontrol?
+    kontrolUriP = Promise.cast kontrolUri
+    kiteUriP = Promise.cast kiteUri
+    Promise.all [kontrolUriP, kiteUriP, @normalizeKiteKey(kiteKey)]
+      .spread (kontrolUri, kiteUri, key) =>
+        { name, username, environment, version, region, hostname } = @options
 
-      @kontrol = new Kontrol
-        url: kontrolUri
-        auth: { type: 'token', key }
+        @key = key
 
-      @kontrol
-        .register kiteKey
-        .then console.log, console.warn
+        @kontrol = new Kontrol
+          url         : kontrolUri
+          auth        : { type: 'kiteKey', key }
+          name        : name
+          username    : username
+          environment : environment
+          version     : version
+          region      : region
+          hostname    : hostname
 
-  fetchKiteKey: (src) ->
-    new Promise (resolve, reject) -> switch
-      when 'string' is typeof src
-        resolve src
-      when src.pipe?
-        resolve toArray(src).then (arr) -> arr.join '\n'
-      else
-        reject new Error "Don't know how to get the kite key: #{ src }"
+        @kontrol.register url: "ws://#{ kiteUri }:#{ @port }/math"
+
+  normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
+    when 'string' is typeof src
+      fs.readFileAsync(src, enc)
+        .catch (err) ->
+          return src  if err.code is 'ENOENT' # assume string itself is key
+          throw err
+    when 'function' is typeof src.pipe
+      toArray(src).then (arr) -> arr.join '\n'
+    else throw new Error """
+      Don't know how to get the kite key: #{ src }
+      """
 
   onConnection: (ws) ->
     proto = dnodeProtocol @api
     proto.on 'request', @handleRequest.bind this, ws
-    ws.on 'message', @handleMessage.bind this, ws, proto
+    ws.on 'message', @handleMessage.bind this, proto
 
-  handleMessage: (ws, proto, message) ->
-    req = try JSON.parse message
-
-    unless req?
-      @emit 'warning', new KiteError "Invalid payload! (#{ message })"
-      return
-
-    { arguments: args, links, callbacks, method } = req
-
-    [{ withArgs, responseCallback, kite }] = args
-
-    withArgs ?= []
-
-    withArgs = [withArgs]  unless Array.isArray withArgs
-
-    # FIXME: this is an ugly hack; there must be a better way to implement it:
-    for own k, c of callbacks when (c.join '.') is '0.responseCallback'
-      callbacks[k] = [withArgs.length]
-      break
-
-    proto.handle {
-      method
-      arguments: [withArgs..., responseCallback]
-      links
-      callbacks
-    }
+  handleMessage: require '../incoming-message-handler.coffee'
 
   handleRequest: (ws, response) ->
     { arguments: args, method, callbacks, links } = response

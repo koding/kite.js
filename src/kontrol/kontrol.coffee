@@ -19,12 +19,17 @@ module.exports = class Kontrol extends EventEmitter
     @authenticate()  if @options.autoConnect
 
   authenticate: (@options = @options) ->
-    { url, auth } = @options
+    { url, auth, username, environment, version, region, hostname, name } = @options
 
     @kite = new @constructor.Kite
-      name  : 'kontrol'
-      url   : url
-      auth  : auth
+      username    : username
+      environment : environment
+      version     : version
+      region      : region
+      hostname    : hostname
+      name        : name ? 'kontrol'
+      url         : url
+      auth        : auth
 
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
 
@@ -122,7 +127,8 @@ module.exports = class Kontrol extends EventEmitter
 
   disconnect: -> @kite.disconnect()
 
-  register: (kiteKey, callback) -> @kite?.tell 'register', [kiteKey], callback
+  register: (url, callback) ->
+    @kite?.tell 'register', [url], callback
 
   @actions      =
     REGISTER    : 'register'

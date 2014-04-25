@@ -8,6 +8,7 @@ module.exports = class Kite extends EventEmitter
   WebSocket     = require 'ws'
 
   wrapApi = require './wrap-api.coffee'
+  handleIncomingMessage = require '../incoming-message-handler.coffee'
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
@@ -35,7 +36,7 @@ module.exports = class Kite extends EventEmitter
 
     @initBackoff()  if @options.autoReconnect
 
-    @proto = dnodeProtocol (wrapApi @options.api)
+    @proto = dnodeProtocol wrapApi.call this, @options.api
 
     @proto.on 'request', (req) =>
       @ready => @ws.send JSON.stringify req
@@ -83,8 +84,7 @@ module.exports = class Kite extends EventEmitter
 
   onMessage: ({ data }) ->
     @emit 'info', "onMessage", data
-    req = try JSON.parse data
-    @proto.handle req  if req?
+    handleIncomingMessage.call this, @proto, data
     return
 
   onError: (err) ->
@@ -101,20 +101,22 @@ module.exports = class Kite extends EventEmitter
 
     { err, result }
 
+  getKiteInfo: (params) ->
+    username    : "#{ @options.username ? 'anonymous' }"
+    environment : "#{ @options.environment ? 'browser-environment' }"
+    name        : "#{ params?[0]?.kiteName ? @options.name ? 'browser-kite' }" # TODO: don't know where to get this value for now
+    version     : "#{ @options.version ? '1.0.0' }"
+    region      : "#{ @options.region ? 'browser-region' }"
+    hostname    : "#{ @options.hostname ? 'browser-hostname' }"
+    id          : @id
+
   wrapMessage: (method, params, callback) ->
     authentication    : @options.auth
     withArgs          : params
     responseCallback  : (response) =>
-      { err, result } = response
+      { error: err, result } = response
       callback err, result
-    kite              :
-      username        : "#{ @options.username ? 'anonymous' }"
-      environment     : "#{ @options.environment ? 'browser-environment' }"
-      name            : "browser-kite" # TODO: don't know where to get this value for now
-      version         : "#{ @options.version ? '1.0.0' }"
-      region          : "#{ @options.region ? 'browser-region' }"
-      hostname        : "#{ @options.hostname ? 'browser-hostname' }"
-      id              : @id
+    kite              : @getKiteInfo params
 
   tell: (method, params, callback) ->
     # by default, remove this callback after it is called once.
@@ -143,7 +145,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   ping: (callback) ->
-    tell 'kite.ping', callback
+    @tell 'kite.ping', callback
 
   # static helpers:
   @disconnect = (kites...) ->
