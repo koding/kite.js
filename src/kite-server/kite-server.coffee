@@ -41,9 +41,10 @@ module.exports = class KiteServer extends EventEmitter
     throw new Error "Already registered!"  if @kontrol?
     kontrolUriP = Promise.cast kontrolUri
     kiteUriP = Promise.cast kiteUri
-    Promise.all [kontrolUriP, kiteUriP, @normalizeKiteKey(kiteKey)]
+    kiteKeyP = @normalizeKiteKey kiteKey
+    Promise.all [kontrolUriP, kiteUriP, kiteKeyP]
       .spread (kontrolUri, kiteUri, key) =>
-        { name, username, environment, version, region, hostname } = @options
+        { name, username, environment, version, region, hostname, logLevel } = @options
 
         throw new Error "No kite key!"  unless key?
 
@@ -58,14 +59,14 @@ module.exports = class KiteServer extends EventEmitter
           version     : version
           region      : region
           hostname    : hostname
+          logLevel    : logLevel
         .on 'connected', =>
           @emit 'notice', "Connected to Kontrol"
 
         kiteUrl = "ws://#{ kiteUri }:#{ @port }/#{ @options.name }"
 
-        @kontrol.register url: kiteUrl
-          .then =>
-            @emit 'info', "Registered to kontrol with URL: #{ kiteUrl }"
+        @kontrol.register(url: kiteUrl).then =>
+          @emit 'info', "Registered to Kontrol with URL: #{ kiteUrl }"
 
   normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
     when 'string' is typeof src
