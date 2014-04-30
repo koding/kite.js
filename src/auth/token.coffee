@@ -15,13 +15,3 @@ module.exports = (tokenString, kiteKey) ->
   privateClaims = jwt.decode tokenString, claims.kontrolKey
 
   Promise.resolve { headers, publicClaims, privateClaims }
-  # [ regSeg, pubSeg, privSeg ] = token.split '.'
-
-  # console.log { regSeg, pubSeg, privSeg }
-
-  # reg = try JSON.parse atob regSeg
-  # pub = try JSON.parse atob pubSeg
-
-  # console.log { reg, pub }
-
-  # Promise.resolve()
