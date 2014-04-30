@@ -17,5 +17,6 @@ module.exports = class Kontrol extends BasicKontrol
     'fetchKite'
     'watchKites'
     'cancelWatcher'
+    'register'
   ].forEach (method) ->
     Kontrol::[method] = Promise.promisify BasicKontrol::[method]
