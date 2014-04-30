@@ -1,3 +1,5 @@
+color = require 'cli-color'
+
 [
   CRITICAL
   ERROR
@@ -5,36 +7,34 @@
   NOTICE
   INFO
   DEBUG
-] = [0,1,2,3,4,5]
+] = [0..5]
 
 error = console.error.bind console
 warn = console.warn.bind console
 info = console.info.bind console
 
-color = require 'cli-color'
-
 enableLogging = (name, emitter, logLevel = INFO) ->
 
-  createLogger = (style, category, fn) -> (message) ->
+  createLogger = (category, style, fn) -> (message) ->
     fn style "[#{ name }] #{ category }\t#{ message }"
 
   if CRITICAL <= logLevel
-    emitter.on 'critical', createLogger color.cyan, 'CRITICAL', error
+    emitter.on 'critical', createLogger 'CRITICAL', color.cyan, error
 
   if ERROR <= logLevel
-    emitter.on 'error', createLogger color.red, 'ERROR', error
+    emitter.on 'error', createLogger 'ERROR', color.red, error
 
   if WARNING <= logLevel
-    emitter.on 'warn', createLogger color.yellow, 'WARN', warn
+    emitter.on 'warn', createLogger 'WARN', color.yellow, warn
 
   if NOTICE <= logLevel
-    emitter.on 'notice', createLogger color.green, 'NOTICE', info
+    emitter.on 'notice', createLogger 'NOTICE', color.green, info
 
   if INFO <= logLevel
-    emitter.on 'info', createLogger color.white, 'INFO', info
+    emitter.on 'info', createLogger 'INFO', color.white, info
 
   if DEBUG <= logLevel
-    emitter.on 'debug', createLogger color.cyan, 'DEBUG', info
+    emitter.on 'debug', createLogger 'DEBUG', color.cyan, info
 
 enableLogging.logLevels = {
   CRITICAL
