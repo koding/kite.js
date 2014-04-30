@@ -39,7 +39,8 @@
     "stream-to-array": "^1.0.0",
     "request": "^2.34.0",
     "atob": "^1.1.0",
-    "koding-backoff": "0.0.1"
+    "koding-backoff": "0.0.1",
+    "cli-color": "^0.3.2"
   },
   "devDependencies": {
     "browserify": "~3.32.0",

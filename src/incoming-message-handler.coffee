@@ -1,6 +1,9 @@
 handleAuth = require './auth/auth.coffee'
 
 module.exports = (proto, message) ->
+
+  @emit 'debug', "Receiving: #{ message }"
+
   req = try JSON.parse message
 
   unless req?

@@ -5,6 +5,8 @@ var log = console.log.bind(console)
   , warn = console.warn.bind(console)
 ;
 
+var logLevels = require('../../logging').logLevels;
+
 var KiteServer = require('../../server');
 
 var fetchRegistrationIp = require('../fetch-registration-ip.js')
@@ -21,7 +23,8 @@ var math = new KiteServer({
       callback(null, x * x);
     }
 
-  }
+  },
+  logLevel: logLevels.LOG_LEVEL_DEBUG
 });
 
 math.listen(5647);
@@ -29,4 +32,4 @@ math.listen(5647);
 math.register('ws://localhost:4000',
   fetchRegistrationIp('vagrant'),
   fs.createReadStream(joinPath(__dirname, './kite.key'), 'utf-8')
-).then(log, warn);
+).then(null, warn);

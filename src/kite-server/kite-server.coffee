@@ -14,6 +14,7 @@ module.exports = class KiteServer extends EventEmitter
   Kontrol = require '../kontrol-as-promised/kontrol.coffee'
 
   wrapApi = require './wrap-api.coffee'
+  enableLogging = require '../logging.coffee'
 
   { v4: createId } = require 'node-uuid'
 
@@ -21,7 +22,9 @@ module.exports = class KiteServer extends EventEmitter
     return new KiteServer api  unless this instanceof KiteServer
     @options = options
 
-    @options.hostname ?= require('os').hostname();
+    @options.hostname ?= require('os').hostname()
+
+    enableLogging options.name, this, options.logLevel
 
     @id = createId()
     @api = wrapApi options.api
@@ -32,6 +35,7 @@ module.exports = class KiteServer extends EventEmitter
     @port = port
     @server = new WebSocketServer { port }
     @server.on 'connection', @bound 'onConnection'
+    @emit 'info', "Listening: #{ @server.options.host }:#{ @server.options.port }"
 
   register: (kontrolUri, kiteUri, kiteKey) ->
     throw new Error "Already registered!"  if @kontrol?
@@ -40,6 +44,8 @@ module.exports = class KiteServer extends EventEmitter
     Promise.all [kontrolUriP, kiteUriP, @normalizeKiteKey(kiteKey)]
       .spread (kontrolUri, kiteUri, key) =>
         { name, username, environment, version, region, hostname } = @options
+
+        throw new Error "No kite key!"  unless key?
 
         @key = key
 
@@ -72,17 +78,21 @@ module.exports = class KiteServer extends EventEmitter
     proto.on 'request', @handleRequest.bind this, ws
     ws.on 'message', @handleMessage.bind this, proto
 
+    @emit 'info', "New connection from: #{ ws._socket.remoteAddress }:#{ ws._socket.remotePort }"
+
   handleMessage: require '../incoming-message-handler.coffee'
 
   handleRequest: (ws, response) ->
     { arguments: args, method, callbacks, links } = response
     [ err, result ] = args
     message = { error: err, result }
-    ws.send JSON.stringify {
+    messageStr = JSON.stringify {
       method
       arguments: [message]
       links
       callbacks
     }
+    @emit 'debug', "Sending: #{ messageStr }"
+    ws.send messageStr
 
   bound: require '../bound.coffee'
