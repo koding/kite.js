@@ -1,5 +1,15 @@
 handleAuth = require './auth/auth.coffee'
 
+mungeCallbacks = (callbacks, n) ->
+  # FIXME: this is an ugly hack; there must be a better way to implement it:
+  for own k, c of callbacks
+    if (c.join '.') is '0.responseCallback'
+      callbacks[k] = [n]
+    if c[1] is 'withArgs'
+      # since we're rewriting the protocol for the withArgs case, we need to remove everything up to withArgs
+      callbacks[k] = c.slice 2
+  callbacks
+
 module.exports = (proto, message) ->
 
   @emit 'debug', "Receiving: #{ message }"
@@ -15,29 +25,36 @@ module.exports = (proto, message) ->
   if args.length > 0
     [{ withArgs, responseCallback, kite, authentication: auth }] = args
 
-  handleAuth(auth, @key).then (token) ->
+  if !withArgs? and !responseCallback?
+    @emit 'debug', "Handling a normal dnode message"
+    return proto.handle req
 
-    if !withArgs? and !responseCallback?
-      # it's a normal dnode protocol message.
-      proto.handle req
-      return
+  @emit 'debug', "Authenticating request"
 
-    # it's a kite protocol message.
+  handleAuth(method, auth, @key).then (token) =>
+    @emit 'debug', "Authentication passed"
+
     withArgs ?= []
 
     withArgs = [withArgs]  unless Array.isArray withArgs
 
-    # FIXME: this is an ugly hack; there must be a better way to implement it:
-    for own k, c of callbacks
-      if (c.join '.') is '0.responseCallback'
-        callbacks[k] = [withArgs.length]
-      if c[1] is 'withArgs'
-        # since we're rewriting the protocol for the withArgs case, we need to remove everything up to withArgs
-        callbacks[k] = c.slice 2
+    mungeCallbacks callbacks, withArgs.length
 
     proto.handle {
       method
       arguments: [withArgs..., responseCallback]
+      links
+      callbacks
+    }
+
+  .catch (err) =>
+    @emit 'debug', "Authentication failed"
+
+    mungeCallbacks callbacks, 1
+
+    proto.handle {
+      method: 'kite.echo'
+      arguments: [err, responseCallback]
       links
       callbacks
     }
