@@ -23,8 +23,8 @@ var math = new KiteServer({
       callback(null, x * x);
     }
 
-  },
-  logLevel: logLevels.LOG_LEVEL_DEBUG
+  }//,
+  // logLevel: logLevels.DEBUG
 });
 
 math.listen(5647);

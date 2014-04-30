@@ -58,8 +58,14 @@ module.exports = class KiteServer extends EventEmitter
           version     : version
           region      : region
           hostname    : hostname
+        .on 'connected', =>
+          @emit 'notice', "Connected to Kontrol"
 
-        @kontrol.register url: "ws://#{ kiteUri }:#{ @port }/math"
+        kiteUrl = "ws://#{ kiteUri }:#{ @port }/#{ @options.name }"
+
+        @kontrol.register url: kiteUrl
+          .then =>
+            @emit 'info', "Registered to kontrol with URL: #{ kiteUrl }"
 
   normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
     when 'string' is typeof src
@@ -77,7 +83,8 @@ module.exports = class KiteServer extends EventEmitter
     proto = dnodeProtocol @api
     proto.on 'request', @handleRequest.bind this, ws
     ws.on 'message', @handleMessage.bind this, proto
-
+    ws.on 'close', =>
+      @emit 'info', 'Client has disconnected: '
     @emit 'info', "New connection from: #{ ws._socket.remoteAddress }:#{ ws._socket.remotePort }"
 
   handleMessage: require '../incoming-message-handler.coffee'
