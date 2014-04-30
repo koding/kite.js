@@ -12,4 +12,7 @@ module.exports = (api) ->
       console.log message
       callback null
 
+    'kite.echo': (err, callback) ->
+      callback err
+
   , api

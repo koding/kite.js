@@ -1,6 +1,6 @@
 {
   "name": "kite.js",
-  "version": "0.0.41",
+  "version": "0.0.45",
   "description": "Kite client library",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,13 @@
     "node-uuid": "^1.4.1",
     "jwt-simple": "^0.2.0",
     "gulp": "^3.6.1",
-    "lodash.assign": "^2.4.1"
+    "lodash.assign": "^2.4.1",
+    "stream-to-array": "^1.0.0",
+    "request": "^2.34.0",
+    "atob": "^1.1.0",
+    "koding-backoff": "0.0.1",
+    "cli-color": "^0.3.2",
+    "minimist": "0.0.8"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
@@ -59,6 +65,7 @@
   "browserify-shim": {
     "bluebird": "global:Promise",
     "ws": "global:WebSocket",
-    "node-uuid": "global:uuid"
+    "node-uuid": "global:uuid",
+    "atob": "global:atob"
   }
 }
