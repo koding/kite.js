@@ -10,6 +10,8 @@ module.exports = class Kite extends EventEmitter
 
   wrapApi = require './wrap-api.coffee'
   { now } = require '../util.coffee'
+  handleIncomingMessage = require '../incoming-message-handler.coffee'
+  enableLogging = require '../logging.coffee'
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
@@ -36,15 +38,17 @@ module.exports = class Kite extends EventEmitter
     # refresh expired tokens
     @expireTokenOnExpiry()
 
+    enableLogging @options.name, this, @options.logLevel
+
     @readyState = NOTREADY
 
     @initBackoff()  if @options.autoReconnect
 
-    @proto = dnodeProtocol (wrapApi @options.api)
+    @proto = dnodeProtocol wrapApi.call this, @options.api
 
     @proto.on 'request', (req) =>
       @ready => @ws.send JSON.stringify req
-      @emit 'info', "proto request", req
+      @emit 'debug', "Sending: ", JSON.stringify req
       return
 
     @connect()  if @options.autoConnect
@@ -62,9 +66,9 @@ module.exports = class Kite extends EventEmitter
     return
 
   disconnect: (reconnect = false) ->
-    @autoReconnect = !!reconnect
+    @options.autoReconnect = !!reconnect
     @ws.close()
-    @emit 'info', "Disconnecting from #{ @options.url }"
+    @emit 'notice', "Disconnecting from #{ @options.url }"
     return
 
   # event handlers:
@@ -72,7 +76,7 @@ module.exports = class Kite extends EventEmitter
     @readyState = READY
     @emit 'connected'
     @emit 'ready'
-    @emit 'info', "Connected to Kite: #{ @options.url }"
+    @emit 'notice', "Connected to Kite: #{ @options.url }"
     @clearBackoffTimeout()
     return
 
@@ -80,25 +84,18 @@ module.exports = class Kite extends EventEmitter
     @readyState = CLOSED
     @emit 'disconnected'
     # enable below to autoReconnect when the socket has been closed
-    if @autoReconnect
+    if @options.autoReconnect
       process.nextTick => @setBackoffTimeout @bound "connect"
-
-    if @errState is ERROR
-      @emit 'error', "Websocket error!"
-      @errState = OKAY
 
     @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
     return
 
   onMessage: ({ data }) ->
-    @emit 'info', "onMessage", data
-    req = try JSON.parse data
-    @proto.handle req  if req?
+    handleIncomingMessage.call this, @proto, data
     return
 
   onError: (err) ->
-    @errState = ERROR
-    @emit 'info', "#{ @options.url } error: #{ err.data }"
+    @emit 'error', "Websocket error!"
     return
 
   unwrapMessage: (message) ->
@@ -110,20 +107,22 @@ module.exports = class Kite extends EventEmitter
 
     { err, result }
 
+  getKiteInfo: (params) ->
+    username    : "#{ @options.username ? 'anonymous' }"
+    environment : "#{ @options.environment ? 'browser-environment' }"
+    name        : "#{ params?[0]?.kiteName ? @options.name ? 'browser-kite' }" # TODO: don't know where to get this value for now
+    version     : "#{ @options.version ? '1.0.0' }"
+    region      : "#{ @options.region ? 'browser-region' }"
+    hostname    : "#{ @options.hostname ? 'browser-hostname' }"
+    id          : @id
+
   wrapMessage: (method, params, callback) ->
     authentication    : @options.auth
     withArgs          : params
     responseCallback  : (response) =>
-      { err, result } = response
+      { error: err, result } = response
       callback err, result
-    kite              :
-      username        : "#{ @options.username ? 'anonymous' }"
-      environment     : "#{ @options.environment ? 'browser-environment' }"
-      name            : "browser-kite" # TODO: don't know where to get this value for now
-      version         : "#{ @options.version ? '1.0.0' }"
-      region          : "#{ @options.region ? 'browser-region' }"
-      hostname        : "#{ @options.hostname ? 'browser-hostname' }"
-      id              : @id
+    kite              : @getKiteInfo params
 
   tell: (method, params, callback) ->
     # by default, remove this callback after it is called once.
@@ -169,7 +168,7 @@ module.exports = class Kite extends EventEmitter
     err.type = type
     err
 
-  bound: require './bound.coffee'
+  bound: require '../bound.coffee'
 
   initBackoff: require './backoff.coffee'
 
@@ -178,6 +177,9 @@ module.exports = class Kite extends EventEmitter
     then process.nextTick callback
     else @once 'ready', callback
     return
+
+  ping: (callback) ->
+    @tell 'kite.ping', callback
 
   # static helpers:
   @disconnect = (kites...) ->

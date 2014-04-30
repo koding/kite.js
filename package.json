@@ -1,8 +1,8 @@
 {
   "name": "kite.js",
-  "version": "0.0.33",
   "description": "Kite client library",
   "main": "index.js",
+  "version": "0.1.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postpublish": "gulp"
@@ -33,7 +33,15 @@
     "dnode-protocol": "~0.2.2",
     "ws": "~0.4.31",
     "node-uuid": "^1.4.1",
-    "atob": "^1.1.0"
+    "jwt-simple": "^0.2.0",
+    "gulp": "^3.6.1",
+    "lodash.assign": "^2.4.1",
+    "stream-to-array": "^1.0.0",
+    "request": "^2.34.0",
+    "atob": "^1.1.0",
+    "koding-backoff": "0.0.1",
+    "cli-color": "^0.3.2",
+    "minimist": "0.0.8"
   },
   "devDependencies": {
     "browserify": "~3.32.0",

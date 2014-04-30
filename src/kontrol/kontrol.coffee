@@ -6,24 +6,34 @@ module.exports = class Kontrol extends EventEmitter
 
   @Kite = require '../kite/kite.coffee'
 
+  KiteError = require '../error.coffee'
+
   constructor: (options) ->
     return new Kontrol options  unless this instanceof Kontrol
 
     @options = options
 
-    @options.autoReconnect ?= yes
+    @options.autoConnect    ?= yes
+    @options.autoReconnect  ?= yes
 
-    @authenticate()
-
-    @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
+    @authenticate()  if @options.autoConnect
 
   authenticate: (@options = @options) ->
-    { url, auth } = @options
+    { url, auth, username, environment, version, region, hostname, name, logLevel } = @options
 
     @kite = new @constructor.Kite
-      name  : 'kontrol'
-      url   : url
-      auth  : auth
+      username    : username
+      environment : environment
+      version     : version
+      region      : region
+      hostname    : hostname
+      name        : name ? 'kontrol'
+      url         : url
+      auth        : auth
+      logLevel    : logLevel
+
+    @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
+    @kite.on 'connected', @emit.bind this, 'connected'
 
   createKite: ({ kite: { name }, token, url }, query) ->
     kite = new @constructor.Kite
@@ -38,6 +48,7 @@ module.exports = class Kontrol extends EventEmitter
       auth        :
         type      : 'token'
         key       : token
+      logLevel    : @options.logLevel
     .on 'tokenExpired', =>
       @renewToken kite, query
 
@@ -57,7 +68,7 @@ module.exports = class Kontrol extends EventEmitter
         return
 
       unless result?
-        callback new Error "No kite found!"
+        callback @createKiteNotFoundError args.query
         return
 
       callback null, @createKites result.kites, args.query
@@ -65,13 +76,13 @@ module.exports = class Kontrol extends EventEmitter
     return
 
   fetchKite: (args = {}, callback) ->
-    @fetchKites args, (err, kites) ->
+    @fetchKites args, (err, kites) =>
       if err?
         callback err
         return
 
       unless kites?[0]?
-        callback new Error "No kite found!"
+        callback @createKiteNotFoundError args.query
         return
 
       callback null, kites[0]
@@ -112,9 +123,23 @@ module.exports = class Kontrol extends EventEmitter
     changes.emit eventName, kite
     return
 
+  createKiteNotFoundError: (query) ->
+    { username, environment, name, version, region, hostname, id } = query
+    new KiteError "No kite found! query: #{
+      username }/#{
+      environment }/#{
+      name }/#{
+      version }/#{
+      region }/#{
+      hostname }/#{
+      id }"
+
   connect: -> @kite.connect()
 
   disconnect: -> @kite.disconnect()
+
+  register: (url, callback) ->
+    @kite?.tell 'register', [url], callback
 
   @actions      =
     REGISTER    : 'register'
