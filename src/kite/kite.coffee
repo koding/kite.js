@@ -10,6 +10,8 @@ module.exports = class Kite extends EventEmitter
   wrapApi = require './wrap-api.coffee'
   handleIncomingMessage = require '../incoming-message-handler.coffee'
 
+  enableLogging = require '../logging.coffee'
+
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
@@ -32,6 +34,8 @@ module.exports = class Kite extends EventEmitter
     @options.autoConnect   ?= yes
     @options.autoReconnect ?= yes
 
+    enableLogging @options.name, this, @options.logLevel
+
     @readyState = NOTREADY
 
     @initBackoff()  if @options.autoReconnect
@@ -40,7 +44,7 @@ module.exports = class Kite extends EventEmitter
 
     @proto.on 'request', (req) =>
       @ready => @ws.send JSON.stringify req
-      @emit 'info', "proto request", req
+      @emit 'debug', "Sending: ", JSON.stringify req
       return
 
     @connect()  if @options.autoConnect
@@ -60,7 +64,7 @@ module.exports = class Kite extends EventEmitter
   disconnect: (reconnect = false) ->
     @options.autoReconnect = !!reconnect
     @ws.close()
-    @emit 'info', "Disconnecting from #{ @options.url }"
+    @emit 'notice', "Disconnecting from #{ @options.url }"
     return
 
   # event handlers:
@@ -68,7 +72,7 @@ module.exports = class Kite extends EventEmitter
     @readyState = READY
     @emit 'connected'
     @emit 'ready'
-    @emit 'info', "Connected to Kite: #{ @options.url }"
+    @emit 'notice', "Connected to Kite: #{ @options.url }"
     @clearBackoffTimeout()
     return
 
@@ -83,13 +87,11 @@ module.exports = class Kite extends EventEmitter
     return
 
   onMessage: ({ data }) ->
-    @emit 'info', "onMessage", data
     handleIncomingMessage.call this, @proto, data
     return
 
   onError: (err) ->
     @emit 'error', "Websocket error!"
-    @emit 'info', "#{ @options.url } error: #{ err.data }"
     return
 
   unwrapMessage: (message) ->
