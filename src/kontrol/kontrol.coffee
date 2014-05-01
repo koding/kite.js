@@ -120,13 +120,13 @@ module.exports = class Kontrol extends EventEmitter
   createKiteNotFoundError: (query) ->
     { username, environment, name, version, region, hostname, id } = query
     new KiteError "No kite found! query: #{
-      username }/#{
-      environment }/#{
-      name }/#{
-      version }/#{
-      region }/#{
-      hostname }/#{
-      id }"
+      username    ? '' }/#{
+      environment ? '' }/#{
+      name        ? '' }/#{
+      version     ? '' }/#{
+      region      ? '' }/#{
+      hostname    ? '' }/#{
+      id          ? '' }"
 
   connect: -> @kite.connect()
 
