@@ -12,7 +12,7 @@ module.exports = class Kite extends EventEmitter
   wrapApi = require './wrap-api.coffee'
   handleIncomingMessage = require '../incoming-message-handler.coffee'
 
-  enableLogging = require '../logging.coffee'
+  enableLogging = require '../logging/logging.coffee'
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]

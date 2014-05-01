@@ -57,7 +57,7 @@
     "vinyl-source-stream": "^0.1.1"
   },
   "browser": {
-    "./src/logging.coffee": "./src/logging-browser.coffee"
+    "./src/logging/logging.coffee": "./src/logging/browser.coffee"
   },
   "browserify": {
     "transform": [

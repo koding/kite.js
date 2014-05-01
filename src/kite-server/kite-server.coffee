@@ -15,7 +15,7 @@ module.exports = class KiteServer extends EventEmitter
   KiteError = require '../error.coffee'
   Kontrol = require '../kontrol-as-promised/kontrol.coffee'
 
-  enableLogging = require '../logging.coffee'
+  enableLogging = require '../logging/logging.coffee'
 
   { v4: createId } = require 'node-uuid'
 
