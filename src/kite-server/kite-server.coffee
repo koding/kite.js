@@ -4,6 +4,8 @@
 
 module.exports = class KiteServer extends EventEmitter
 
+  { @version } = require '../../package.json'
+
   Promise = require 'bluebird'
   { Server: WebSocketServer } = require 'ws'
   dnodeProtocol = require 'dnode-protocol'

@@ -4,6 +4,8 @@
 
 module.exports = class Kontrol extends EventEmitter
 
+  { @version } = require '../../package.json'
+
   @Kite = require '../kite/kite.coffee'
 
   KiteError = require '../error.coffee'

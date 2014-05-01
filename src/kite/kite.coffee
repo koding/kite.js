@@ -4,6 +4,8 @@
 
 module.exports = class Kite extends EventEmitter
 
+  { @version } = require '../../package.json'
+
   dnodeProtocol = require 'dnode-protocol'
   WebSocket     = require 'ws'
 
