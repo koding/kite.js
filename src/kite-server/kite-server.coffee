@@ -15,7 +15,6 @@ module.exports = class KiteServer extends EventEmitter
   KiteError = require '../error.coffee'
   Kontrol = require '../kontrol-as-promised/kontrol.coffee'
 
-  wrapApi = require './wrap-api.coffee'
   enableLogging = require '../logging.coffee'
 
   { v4: createId } = require 'node-uuid'
@@ -29,8 +28,13 @@ module.exports = class KiteServer extends EventEmitter
     enableLogging options.name, this, options.logLevel
 
     @id = createId()
-    @api = wrapApi options.api
     @server = null
+
+    @methods options.api  if options.api?
+
+  methods: (methods) ->
+    @api ?= (require './default-api.coffee')()
+    @api[method] = fn  for method, fn of methods
 
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
