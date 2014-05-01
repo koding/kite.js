@@ -39,36 +39,36 @@ module.exports = class KiteServer extends EventEmitter
     @server.on 'connection', @bound 'onConnection'
     @emit 'info', "Listening: #{ @server.options.host }:#{ @server.options.port }"
 
-  register: ({ to: kontrolUri, host, kiteKey }) ->
+  register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
-    kontrolUriP = Promise.cast kontrolUri
-    hostP       = Promise.cast host
-    kiteKeyP    = @normalizeKiteKey kiteKey
-    Promise.all [kontrolUriP, hostP, kiteKeyP]
-      .spread (kontrolUri, host, key) =>
-        { name, username, environment, version, region, hostname, logLevel } = @options
+    Promise.all([
+      Promise.cast u
+      Promise.cast h
+      @normalizeKiteKey k
+    ]).spread (kontrolUri, host, key) =>
+      { name, username, environment, version, region, hostname, logLevel } = @options
 
-        throw new Error "No kite key!"  unless key?
+      throw new Error "No kite key!"  unless key?
 
-        @key = key
+      @key = key
 
-        @kontrol = new Kontrol
-          url         : kontrolUri
-          auth        : { type: 'kiteKey', key }
-          name        : name
-          username    : username
-          environment : environment
-          version     : version
-          region      : region
-          hostname    : hostname
-          logLevel    : logLevel
-        .on 'connected', =>
-          @emit 'info', "Connected to Kontrol"
+      @kontrol = new Kontrol
+        url         : kontrolUri
+        auth        : { type: 'kiteKey', key }
+        name        : name
+        username    : username
+        environment : environment
+        version     : version
+        region      : region
+        hostname    : hostname
+        logLevel    : logLevel
+      .on 'connected', =>
+        @emit 'info', "Connected to Kontrol"
 
-        kiteUri = "ws://#{ host }:#{ @port }/#{ @options.name }"
+      kiteUri = "ws://#{ host }:#{ @port }/#{ @options.name }"
 
-        @kontrol.register(url: kiteUri).then =>
-          @emit 'info', "Registered to Kontrol with URL: #{ kiteUri }"
+      @kontrol.register(url: kiteUri).then =>
+        @emit 'info', "Registered to Kontrol with URL: #{ kiteUri }"
 
   normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
     when 'string' is typeof src
