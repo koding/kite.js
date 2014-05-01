@@ -3,3 +3,4 @@ browser-min
 lib
 node_modules
 *.DS_Store
+examples/kontrol/kite.key
