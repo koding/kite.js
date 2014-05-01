@@ -19,14 +19,19 @@ var math = new KiteServer({
   environment:  'vagrant',
   region:       'vagrant',
   version:      '1.0.0',
-  api: {
+  logLevel:     argv.v ? logLevels.DEBUG : logLevels.INFO
+});
 
-    square: function (x, callback) {
-      callback(null, x * x);
-    }
+math.methods({
 
+  square: function (x, callback) {
+    callback(null, x * x);
   },
-  logLevel: argv.v ? logLevels.DEBUG : logLevels.INFO
+
+  pow: function (x, y, callback) {
+    callback(null, Math.pow(x, y));
+  }
+
 });
 
 math.listen(5647);
