@@ -31,4 +31,8 @@ var math = new KiteServer({
 
 math.listen(5647);
 
-math.register('ws://localhost:4000', registationIp, kiteKey);
+math.register({
+  to:       'ws://localhost:4000',
+  host:     registationIp,
+  kiteKey:  kiteKey
+});
