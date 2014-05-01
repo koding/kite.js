@@ -56,6 +56,9 @@
     "gulp-replace": "^0.2.0",
     "vinyl-source-stream": "^0.1.1"
   },
+  "browser": {
+    "./src/logging.coffee": "./src/logging-browser.coffee"
+  },
   "browserify": {
     "transform": [
       "browserify-shim"
