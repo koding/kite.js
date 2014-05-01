@@ -32,6 +32,10 @@ module.exports = class KiteServer extends EventEmitter
 
     @methods options.api  if options.api?
 
+    @currentToken = null
+
+  getToken: -> @currentToken
+
   methods: (methods) ->
     @api ?= (require './default-api.coffee')()
     @api[method] = fn  for method, fn of methods

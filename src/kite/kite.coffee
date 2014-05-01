@@ -51,6 +51,10 @@ module.exports = class Kite extends EventEmitter
 
     @connect()  if @options.autoConnect
 
+    @currentToken = null
+
+  getToken: -> @currentToken
+
   # connection state:
   connect: ->
     return  if @readyState is READY
