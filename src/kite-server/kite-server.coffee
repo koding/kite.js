@@ -36,9 +36,12 @@ module.exports = class KiteServer extends EventEmitter
 
   getToken: -> @currentToken
 
-  methods: (methods) ->
+  method: (methodName, fn) ->
     @api ?= (require './default-api.coffee')()
-    @api[method] = fn  for method, fn of methods
+    @api[methodName] = fn
+
+  methods: (methods) ->
+    @method methodName, fn for methodName, fn of methods
 
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
