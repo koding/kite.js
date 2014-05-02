@@ -14,4 +14,5 @@ module.exports = Promise.method (method, auth, kiteKey) ->
   switch type
     when 'token'
       handleToken key, kiteKey
-    else throw new Error "Unknown auth type: #{ type }"
+    else
+      throw new Error "Unknown auth type: #{ type }"
