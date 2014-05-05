@@ -40,12 +40,18 @@ module.exports = (proto, message) ->
 
     mungeCallbacks callbacks, withArgs.length
 
+    # set this as the current token for the duration of the synchronous method call.
+    # NOTE: this mechanism may be changed at some point in the future.
+    @currentToken = token
+
     proto.handle {
       method
       arguments: [withArgs..., responseCallback]
       links
       callbacks
     }
+
+    @currentToken = null
 
   .catch (err) =>
     @emit 'debug', "Authentication failed"

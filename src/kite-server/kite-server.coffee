@@ -4,6 +4,8 @@
 
 module.exports = class KiteServer extends EventEmitter
 
+  { @version } = require '../../package.json'
+
   Promise = require 'bluebird'
   { Server: WebSocketServer } = require 'ws'
   dnodeProtocol = require 'dnode-protocol'
@@ -13,8 +15,7 @@ module.exports = class KiteServer extends EventEmitter
   KiteError = require '../error.coffee'
   Kontrol = require '../kontrol-as-promised/kontrol.coffee'
 
-  wrapApi = require './wrap-api.coffee'
-  enableLogging = require '../logging.coffee'
+  enableLogging = require '../logging/logging.coffee'
 
   { v4: createId } = require 'node-uuid'
 
@@ -27,8 +28,20 @@ module.exports = class KiteServer extends EventEmitter
     enableLogging options.name, this, options.logLevel
 
     @id = createId()
-    @api = wrapApi options.api
     @server = null
+
+    @methods options.api  if options.api?
+
+    @currentToken = null
+
+  getToken: -> @currentToken
+
+  method: (methodName, fn) ->
+    @api ?= (require './default-api.coffee')()
+    @api[methodName] = fn
+
+  methods: (methods) ->
+    @method methodName, fn for methodName, fn of methods
 
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
@@ -37,36 +50,36 @@ module.exports = class KiteServer extends EventEmitter
     @server.on 'connection', @bound 'onConnection'
     @emit 'info', "Listening: #{ @server.options.host }:#{ @server.options.port }"
 
-  register: (kontrolUri, kiteUri, kiteKey) ->
+  register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
-    kontrolUriP = Promise.cast kontrolUri
-    kiteUriP = Promise.cast kiteUri
-    kiteKeyP = @normalizeKiteKey kiteKey
-    Promise.all [kontrolUriP, kiteUriP, kiteKeyP]
-      .spread (kontrolUri, kiteUri, key) =>
-        { name, username, environment, version, region, hostname, logLevel } = @options
+    Promise.all([
+      Promise.cast u
+      Promise.cast h
+      @normalizeKiteKey k
+    ]).spread (kontrolUri, host, key) =>
+      { name, username, environment, version, region, hostname, logLevel } = @options
 
-        throw new Error "No kite key!"  unless key?
+      throw new Error "No kite key!"  unless key?
 
-        @key = key
+      @key = key
 
-        @kontrol = new Kontrol
-          url         : kontrolUri
-          auth        : { type: 'kiteKey', key }
-          name        : name
-          username    : username
-          environment : environment
-          version     : version
-          region      : region
-          hostname    : hostname
-          logLevel    : logLevel
-        .on 'connected', =>
-          @emit 'notice', "Connected to Kontrol"
+      @kontrol = new Kontrol
+        url         : kontrolUri
+        auth        : { type: 'kiteKey', key }
+        name        : name
+        username    : username
+        environment : environment
+        version     : version
+        region      : region
+        hostname    : hostname
+        logLevel    : logLevel
+      .on 'connected', =>
+        @emit 'info', "Connected to Kontrol"
 
-        kiteUrl = "ws://#{ kiteUri }:#{ @port }/#{ @options.name }"
+      kiteUri = "ws://#{ host }:#{ @port }/#{ @options.name }"
 
-        @kontrol.register(url: kiteUrl).then =>
-          @emit 'info', "Registered to Kontrol with URL: #{ kiteUrl }"
+      @kontrol.register(url: kiteUri).then =>
+        @emit 'info', "Registered to Kontrol with URL: #{ kiteUri }"
 
   normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
     when 'string' is typeof src
@@ -77,7 +90,7 @@ module.exports = class KiteServer extends EventEmitter
     when 'function' is typeof src.pipe
       toArray(src).then (arr) -> arr.join '\n'
     else throw new Error """
-      Don't know how to get the kite key: #{ src }
+      Don't know how to normalize the kite key: #{ src }
       """
 
   onConnection: (ws) ->

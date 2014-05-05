@@ -2,7 +2,7 @@
   "name": "kite.js",
   "description": "Kite client library",
   "main": "index.js",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postpublish": "gulp"
@@ -35,7 +35,6 @@
     "node-uuid": "^1.4.1",
     "jwt-simple": "^0.2.0",
     "gulp": "^3.6.1",
-    "lodash.assign": "^2.4.1",
     "stream-to-array": "^1.0.0",
     "request": "^2.34.0",
     "atob": "^1.1.0",
@@ -56,6 +55,9 @@
     "gulp-util": "^2.2.14",
     "gulp-replace": "^0.2.0",
     "vinyl-source-stream": "^0.1.1"
+  },
+  "browser": {
+    "./src/logging/logging.coffee": "./src/logging/browser.coffee"
   },
   "browserify": {
     "transform": [

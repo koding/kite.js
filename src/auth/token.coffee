@@ -1,4 +1,3 @@
-Promise = require 'bluebird'
 jwt = require 'jwt-simple'
 atob = require 'atob'
 
@@ -8,10 +7,9 @@ module.exports = (tokenString, kiteKey) ->
   [ _, kontrolClaimsA ] = kiteKey.split '.'
   [ headersA, publicClaimsA ] = tokenString.split '.'
 
-  claims = parse kontrolClaimsA
+  kontrolClaims = parse kontrolClaimsA
   headers = parse headersA
-  publicClaims = parse publicClaimsA
 
-  privateClaims = jwt.decode tokenString, claims.kontrolKey
+  claims = jwt.decode tokenString, kontrolClaims.kontrolKey
 
-  Promise.resolve { headers, publicClaims, privateClaims }
+  { headers, claims }
