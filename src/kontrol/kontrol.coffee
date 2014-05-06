@@ -57,8 +57,12 @@ module.exports = class Kontrol extends EventEmitter
     return kite
 
   renewToken: (kite, query) ->
-    # TODO: need to implement #renewToken
-    throw new Error 'Kontrol#renewToken is not implemented'
+    @kite.tell 'getToken', [query], (err, token) ->
+      if err
+        # FIXME: what should happen to this error?
+        console.error err
+        return
+      kite.setToken token
 
   createKites: (kiteDescriptors, query) ->
     (@createKite k, query for k in kiteDescriptors)
