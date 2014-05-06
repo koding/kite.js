@@ -14,6 +14,8 @@ module.exports = class Kite extends EventEmitter
 
   enableLogging = require '../logging/logging.coffee'
 
+  KiteError = require '../error.coffee'
+
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
 
@@ -134,9 +136,10 @@ module.exports = class Kite extends EventEmitter
     return
 
   # util:
-  makeProperError = ({ type, message }) ->
-    err = new Error message
+  makeProperError = ({ type, message, code }) ->
+    err = new KiteError message
     err.type = type
+    err.code = code
     err
 
   bound: require '../bound.coffee'
