@@ -1,6 +1,6 @@
 "use strict"
 
-{ define } = require '../util.coffee'
+{ define } = require './util.coffee'
 
 module.exports = (method, ctx = this) ->
   throw new Error "Could not bind method: #{method}"  unless ctx[method]?
