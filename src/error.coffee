@@ -4,4 +4,6 @@ module.exports = class KiteError extends Error
     @message = message
     @name = "KiteError"
 
-  @byCode = (code) -> (err) -> code is err.code
+  @codeIs = (code) -> (err) -> code is err.code
+
+  @codeIsnt = (code) -> (err) -> code isnt err.code

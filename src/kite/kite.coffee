@@ -15,6 +15,8 @@ module.exports = class Kite extends EventEmitter
   enableLogging = require '../logging/logging.coffee'
 
   KiteError = require '../error.coffee'
+  # expose the error object for it's predicates
+  @Error = KiteError
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
