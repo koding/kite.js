@@ -103,7 +103,7 @@ module.exports = class Kite extends EventEmitter
   getKiteInfo: (params) ->
     username    : "#{ @options.username ? 'anonymous' }"
     environment : "#{ @options.environment ? 'browser-environment' }"
-    name        : "#{ params?[0]?.kiteName ? @options.name ? 'browser-kite' }" # TODO: don't know where to get this value for now
+    name        : "#{ params?[0]?.kiteName ? @options.name ? 'browser-kite' }"
     version     : "#{ @options.version ? '1.0.0' }"
     region      : "#{ @options.region ? 'browser-region' }"
     hostname    : "#{ @options.hostname ? 'browser-hostname' }"
