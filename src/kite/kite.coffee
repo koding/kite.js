@@ -104,31 +104,28 @@ module.exports = class Kite extends EventEmitter
     @emit 'error', "Websocket error!"
     return
 
-  unwrapMessage: (message) ->
-    { withArgs:[{ error: err, result }]} = message
-
-    # we will get a plain object as an error, but it's important for debugging
-    # that we send a proper error object.
-    err = makeProperError err  if err?
-
-    { err, result }
-
   getKiteInfo: (params) ->
     username    : "#{ @options.username ? 'anonymous' }"
     environment : "#{ @options.environment ? 'browser-environment' }"
-    name        : "#{ params?[0]?.kiteName ? @options.name ? 'browser-kite' }" # TODO: don't know where to get this value for now
+    name        : "#{ params?[0]?.kiteName ? @options.name ? 'browser-kite' }"
     version     : "#{ @options.version ? '1.0.0' }"
     region      : "#{ @options.region ? 'browser-region' }"
     hostname    : "#{ @options.hostname ? 'browser-hostname' }"
     id          : @id
 
   wrapMessage: (method, params, callback) ->
+    kite              : @getKiteInfo params
     authentication    : @options.auth
     withArgs          : params
     responseCallback  : (response) =>
-      { error: err, result } = response
+      { error: rawErr, result } = response
+
+      err =
+        if rawErr?
+        then makeProperError rawErr
+        else null
+
       callback err, result
-    kite              : @getKiteInfo params
 
   tell: (method, params, callback) ->
     # by default, remove this callback after it is called once.
