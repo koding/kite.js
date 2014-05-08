@@ -16,7 +16,7 @@ module.exports = class Kite extends EventEmitter
   enableLogging = require '../logging/logging.coffee'
 
   KiteError = require '../error.coffee'
-  # expose the error object for it's predicates
+  # expose the error object for its predicates
   @Error = KiteError
 
   # ready states:
@@ -129,10 +129,7 @@ module.exports = class Kite extends EventEmitter
     responseCallback  : (response) =>
       { error: rawErr, result } = response
 
-      err =
-        if rawErr?
-        then makeProperError rawErr
-        else null
+      err = if rawErr? then makeProperError rawErr else null
 
       callback err, result
 
