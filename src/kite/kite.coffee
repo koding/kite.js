@@ -65,8 +65,8 @@ module.exports = class Kite extends EventEmitter
 
   setToken: (token) ->
     # FIXME: this setter is not symettrical with the getter
-    throw new Error "Invalid auth type!"  unless @options.auth?.type is token
-    @options.auth.token = token
+    throw new Error "Invalid auth type!"  unless @options.auth?.type is 'token'
+    @options.auth.key = token
 
   # connection state:
   connect: ->
