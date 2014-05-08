@@ -37,22 +37,22 @@ module.exports = class Kontrol extends EventEmitter
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
     @kite.on 'connected', @emit.bind this, 'connected'
 
-  createKite: ({ kite: { name }, token, url }, query) ->
+  createKite: ({ kite: kiteDescriptor, token, url }) ->
     kite = new @constructor.Kite
-      username    : @options.username
-      environment : @options.environment
-      version     : @options.version
-      region      : @options.region
-      hostname    : @options.hostname
+      username    : kiteDescriptor.username
+      environment : kiteDescriptor.environment
+      version     : kiteDescriptor.version
+      region      : kiteDescriptor.region
+      hostname    : kiteDescriptor.hostname
       autoConnect : no
-      name        : name
+      name        : kiteDescriptor.name
       url         : url
       auth        :
         type      : 'token'
         key       : token
       logLevel    : @options.logLevel
     .on 'tokenExpired', =>
-      @renewToken kite, query
+      @renewToken kite, kiteDescriptor
 
     return kite
 
@@ -65,7 +65,7 @@ module.exports = class Kontrol extends EventEmitter
       kite.setToken token
 
   createKites: (kiteDescriptors, query) ->
-    (@createKite k, query for k in kiteDescriptors)
+    (@createKite k for k in kiteDescriptors)
 
   fetchKites: (args = {}, callback) ->
     @kite.tell 'getKites', [args], (err, result) =>
@@ -77,7 +77,7 @@ module.exports = class Kontrol extends EventEmitter
         callback @createKiteNotFoundError args.query
         return
 
-      callback null, @createKites result.kites, args.query
+      callback null, @createKites result.kites
       return
     return
 
