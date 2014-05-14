@@ -64,7 +64,6 @@ gulp.task 'build auth', ->
 gulp.task 'browserify kite', ->
   browserify
     entries     : ['./src/kite/kite.coffee']
-    extensions  : ['./coffee']
     debug       : no
   .require 'events'
   .require './src/kite/kite.coffee', expose: 'kite'
@@ -77,7 +76,6 @@ gulp.task 'browserify kite', ->
 gulp.task 'browserify kite as promised', ->
   browserify
     entries     : ['./src/kite-as-promised/kite.coffee']
-    extensions  : ['./coffee']
     debug       : no
   .require 'events'
   .require './src/kite/kite.coffee'
