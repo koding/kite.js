@@ -1,3 +1,6 @@
+
+var SockJS = require('node-sockjs-client');
+
 var argv = require('minimist')(process.argv);
 var Kite = require('../../promises.js');
 
@@ -12,7 +15,10 @@ console.log('squaring a number! ' + (
     : 'defaulting to 42'
 ));
 
-var math = new Kite('ws://localhost:5647')
+var math = new Kite({
+  url: 'http://localhost:5647',
+  transportClass: SockJS
+})
   .on('error', error)
 ;
 

@@ -13,7 +13,7 @@ error = console.error.bind console
 warn = console.warn.bind console
 info = console.info.bind console
 
-enableLogging = (name, emitter, logLevel = INFO) ->
+enableLogging = (name = "kite", emitter, logLevel = INFO) ->
 
   createLogger = (category, style, fn) -> (messages...) ->
     fn style "[#{ name }] #{ category }\t#{ messages.join ' ' }"

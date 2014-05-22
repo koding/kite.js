@@ -21,36 +21,38 @@ module.exports = class Kontrol extends EventEmitter
     @authenticate()  if @options.autoConnect
 
   authenticate: (@options = @options) ->
-    { url, auth, username, environment, version, region, hostname, name, logLevel } = @options
+    { url, auth, username, environment, version, region, hostname, name, logLevel, transportClass } = @options
 
     @kite = new @constructor.Kite
-      username    : username
-      environment : environment
-      version     : version
-      region      : region
-      hostname    : hostname
-      name        : name ? 'kontrol'
-      url         : url
-      auth        : auth
-      logLevel    : logLevel
+      username        : username
+      environment     : environment
+      version         : version
+      region          : region
+      hostname        : hostname
+      name            : name ? 'kontrol'
+      url             : url
+      auth            : auth
+      logLevel        : logLevel
+      transportClass  : transportClass
 
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
     @kite.on 'connected', @emit.bind this, 'connected'
 
   createKite: ({ kite: { name }, token, url }) ->
     new @constructor.Kite
-      username    : @options.username
-      environment : @options.environment
-      version     : @options.version
-      region      : @options.region
-      hostname    : @options.hostname
-      autoConnect : no
-      name        : name
-      url         : url
-      auth        :
-        type      : 'token'
-        key       : token
-      logLevel    : @options.logLevel
+      username        : @options.username
+      environment     : @options.environment
+      version         : @options.version
+      region          : @options.region
+      hostname        : @options.hostname
+      autoConnect     : no
+      name            : name
+      url             : url
+      auth            :
+        type          : 'token'
+        key           : token
+      logLevel        : @options.logLevel
+      transportClass  : @options.transportClass
 
   createKites: (kiteDescriptors) ->
     (@createKite k for k in kiteDescriptors)
