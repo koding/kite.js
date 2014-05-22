@@ -7,7 +7,7 @@ module.exports = class Kite extends EventEmitter
   { @version } = require '../../package.json'
 
   dnodeProtocol = require 'dnode-protocol'
-  WebSocket     = require 'ws'
+  SockJS = require 'sockjs'
 
   wrapApi = require './wrap-api.coffee'
   handleIncomingMessage = require '../incoming-message-handler.coffee'
@@ -63,7 +63,7 @@ module.exports = class Kite extends EventEmitter
   connect: ->
     return  if @readyState is READY
     { url } = @options
-    @ws = new WebSocket url
+    @ws = new SockJS url
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'

@@ -1,5 +1,6 @@
 gulp        = require 'gulp'
 browserify  = require 'browserify'
+concat      = require 'gulp-concat'
 uglify      = require 'gulp-uglify'
 rename      = require 'gulp-rename'
 coffee      = require 'gulp-coffee'
@@ -73,6 +74,11 @@ gulp.task 'browserify kite', ->
   .pipe rename 'kite-bundle.js'
   .pipe gulp.dest 'browser'
 
+gulp.task 'polyfill kite', ['browserify kite'], ->
+  gulp.src ['./vendor/sockjs-0.3.4.min.nojson.js', './browser/kite-bundle.js']
+    .pipe concat 'kite-sock-bundle.js'
+    .pipe gulp.dest 'browser'
+
 gulp.task 'browserify kite as promised', ->
   browserify
     entries     : ['./src/kite-as-promised/kite.coffee']
@@ -85,6 +91,11 @@ gulp.task 'browserify kite as promised', ->
   .pipe source 'kite.coffee'
   .pipe rename 'kite-promises-bundle.js'
   .pipe gulp.dest 'browser'
+
+gulp.task 'polyfill kite as promised', ['browserify kite as promised'], ->
+  gulp.src ['./vendor/sockjs-0.3.4.min.nojson.js', './browser/kite-promises-bundle.js']
+    .pipe concat 'kite-promises-sock-bundle.js'
+    .pipe gulp.dest 'browser'
 
 gulp.task 'browserify kontrol', ->
   browserify
@@ -127,6 +138,8 @@ gulp.task 'build', [
 gulp.task 'browserify', [
   'browserify kite'
   'browserify kite as promised'
+  'polyfill kite'
+  'polyfill kite as promised'
   'browserify kontrol'
   'browserify kontrol as promised'
 ]
