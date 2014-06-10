@@ -63,7 +63,7 @@ module.exports = class Kite extends EventEmitter
   connect: ->
     return  if @readyState is READY
     { url } = @options
-    @ws = new SockJS url
+    @ws = new SockJS url, null, { protocols_whitelist: ['xhr-polling'] }
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'
