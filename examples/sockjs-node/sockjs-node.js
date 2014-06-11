@@ -1,6 +1,6 @@
-var Kite = require('../../promises.js');
-var SockJS = require('../../../sockjs-client/lib/sockjs.js');
+var SockJS = require('node-sockjs-client');
 
+var Kite = require('../../promises.js');
 var logging = require('../../lib/logging/logging.js');
 
 var k = new Kite({

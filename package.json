@@ -39,7 +39,7 @@
     "request": "^2.34.0",
     "atob": "^1.1.0",
     "cli-color": "^0.3.2",
-    "minimist": "0.0.8",
+    "minimist": "0.0.8"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
@@ -55,7 +55,8 @@
     "gulp-replace": "^0.2.0",
     "vinyl-source-stream": "^0.1.1",
     "ecstatic": "^0.5.3",
-    "gulp-concat": "^2.2.0"
+    "gulp-concat": "^2.2.0",
+    "node-sockjs-client": "0.0.1"
   },
   "browser": {
     "./src/logging/logging.coffee": "./src/logging/browser.coffee"
