@@ -38,10 +38,8 @@
     "stream-to-array": "^1.0.0",
     "request": "^2.34.0",
     "atob": "^1.1.0",
-    "koding-backoff": "0.0.1",
     "cli-color": "^0.3.2",
     "minimist": "0.0.8",
-    "gulp-concat": "^2.2.0"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
@@ -56,7 +54,8 @@
     "gulp-util": "^2.2.14",
     "gulp-replace": "^0.2.0",
     "vinyl-source-stream": "^0.1.1",
-    "ecstatic": "^0.5.3"
+    "ecstatic": "^0.5.3",
+    "gulp-concat": "^2.2.0"
   },
   "browser": {
     "./src/logging/logging.coffee": "./src/logging/browser.coffee"
@@ -69,6 +68,7 @@
   "browserify-shim": {
     "bluebird": "global:Promise",
     "sockjs": "global:SockJS",
+    "ws": "global:WebSocket",
     "node-uuid": "global:uuid",
     "atob": "global:atob"
   }
