@@ -7,7 +7,6 @@ module.exports = class KiteServer extends EventEmitter
   { @version } = require '../../package.json'
 
   Promise = require 'bluebird'
-  SockJSServer = require 'sockjs'
   dnodeProtocol = require 'dnode-protocol'
   toArray = Promise.promisify require 'stream-to-array'
   fs = Promise.promisifyAll require 'fs'
@@ -18,6 +17,8 @@ module.exports = class KiteServer extends EventEmitter
   enableLogging = require '../logging/logging.coffee'
 
   { v4: createId } = require 'node-uuid'
+
+  { Server: @serverClass } = require 'ws'
 
   constructor: (options) ->
     return new KiteServer api  unless this instanceof KiteServer
@@ -46,7 +47,8 @@ module.exports = class KiteServer extends EventEmitter
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
     @port = port
-    @server = new WebSocketServer { port }
+    { serverClass } = @options
+    @server = new (serverClass ? @constructor.serverClass) { port }
     @server.on 'connection', @bound 'onConnection'
     @emit 'info', "Listening: #{ @server.options.host }:#{ @server.options.port }"
 
