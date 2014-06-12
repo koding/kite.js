@@ -46,11 +46,16 @@ module.exports = class KiteServer extends EventEmitter
   methods: (methods) ->
     @method methodName, fn for methodName, fn of methods
 
+  getServerClass: ->
+    @options.serverClass ? @constructor.serverClass
+
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
     @port = port
-    { serverClass } = @options
-    @server = new (serverClass ? @constructor.serverClass) { port }
+    { prefix } = @options
+    prefix = "/#{prefix}"  unless '/' is prefix.charAt 0
+    Server = @getServerClass()
+    @server = new Server { port, prefix }
     @server.on 'connection', @bound 'onConnection'
     @emit 'info', "Listening: #{ @server.getAddress() }"
 
@@ -61,7 +66,15 @@ module.exports = class KiteServer extends EventEmitter
       Promise.cast h
       @normalizeKiteKey k
     ]).spread (kontrolUri, host, key) =>
-      { name, username, environment, version, region, hostname, logLevel, transportClass } = @options
+      { name, username, environment, version, region, hostname, logLevel, transportClass, secure } = @options
+
+      Server = @getServerClass()
+
+      scheme = (
+        if secure is true
+        then Server.secureScheme
+        else Server.scheme
+      ) or 'ws'
 
       throw new Error "No kite key!"  unless key?
 
@@ -81,7 +94,7 @@ module.exports = class KiteServer extends EventEmitter
       .on 'connected', =>
         @emit 'info', "Connected to Kontrol"
 
-      kiteUri = "ws://#{ host }:#{ @port }/#{ @options.name }"
+      kiteUri = "#{ scheme }://#{ host }:#{ @port }/#{ @options.name }"
 
       @kontrol.register(url: kiteUri).then =>
         @emit 'info', "Registered to Kontrol with URL: #{ kiteUri }"

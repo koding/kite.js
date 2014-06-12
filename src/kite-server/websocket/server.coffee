@@ -5,6 +5,9 @@ Session = require './session.coffee'
 
 module.exports = class Server extends EventEmitter
 
+  @scheme = 'ws'
+  @secureScheme = 'wss'
+
   constructor: (options) ->
     return new Server options  unless this instanceof Server
     @options = options

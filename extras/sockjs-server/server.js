@@ -1,3 +1,4 @@
+/* jshint node: true */
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var sockJS = require('sockjs');
@@ -26,6 +27,9 @@ function Server(options) {
   // WebSocketServer connects automatically:
   this.server.listen(options.port, options.hostname);
 }
+
+Server.scheme = 'http';
+Server.secureScheme = 'https';
 
 Server.prototype.getAddress = function () {
   return this.server._connectionKey;

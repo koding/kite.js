@@ -39,7 +39,8 @@
     "request": "^2.34.0",
     "atob": "^1.1.0",
     "cli-color": "^0.3.2",
-    "minimist": "0.0.8"
+    "minimist": "0.0.8",
+    "node-sockjs-client": "^0.1.0"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
