@@ -2,12 +2,13 @@
 
 { EventEmitter } = require 'events'
 
+SockJS = require 'node-sockjs-client'
+
 module.exports = class KiteServer extends EventEmitter
 
   { @version } = require '../../package.json'
 
   Promise = require 'bluebird'
-  { Server: WebSocketServer } = require 'ws'
   dnodeProtocol = require 'dnode-protocol'
   toArray = Promise.promisify require 'stream-to-array'
   fs = Promise.promisifyAll require 'fs'
@@ -18,6 +19,8 @@ module.exports = class KiteServer extends EventEmitter
   enableLogging = require '../logging/logging.coffee'
 
   { v4: createId } = require 'node-uuid'
+
+  @serverClass = require './websocket/server.coffee'
 
   constructor: (options) ->
     return new KiteServer api  unless this instanceof KiteServer
@@ -37,18 +40,24 @@ module.exports = class KiteServer extends EventEmitter
   getToken: -> @currentToken
 
   method: (methodName, fn) ->
-    @api ?= (require './default-api.coffee')()
+    @api ?= do require './default-api.coffee'
     @api[methodName] = fn
 
   methods: (methods) ->
     @method methodName, fn for methodName, fn of methods
 
+  getServerClass: ->
+    @options.serverClass ? @constructor.serverClass
+
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
     @port = port
-    @server = new WebSocketServer { port }
+    { prefix } = @options
+    prefix = "/#{prefix}"  unless '/' is prefix.charAt 0
+    Server = @getServerClass()
+    @server = new Server { port, prefix }
     @server.on 'connection', @bound 'onConnection'
-    @emit 'info', "Listening: #{ @server.options.host }:#{ @server.options.port }"
+    @emit 'info', "Listening: #{ @server.getAddress() }"
 
   register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
@@ -57,26 +66,35 @@ module.exports = class KiteServer extends EventEmitter
       Promise.cast h
       @normalizeKiteKey k
     ]).spread (kontrolUri, host, key) =>
-      { name, username, environment, version, region, hostname, logLevel } = @options
+      { name, username, environment, version, region, hostname, logLevel, transportClass, secure } = @options
+
+      Server = @getServerClass()
+
+      scheme = (
+        if secure is true
+        then Server.secureScheme
+        else Server.scheme
+      ) or 'ws'
 
       throw new Error "No kite key!"  unless key?
 
       @key = key
 
       @kontrol = new Kontrol
-        url         : kontrolUri
-        auth        : { type: 'kiteKey', key }
-        name        : name
-        username    : username
-        environment : environment
-        version     : version
-        region      : region
-        hostname    : hostname
-        logLevel    : logLevel
+        url             : kontrolUri
+        auth            : { type: 'kiteKey', key }
+        name            : name
+        username        : username
+        environment     : environment
+        version         : version
+        region          : region
+        hostname        : hostname
+        logLevel        : logLevel
+        transportClass  : transportClass
       .on 'connected', =>
         @emit 'info', "Connected to Kontrol"
 
-      kiteUri = "ws://#{ host }:#{ @port }/#{ @options.name }"
+      kiteUri = "#{ scheme }://#{ host }:#{ @port }/#{ @options.name }"
 
       @kontrol.register(url: kiteUri).then =>
         @emit 'info', "Registered to Kontrol with URL: #{ kiteUri }"
@@ -96,10 +114,11 @@ module.exports = class KiteServer extends EventEmitter
   onConnection: (ws) ->
     proto = dnodeProtocol @api
     proto.on 'request', @handleRequest.bind this, ws
+    id = ws.getId()
     ws.on 'message', @handleMessage.bind this, proto
     ws.on 'close', =>
-      @emit 'info', 'Client has disconnected: '
-    @emit 'info', "New connection from: #{ ws._socket.remoteAddress }:#{ ws._socket.remotePort }"
+      @emit 'info', "Client has disconnected: #{ id }"
+    @emit 'info', "New connection from: #{ id }"
 
   handleMessage: require '../incoming-message-handler.coffee'
 
