@@ -28,5 +28,5 @@ function Server(options) {
 }
 
 Server.prototype.getAddress = function () {
-  return 4;
+  return this.server._connectionKey;
 };
