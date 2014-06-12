@@ -7,7 +7,6 @@ module.exports = class KiteServer extends EventEmitter
   { @version } = require '../../package.json'
 
   Promise = require 'bluebird'
-  { Server: WebSocketServer } = require 'ws'
   dnodeProtocol = require 'dnode-protocol'
   toArray = Promise.promisify require 'stream-to-array'
   fs = Promise.promisifyAll require 'fs'
@@ -18,6 +17,8 @@ module.exports = class KiteServer extends EventEmitter
   enableLogging = require '../logging/logging.coffee'
 
   { v4: createId } = require 'node-uuid'
+
+  @serverClass = require './websocket/server.coffee'
 
   constructor: (options) ->
     return new KiteServer api  unless this instanceof KiteServer
@@ -37,7 +38,7 @@ module.exports = class KiteServer extends EventEmitter
   getToken: -> @currentToken
 
   method: (methodName, fn) ->
-    @api ?= (require './default-api.coffee')()
+    @api ?= do require './default-api.coffee'
     @api[methodName] = fn
 
   methods: (methods) ->
@@ -46,9 +47,10 @@ module.exports = class KiteServer extends EventEmitter
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
     @port = port
-    @server = new WebSocketServer { port }
+    { serverClass } = @options
+    @server = new (serverClass ? @constructor.serverClass) { port }
     @server.on 'connection', @bound 'onConnection'
-    @emit 'info', "Listening: #{ @server.options.host }:#{ @server.options.port }"
+    @emit 'info', "Listening: #{ @server.getAddress() }"
 
   register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
@@ -96,10 +98,11 @@ module.exports = class KiteServer extends EventEmitter
   onConnection: (ws) ->
     proto = dnodeProtocol @api
     proto.on 'request', @handleRequest.bind this, ws
+    id = ws.getId()
     ws.on 'message', @handleMessage.bind this, proto
     ws.on 'close', =>
-      @emit 'info', 'Client has disconnected: '
-    @emit 'info', "New connection from: #{ ws._socket.remoteAddress }:#{ ws._socket.remotePort }"
+      @emit 'info', "Client has disconnected: #{ id }"
+    @emit 'info', "New connection from: #{ id }"
 
   handleMessage: require '../incoming-message-handler.coffee'
 

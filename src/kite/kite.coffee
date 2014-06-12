@@ -7,7 +7,6 @@ module.exports = class Kite extends EventEmitter
   { @version } = require '../../package.json'
 
   dnodeProtocol = require 'dnode-protocol'
-  WebSocket     = require 'ws'
 
   wrapApi = require './wrap-api.coffee'
   handleIncomingMessage = require '../incoming-message-handler.coffee'
@@ -25,6 +24,8 @@ module.exports = class Kite extends EventEmitter
   [ OKAY, ERROR ] = [0,1]
 
   { v4: uniqueId } = require 'node-uuid'
+
+  @transportClass = require 'ws'
 
   constructor: (options) ->
     return new Kite options  unless this instanceof Kite
@@ -62,8 +63,8 @@ module.exports = class Kite extends EventEmitter
   # connection state:
   connect: ->
     return  if @readyState is READY
-    { url } = @options
-    @ws = new WebSocket url
+    { url, transportClass } = @options
+    @ws = new (transportClass ? @constructor.transportClass) url
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'
