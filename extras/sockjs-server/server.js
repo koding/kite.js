@@ -10,6 +10,9 @@ util.inherits(Server, EventEmitter)
 module.exports = Server
 
 function Server(options) {
+  if (!(this instanceof Server)) {
+    return new Server(options);
+  }
   this.sockjs = sockJS.createServer();
   this.server = http.createServer();
   this.options = options;
@@ -23,3 +26,7 @@ function Server(options) {
   // WebSocketServer connects automatically:
   this.server.listen(options.port, options.hostname);
 }
+
+Server.prototype.getAddress = function () {
+  return 4;
+};

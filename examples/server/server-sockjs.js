@@ -1,4 +1,5 @@
 var KiteServer = require('../../server');
+var SockJsServer = require('../../extras/sockjs-server/server.js');
 
 var math = new KiteServer({
   name: 'math',
@@ -6,6 +7,7 @@ var math = new KiteServer({
   environment: 'vagrant',
   region: 'vagrant',
   version: '1.0.0',
+  serverClass: SockJsServer,
   api: {
 
     square: function (x, callback) {

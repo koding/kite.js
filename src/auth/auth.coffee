@@ -5,7 +5,6 @@ handleToken = require './token.coffee'
 whitelist = require './whitelist.coffee'
 
 module.exports = Promise.method (method, auth, kiteKey) ->
-  console.log method, auth, kiteKey
   unless auth?
     return  if method in whitelist
     throw new Error "Access denied!"
