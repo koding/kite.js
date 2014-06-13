@@ -9,6 +9,11 @@ killall main || true
 rm -rf kite
 
 go get github.com/koding/kite
+echo "downloading dependencies of github.com/koding/kite"
+
+cd $KODINGROOT/kite/
+go get -d -v ./...
+cd -
 
 # delete existing kite.key
 rm -rf $HOME/.kite
