@@ -58,7 +58,8 @@
     "ecstatic": "^0.5.3",
     "gulp-concat": "^2.2.0",
     "node-sockjs-client": "0.0.1",
-    "sockjs": "^0.3.9"
+    "sockjs": "^0.3.9",
+    "minimist": "0.0.8"
   },
   "browser": {
     "./src/logging/logging.coffee": "./src/logging/browser.coffee"
