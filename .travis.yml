@@ -1,0 +1,5 @@
+install:
+  - sh run-kontrol.sh
+before_script:
+  - sleep 2
+  - node examples/kontrol/kontrol.js
