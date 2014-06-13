@@ -49,11 +49,15 @@ module.exports = class KiteServer extends EventEmitter
   getServerClass: ->
     @options.serverClass ? @constructor.serverClass
 
+  getPrefix: ->
+    { prefix } = @options
+    prefix ?= ''
+    prefix = "/#{prefix}"  unless '/' is prefix.charAt 0
+
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
     @port = port
-    { prefix } = @options
-    prefix = "/#{prefix}"  unless '/' is prefix.charAt 0
+    prefix = @getPrefix()
     Server = @getServerClass()
     @server = new Server { port, prefix }
     @server.on 'connection', @bound 'onConnection'
@@ -91,6 +95,7 @@ module.exports = class KiteServer extends EventEmitter
         hostname        : hostname
         logLevel        : logLevel
         transportClass  : transportClass
+        prefix          : @getPrefix()
       .on 'connected', =>
         @emit 'info', "Connected to Kontrol"
 

@@ -41,6 +41,8 @@ module.exports = class Kite extends EventEmitter
     @options.autoConnect   ?= yes
     @options.autoReconnect ?= yes
 
+    @options.url += @options.prefix  if @options.prefix
+
     enableLogging @options.name, this, @options.logLevel
 
     @readyState = NOTREADY
