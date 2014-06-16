@@ -5,16 +5,16 @@ var joinPath = require('path').join;
 var log = console.log.bind(console);
 var warn = console.warn.bind(console);
 
-var registationIp = require('../fetch-registration-ip.js')(argv.c || 'vagrant');
-
 var kiteKey = fs.createReadStream(joinPath(process.env.HOME, './.kite/kite.key'), 'utf-8');
 
 var logLevels = require('../../logging').logLevels;
 
 var KiteServer = require('../../server');
 
-var SockJS = require('node-sockjs-client');
+var SockJs = require('node-sockjs-client');
 var SockJsServer = require('../../extras/sockjs-server/server.js');
+
+console.log('running node SockJs version: ', SockJs.version);
 
 var math = new KiteServer({
   name:           'math',
@@ -24,7 +24,7 @@ var math = new KiteServer({
   version:        '1.0.0',
   prefix:         'kite',
   logLevel:       argv.v ? logLevels.DEBUG : logLevels.INFO,
-  transportClass: SockJS,
+  transportClass: SockJs,
   serverClass:    SockJsServer
 });
 
@@ -43,7 +43,7 @@ math.methods({
 math.listen(5647);
 
 math.register({
-  to:       'http://localhost:4000',
-  host:     registationIp,
+  to:       'http://0.0.0.0:4000',
+  host:     '0.0.0.0',
   kiteKey:  kiteKey
 });

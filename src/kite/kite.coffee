@@ -71,6 +71,7 @@ module.exports = class Kite extends EventEmitter
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'
     @ws.addEventListener 'error',   @bound 'onError'
+    @ws.addEventListener 'info',    (info) => @emit 'info', info
     @emit 'info', "Trying to connect to #{ url }"
     return
 
@@ -90,6 +91,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   onClose: ->
+    console.log arguments
     @readyState = CLOSED
     @emit 'disconnected'
     # enable below to autoReconnect when the socket has been closed
@@ -104,6 +106,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   onError: (err) ->
+    console.log err
     @emit 'error', "Websocket error!"
     return
 

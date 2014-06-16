@@ -17,7 +17,7 @@ module.exports = Promise.method(function (environment) {
         return body.trim()
       });
   case 'vagrant':
-    return '127.0.0.1';
+    return '0.0.0.0';
   default:
     throw new Error("I don't know which IP address to register in this environment: " + environment);
   }

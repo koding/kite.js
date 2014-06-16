@@ -2,8 +2,12 @@ language: node_js
 node_js:
   - "0.11"
   - "0.10"
+cache: false
 install:
+  - npm install
+  - gulp
   - sh run-kontrol.sh
 before_script:
-  - sleep 2
+  - sleep 10
+  - curl http://0.0.0.0:4000/kite
   - node examples/kontrol/kontrol.js
