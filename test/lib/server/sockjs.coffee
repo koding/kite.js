@@ -1,4 +1,4 @@
-SockJsServer  = require '../../../extras/sockjs-server/server.js'
+SockJsServer  = require '../../../lib/kite-server/sockjs/server.js'
 KiteServer    = require '../../../server'
 
 module.exports = new KiteServer
