@@ -1,5 +1,5 @@
 var KiteServer = require('../../server');
-var SockJsServer = require('../../extras/sockjs-server/server.js');
+var SockJsServer = require('../../lib/kite-server/sockjs/server.js');
 
 var math = new KiteServer({
   name: 'math',

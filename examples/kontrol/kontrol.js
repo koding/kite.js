@@ -12,7 +12,7 @@ var logLevels = require('../../logging').logLevels;
 var KiteServer = require('../../server');
 
 var SockJs = require('node-sockjs-client');
-var SockJsServer = require('../../extras/sockjs-server/server.js');
+var SockJsServer = require('../../lib/kite-server/sockjs/server.js');
 
 console.log('running node SockJs version: ', SockJs.version);
 
