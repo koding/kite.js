@@ -63,6 +63,9 @@ module.exports = class KiteServer extends EventEmitter
     @server.on 'connection', @bound 'onConnection'
     @emit 'info', "Listening: #{ @server.getAddress() }"
 
+  close: ->
+    @server?.close()
+
   register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
     Promise.all([

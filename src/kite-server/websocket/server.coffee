@@ -18,3 +18,6 @@ module.exports = class Server extends EventEmitter
 
   getAddress: ->
     "#{ @server.options.host }:#{ @server.options.port }"
+
+  close: ->
+    @server?.close()

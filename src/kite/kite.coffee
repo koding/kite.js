@@ -91,7 +91,6 @@ module.exports = class Kite extends EventEmitter
     return
 
   onClose: ->
-    console.log arguments
     @readyState = CLOSED
     @emit 'disconnected'
     # enable below to autoReconnect when the socket has been closed

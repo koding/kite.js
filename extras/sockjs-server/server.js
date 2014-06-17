@@ -34,3 +34,7 @@ Server.secureScheme = 'https';
 Server.prototype.getAddress = function () {
   return this.server._connectionKey;
 };
+
+Server.prototype.close = function () {
+  this.server && this.server.close();
+};
