@@ -98,7 +98,6 @@ module.exports = class KiteServer extends EventEmitter
         hostname        : hostname
         logLevel        : logLevel
         transportClass  : transportClass
-        prefix          : @getPrefix()
       .on 'connected', =>
         @emit 'info', "Connected to Kontrol"
 
