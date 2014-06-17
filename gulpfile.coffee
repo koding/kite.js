@@ -51,7 +51,10 @@ gulp.task 'build kontrol as promised', ->
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kontrol-as-promised'
 
-gulp.task 'build kite server', ['build websocket server adapter'], ->
+gulp.task 'build kite server', [
+  'build websocket server adapter'
+  'build sockjs server adapter'
+], ->
   gulp.src 'src/kite-server/*.coffee'
     .pipe coffee4Node()
     .pipe replace '.coffee', '.js'
@@ -62,6 +65,12 @@ gulp.task 'build websocket server adapter', ->
     .pipe coffee4Node()
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/kite-server/websocket'
+
+gulp.task 'build sockjs server adapter', ->
+  gulp.src 'src/kite-server/sockjs/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/kite-server/sockjs'
 
 gulp.task 'build auth', ->
   gulp.src 'src/auth/*.coffee'
