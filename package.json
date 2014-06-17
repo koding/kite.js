@@ -40,6 +40,7 @@
     "atob": "^1.1.0",
     "cli-color": "^0.3.2",
     "minimist": "0.0.8",
+    "sockjs": "^0.3.9",
     "node-sockjs-client": "1.0.5"
   },
   "devDependencies": {
@@ -57,7 +58,6 @@
     "vinyl-source-stream": "^0.1.1",
     "ecstatic": "^0.5.3",
     "gulp-concat": "^2.2.0",
-    "sockjs": "^0.3.9",
     "tap": "^0.4.11",
     "tape": "^2.13.3"
   },
