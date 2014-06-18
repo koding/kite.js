@@ -18,9 +18,9 @@ test 'kontrol: register to kontrol', (t) ->
     host: '0.0.0.0'
     kiteKey: kiteKey
   .then ->
-    t.ok true
+    t.ok yes
   .catch ->
-    t.ok false
+    t.ok no
   .finally ->
 
     SockJs = require 'node-sockjs-client'
@@ -50,12 +50,12 @@ test 'kontrol: register to kontrol', (t) ->
       kite.tell('echo', 'ECHO').then (echo) ->
         t.equal echo, 'ECHO'
       .catch ->
-        t.ok false
+        t.ok no
       .finally ->
         kite.disconnect()
 
     .catch (err) ->
-      t.ok false
+      t.ok no
 
     .finally ->
       k.disconnect()

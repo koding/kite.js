@@ -4,7 +4,7 @@
   "main": "index.js",
   "version": "0.2.4",
   "scripts": {
-    "test": "KITE_KEY=$(cat ./kontrol_client.key) node ./test/index.js",
+    "test": "KITE_KEY=$(cat ./kontrol_client.key) ./node_modules/.bin/tap ./test/index.js",
     "postpublish": "gulp"
   },
   "author": {
