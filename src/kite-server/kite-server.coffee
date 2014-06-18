@@ -65,6 +65,7 @@ module.exports = class KiteServer extends EventEmitter
 
   close: ->
     @server?.close()
+    @server = null
 
   register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
