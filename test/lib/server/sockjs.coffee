@@ -4,7 +4,7 @@ KiteServer    = require '../../../server'
 
 module.exports = new KiteServer
   name            : 'echo'
-  username        : 'koding'
+  username        : 'testuser'
   environment     : 'vagrant'
   region          : 'vagrant'
   version         : '1.0.0'
@@ -12,4 +12,4 @@ module.exports = new KiteServer
   transportClass  : SockJs
   prefix          : '/echo'
   api             :
-    echo          : (it, echo) -> echo it
+    echo          : (it, echo) -> echo null, it

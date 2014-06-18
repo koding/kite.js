@@ -76,6 +76,9 @@ module.exports = class Kite extends EventEmitter
     return
 
   disconnect: (reconnect = false) ->
+    if @heartbeatHandle
+      clearInterval @heartbeatHandle
+      @heartbeatHandle = null
     @options.autoReconnect = !!reconnect
     @ws.close()
     @emit 'notice', "Disconnecting from #{ @options.url }"
@@ -93,11 +96,14 @@ module.exports = class Kite extends EventEmitter
   onClose: ->
     @readyState = CLOSED
     @emit 'disconnected'
+
+    dcInfo = "#{ @options.url }: disconnected"
     # enable below to autoReconnect when the socket has been closed
     if @options.autoReconnect
       process.nextTick => @setBackoffTimeout @bound "connect"
+      dcInfo += ', trying to reconnect...'
 
-    @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
+    @emit 'info', dcInfo
     return
 
   onMessage: ({ data }) ->

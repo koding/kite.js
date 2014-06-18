@@ -29,4 +29,5 @@ module.exports = class Server extends EventEmitter
     @server._connectionKey
 
   close: ->
-    @server?.close()
+    if @server?
+      @server.close()

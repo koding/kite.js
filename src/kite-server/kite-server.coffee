@@ -53,6 +53,7 @@ module.exports = class KiteServer extends EventEmitter
     { prefix } = @options
     prefix ?= ''
     prefix = "/#{prefix}"  unless '/' is prefix.charAt 0
+    prefix
 
   listen: (port) ->
     throw new Error "Already listening!"  if @server?
@@ -66,6 +67,8 @@ module.exports = class KiteServer extends EventEmitter
   close: ->
     @server?.close()
     @server = null
+    @kontrol?.disconnect()
+    @kontrol = null
 
   register: ({ to: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?

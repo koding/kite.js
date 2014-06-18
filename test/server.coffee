@@ -8,7 +8,7 @@ test 'kite server: ping over WebSocket', (t) ->
   server = require './lib/server/websocket.coffee'
   server.listen 7777
 
-  kite = new Kite 'http://localhost:7777'
+  kite = new Kite 'http://localhost:7777/echo'
 
   kite.tell('kite.ping').then (pong) ->
     t.equal pong, 'pong'
@@ -27,14 +27,13 @@ test 'kite server: ping over SockJs', (t) ->
   SockJs = require 'node-sockjs-client'
 
   kite = new Kite
-    url: 'http://localhost:7777'
+    url: 'http://localhost:7777/echo'
     transportClass: SockJs
 
   kite.tell('kite.ping').then (pong) ->
     t.equal pong, 'pong'
 
   .finally ->
-    console.log server
     kite.disconnect()
     server.close()
     t.end()

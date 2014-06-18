@@ -1,1 +1,2 @@
-require './test.coffee'
+require './server.coffee'
+require './kontrol.coffee'
