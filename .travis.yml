@@ -10,4 +10,3 @@ install:
 before_script:
   - sleep 10
   - curl http://0.0.0.0:4000/kite
-script: ./node_modules/.bin/tap ./test/index.js
