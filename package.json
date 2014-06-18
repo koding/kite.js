@@ -41,7 +41,7 @@
     "cli-color": "^0.3.2",
     "minimist": "0.0.8",
     "sockjs": "^0.3.9",
-    "node-sockjs-client": "1.0.5"
+    "node-sockjs-client": "1.0.6"
   },
   "devDependencies": {
     "browserify": "~3.32.0",
