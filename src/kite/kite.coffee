@@ -65,8 +65,9 @@ module.exports = class Kite extends EventEmitter
   # connection state:
   connect: ->
     return  if @readyState is READY
-    { url, transportClass } = @options
-    @ws = new (transportClass ? @constructor.transportClass) url
+    { url, transportClass, transportOptions } = @options
+    konstructor = transportClass ? @constructor.transportClass
+    @ws = new konstructor url, null, transportOptions
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'
