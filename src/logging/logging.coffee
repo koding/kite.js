@@ -19,7 +19,7 @@ enableLogging = (name = "kite", emitter, logLevel = INFO) ->
     fn style "[#{ name }] #{ category }\t#{ messages.join ' ' }"
 
   if CRITICAL <= logLevel
-    emitter.on 'critical', createLogger 'CRITICAL', color.cyan, error
+    emitter.on 'critical', createLogger 'CRITICAL', color.red, error
 
   if ERROR <= logLevel
     emitter.on 'error', createLogger 'ERROR', color.red, error
