@@ -6,7 +6,7 @@ module.exports = (userlandApi = {}) ->
     api
   , {}
   api['kite.heartbeat'] = (duration, ping, callback) =>
-    setInterval ping, duration * 1000
+    @heartbeatHandle = setInterval ping, duration * 1000
     callback { error: null }
   api[method] = fn  for own method, fn of userlandApi
   api

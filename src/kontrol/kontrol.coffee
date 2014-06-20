@@ -21,40 +21,41 @@ module.exports = class Kontrol extends EventEmitter
     @authenticate()  if @options.autoConnect
 
   authenticate: (@options = @options) ->
-    { url, auth, username, environment, version, region, hostname, name, logLevel } = @options
+    { url, auth, username, environment, version, region, hostname, name, logLevel, transportClass, transportOptions, prefix } = @options
 
     @kite = new @constructor.Kite
-      username    : username
-      environment : environment
-      version     : version
-      region      : region
-      hostname    : hostname
-      name        : name ? 'kontrol'
-      url         : url
-      auth        : auth
-      logLevel    : logLevel
+      username        : username
+      environment     : environment
+      version         : version
+      region          : region
+      hostname        : hostname
+      name            : name ? 'kontrol'
+      url             : url
+      auth            : auth
+      logLevel        : logLevel
+      transportClass  : transportClass
+      transportOptions: transportOptions
+      prefix          : prefix
 
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
     @kite.on 'connected', @emit.bind this, 'connected'
 
-  createKite: ({ kite: kiteDescriptor, token, url }) ->
-    kite = new @constructor.Kite
-      username    : kiteDescriptor.username
-      environment : kiteDescriptor.environment
-      version     : kiteDescriptor.version
-      region      : kiteDescriptor.region
-      hostname    : kiteDescriptor.hostname
-      autoConnect : no
-      name        : kiteDescriptor.name
-      url         : url
-      auth        :
-        type      : 'token'
-        key       : token
-      logLevel    : @options.logLevel
-    .on 'tokenExpired', =>
-      @renewToken kite, kiteDescriptor
-
-    return kite
+  createKite: ({ kite: { name }, token, url }) ->
+    new @constructor.Kite
+      username        : kiteDescriptor.username
+      environment     : kiteDescriptor.environment
+      version         : kiteDescriptor.version
+      region          : kiteDescriptor.region
+      hostname        : kiteDescriptor.hostname
+      autoConnect     : no
+      name            : name
+      url             : url
+      auth            :
+        type          : 'token'
+        key           : token
+      logLevel        : @options.logLevel
+      transportClass  : @options.transportClass
+      transportOptions: @options.transportOptions
 
   renewToken: (kite, query) ->
     @kite.tell 'getToken', [query], (err, token) ->

@@ -27,6 +27,8 @@ module.exports = class Kite extends EventEmitter
 
   { v4: uniqueId } = require 'node-uuid'
 
+  @transportClass = require 'ws'
+
   constructor: (options) ->
     return new Kite options  unless this instanceof Kite
 
@@ -43,6 +45,8 @@ module.exports = class Kite extends EventEmitter
 
     # refresh expired tokens
     @expireTokenOnExpiry()
+
+    @options.url += @options.prefix  if @options.prefix
 
     enableLogging @options.name, this, @options.logLevel
 
@@ -71,16 +75,22 @@ module.exports = class Kite extends EventEmitter
   # connection state:
   connect: ->
     return  if @readyState is READY
-    { url } = @options
-    @ws = new WebSocket url
+    { url, transportClass, transportOptions } = @options
+    konstructor = transportClass ? @constructor.transportClass
+    options = transportOptions ? @constructor.transportOptions
+    @ws = new konstructor url, null, options
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'
     @ws.addEventListener 'error',   @bound 'onError'
+    @ws.addEventListener 'info',    (info) => @emit 'info', info
     @emit 'info', "Trying to connect to #{ url }"
     return
 
   disconnect: (reconnect = false) ->
+    if @heartbeatHandle
+      clearInterval @heartbeatHandle
+      @heartbeatHandle = null
     @options.autoReconnect = !!reconnect
     @ws.close()
     @emit 'notice', "Disconnecting from #{ @options.url }"
@@ -98,11 +108,14 @@ module.exports = class Kite extends EventEmitter
   onClose: ->
     @readyState = CLOSED
     @emit 'disconnected'
+
+    dcInfo = "#{ @options.url }: disconnected"
     # enable below to autoReconnect when the socket has been closed
     if @options.autoReconnect
       process.nextTick => @setBackoffTimeout @bound "connect"
+      dcInfo += ', trying to reconnect...'
 
-    @emit 'info', "#{ @options.url }: disconnected, trying to reconnect..."
+    @emit 'info', dcInfo
     return
 
   onMessage: ({ data }) ->
@@ -110,6 +123,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   onError: (err) ->
+    console.log err
     @emit 'error', "Websocket error!"
     return
 

@@ -13,13 +13,13 @@ error = console.error.bind console
 warn = console.warn.bind console
 info = console.info.bind console
 
-enableLogging = (name, emitter, logLevel = INFO) ->
+enableLogging = (name = "kite", emitter, logLevel = INFO) ->
 
   createLogger = (category, style, fn) -> (messages...) ->
     fn style "[#{ name }] #{ category }\t#{ messages.join ' ' }"
 
   if CRITICAL <= logLevel
-    emitter.on 'critical', createLogger 'CRITICAL', color.cyan, error
+    emitter.on 'critical', createLogger 'CRITICAL', color.red, error
 
   if ERROR <= logLevel
     emitter.on 'error', createLogger 'ERROR', color.red, error
