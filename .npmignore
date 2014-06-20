@@ -1,5 +1,6 @@
-src
-.gitignore
-gulpfile.js
-gulpfile.coffee
-
+/src
+/.gitignore
+/gulpfile.js
+/gulpfile.coffee
+/test
+/test.sh

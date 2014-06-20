@@ -5,3 +5,5 @@
 .DS_Store
 /examples/kontrol/kite.key
 /kontrol_client.key
+/test
+/test.sh
