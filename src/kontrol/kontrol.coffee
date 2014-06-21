@@ -56,6 +56,8 @@ module.exports = class Kontrol extends EventEmitter
       logLevel        : @options.logLevel
       transportClass  : @options.transportClass
       transportOptions: @options.transportOptions
+    .on 'tokenExpired', =>
+      @renewToken kite, kiteDescriptor
 
   renewToken: (kite, query) ->
     @kite.tell 'getToken', [query], (err, token) ->
