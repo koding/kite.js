@@ -1,14 +1,16 @@
 module.exports = class Delayed
 
+  mustOverride = -> throw new Error 'not implemented'
+
   @handles = []
 
   constructor: (@fn, @ms, @params...) ->
     Delayed.handles.push this
     @begin()
 
-  begin: -> throw new Error 'not implemented'
+  begin: mustOverride
 
-  clear: -> throw new Error 'not implemented'
+  clear: mustOverride
 
   @clearAll: ->
     @handles.forEach (h) -> h.clear()
