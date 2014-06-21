@@ -2,8 +2,9 @@ module.exports = class Delayed
 
   @handles = []
 
-  constructor: (@ms, @fn, @params...) ->
+  constructor: (@fn, @ms, @params...) ->
     Delayed.handles.push this
+    @begin()
 
   begin: -> throw new Error 'not implemented'
 
