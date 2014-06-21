@@ -41,7 +41,7 @@ module.exports = class Kontrol extends EventEmitter
     @kite.on 'connected', @emit.bind this, 'connected'
 
   createKite: ({ kite: kiteDescriptor, token, url }) ->
-    new @constructor.Kite
+    kite = new @constructor.Kite
       username        : kiteDescriptor.username
       environment     : kiteDescriptor.environment
       version         : kiteDescriptor.version

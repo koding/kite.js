@@ -64,14 +64,14 @@ module.exports = class Kite extends EventEmitter
 
     @connect()  if @options.autoConnect
 
-    @currentToken = null
-
-  getToken: -> @currentToken
+  getToken: ->
+    @options.auth.key
 
   setToken: (token) ->
     # FIXME: this setter is not symettrical with the getter
     throw new Error "Invalid auth type!"  unless @options.auth?.type is 'token'
     @options.auth.key = token
+    @emit 'tokenSet', token
 
   # connection state:
   connect: ->
@@ -179,7 +179,9 @@ module.exports = class Kite extends EventEmitter
       @expiryHandle = new Timeout (@bound 'expireToken'), renewMs
     return
 
-  expireToken: ->
+  expireToken: (callback) ->
+    if callback?
+      @once 'tokenSet', (newToken) -> callback null, newToken
     @emit 'tokenExpired'
     if @expiryHandle
       @expiryHandle.clear()
