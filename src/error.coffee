@@ -4,6 +4,7 @@ module.exports = class KiteError extends Error
     @message = message
     @name = "KiteError"
 
+  # the predicates these factories make are useful as bluebird catch guards:
   @codeIs = (code) -> (err) -> code is err.code
 
   @codeIsnt = (code) -> (err) -> code isnt err.code

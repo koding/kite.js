@@ -22,3 +22,4 @@ module.exports = class Kite extends BasicKite
       super resolve
     .nodeify callback
 
+  expireToken: Promise.promisify @::expireToken
