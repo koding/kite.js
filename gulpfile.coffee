@@ -27,6 +27,12 @@ gulp.task 'build logging', ->
     .pipe replace '.coffee', '.js'
     .pipe gulp.dest 'lib/logging'
 
+gulp.task 'build delayed', ->
+  gulp.src 'src/delayed/*.coffee'
+    .pipe coffee4Node()
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest 'lib/delayed'
+
 gulp.task 'build kite', ->
   gulp.src 'src/kite/*.coffee'
     .pipe coffee4Node()
@@ -144,6 +150,7 @@ gulp.task 'browserify kontrol as promised', ->
 gulp.task 'build', [
   'build commons'
   'build logging'
+  'build delayed'
   'build kite'
   'build kite as promised'
   'build kontrol'

@@ -15,6 +15,7 @@ module.exports = class Kite extends EventEmitter
   handleIncomingMessage = require '../incoming-message-handler.coffee'
   enableLogging = require '../logging/logging.coffee'
 
+  Timeout = require '../delayed/timeout.coffee'
   KiteError = require '../error.coffee'
   # expose the error object for its predicates
   @Error = KiteError
@@ -88,9 +89,9 @@ module.exports = class Kite extends EventEmitter
     return
 
   disconnect: (reconnect = false) ->
-    if @heartbeatHandle
-      clearInterval @heartbeatHandle
-      @heartbeatHandle = null
+    for handle in ['heartbeatHandle', 'expiryHandle'] when @[handle]?
+      @[handle].clear()
+      @[handle] = null
     @options.autoReconnect = !!reconnect
     @ws.close()
     @emit 'notice', "Disconnecting from #{ @options.url }"
@@ -175,13 +176,13 @@ module.exports = class Kite extends EventEmitter
       # renew token before it expires:
       earlyMs = 5 * 60 * 1000 # 5 min
       renewMs = expMs - nowMs - earlyMs
-      @expiryHandle = setTimeout (@bound 'expireToken'), renewMs
+      @expiryHandle = new Timeout (@bound 'expireToken'), renewMs
     return
 
   expireToken: ->
     @emit 'tokenExpired'
     if @expiryHandle
-      clearTimeout @expiryHandle
+      @expiryHandle.clear()
       @expiryHandle = null
     return
 

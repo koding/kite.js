@@ -40,7 +40,7 @@ module.exports = class Kontrol extends EventEmitter
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
     @kite.on 'connected', @emit.bind this, 'connected'
 
-  createKite: ({ kite: { name }, token, url }) ->
+  createKite: ({ kite: kiteDescriptor, token, url }) ->
     new @constructor.Kite
       username        : kiteDescriptor.username
       environment     : kiteDescriptor.environment
@@ -48,7 +48,7 @@ module.exports = class Kontrol extends EventEmitter
       region          : kiteDescriptor.region
       hostname        : kiteDescriptor.hostname
       autoConnect     : no
-      name            : name
+      name            : kiteDescriptor.name
       url             : url
       auth            :
         type          : 'token'
