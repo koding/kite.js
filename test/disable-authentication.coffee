@@ -30,4 +30,3 @@ test 'disable authentication', (t) ->
   .finally ->
     kite.disconnect()
     server.close()
-    t.end()
