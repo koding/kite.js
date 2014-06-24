@@ -1,7 +1,5 @@
 # kite.js [![Build Status](https://travis-ci.org/koding/kite.js.svg?branch=master)](https://travis-ci.org/koding/kite.js)
 
-_Warning:_ This is not yet stable, and should not be depended upon at this time.
-
 A [Kite](https://github.com/koding/kite) client library for the browser and node.js
 
 # installation
