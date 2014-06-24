@@ -185,6 +185,4 @@ gulp.task 'playground', ->
   util.log util.colors.cyan 'Playground server started: http://0.0.0.0:1337'
 
 gulp.task 'test', ['default'], ->
-  { stdout, stderr } = spawn 'npm', ['test']
-  stdout.pipe process.stdout
-  stderr.pipe process.stderr
+  { stdout, stderr } = spawn 'npm', ['test'], stdio: 'inherit'
