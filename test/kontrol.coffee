@@ -57,11 +57,11 @@ test 'kontrol: register to kontrol', (t) ->
 
       .then ->
         oldToken = kite.getToken()
-        t.notEqual oldToken, undefined
+        t.ok oldToken?
         kite.expireToken()
 
       .then (token) ->
-        t.notEqual token, undefined
+        t.ok token?
         t.notEqual token, oldToken
         t.equal token, kite.getToken()
         kite.tell 'echo', 'HELLO'
