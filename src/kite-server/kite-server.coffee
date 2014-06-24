@@ -90,7 +90,7 @@ module.exports = class KiteServer extends EventEmitter
       Promise.cast u
       Promise.cast h
       @normalizeKiteKey k
-    ]).spread (userKontrolUri, host, key) =>
+    ]).spread (userKontrolURL, host, key) =>
       { name, username, environment, version, region, hostname, logLevel, transportClass, secure } = @options
 
       Server = @getServerClass()
@@ -108,7 +108,7 @@ module.exports = class KiteServer extends EventEmitter
       { kontrolURL } = getKontrolClaims @key
 
       @kontrol = new Kontrol
-        url             : userKontrolUri ? kontrolURL
+        url             : userKontrolURL ? kontrolURL
         auth            : { type: 'kiteKey', key }
         name            : name
         username        : username
@@ -121,10 +121,10 @@ module.exports = class KiteServer extends EventEmitter
       .on 'connected', =>
         @emit 'info', "Connected to Kontrol"
 
-      kiteUri = "#{ scheme }://#{ host }:#{ @port }/#{ @options.name }"
+      kiteURL = "#{ scheme }://#{ host }:#{ @port }/#{ @options.name }"
 
-      @kontrol.register(url: kiteUri).then =>
-        @emit 'info', "Registered to Kontrol with URL: #{ kiteUri }"
+      @kontrol.register(url: kiteURL).then =>
+        @emit 'info', "Registered to Kontrol with URL: #{ kiteURL }"
 
   normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
     when 'string' is typeof src
