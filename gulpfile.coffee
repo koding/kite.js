@@ -10,6 +10,7 @@ source      = require 'vinyl-source-stream'
 coffeeify   = require 'coffeeify'
 http        = require 'http'
 ecstatic    = require 'ecstatic'
+{ spawn }   = require 'child_process'
 
 coffee4Node = -> (coffee bare: yes, sourceMap: yes).on 'error', util.log
 
@@ -182,3 +183,8 @@ gulp.task 'watch', ['default', 'playground'], ->
 gulp.task 'playground', ->
   http.createServer(ecstatic root: "#{ __dirname }/static").listen 1337
   util.log util.colors.cyan 'Playground server started: http://0.0.0.0:1337'
+
+gulp.task 'test', ['default'], ->
+  { stdout, stderr } = spawn 'npm', ['test']
+  stdout.pipe process.stdout
+  stderr.pipe process.stderr

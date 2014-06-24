@@ -67,23 +67,6 @@ module.exports = class Kite extends EventEmitter
   getToken: ->
     @options.auth.key
 
-  expireTokenOnExpiry: ->
-    { auth: { key: token }} = @options
-    [ _, claimsA ] = token.split '.'
-
-    claims = try JSON.parse atob claimsA
-
-    if claims?.exp
-      # the `exp` is measured in seconds since the UNIX epoch; convert to ms
-      expMs = claims.exp * 1000
-      nowMs = +now()
-      # renew token before it expires:
-      earlyMs = 5 * 60 * 1000 # 5 min
-      renewMs = expMs - nowMs - earlyMs
-      setTimeout (@bound 'expireToken'), renewMs
-
-  expireToken: -> @emit 'tokenExpired'
-
   setToken: (token) ->
     # FIXME: this setter is not symettrical with the getter
     throw new Error "Invalid auth type!"  unless @options.auth?.type is 'token'

@@ -1,5 +1,7 @@
 KiteServer = require '../../../server'
 
+{ logLevels } = require '../../../logging'
+
 module.exports = new KiteServer
   name        : 'echo'
   username    : 'testuser'
@@ -7,6 +9,6 @@ module.exports = new KiteServer
   region      : 'vagrant'
   version     : '1.0.0'
   prefix      : '/echo'
-  auth        : no
+  logLevels   : logLevels.DEBUG
   api         :
     echo      : (it, echo) -> echo null, it

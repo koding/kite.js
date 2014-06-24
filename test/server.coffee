@@ -11,7 +11,7 @@ test 'kite server: ping over WebSocket', (t) ->
   kite = new Kite 'http://localhost:7777/echo'
 
   kite.tell('kite.ping').then (pong) ->
-    t.equal pong, 'pong'
+    t.equal pong, 'pong', 'got a pong'
 
   .finally ->
     kite.disconnect()

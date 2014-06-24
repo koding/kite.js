@@ -1,14 +1,14 @@
 jwt = require 'jwt-simple'
 atob = require 'atob'
+parse = require 'try-json-parse'
 
-parse = (it) -> try JSON.parse atob it
+{ getKontrolClaims } = require '../util.coffee'
 
 module.exports = (tokenString, kiteKey) ->
-  [ _, kontrolClaimsA ] = kiteKey.split '.'
   [ headersA, publicClaimsA ] = tokenString.split '.'
 
-  kontrolClaims = parse kontrolClaimsA
-  headers = parse headersA
+  kontrolClaims = getKontrolClaims kiteKey
+  headers = parse atob headersA
 
   claims = jwt.decode tokenString, kontrolClaims.kontrolKey
 

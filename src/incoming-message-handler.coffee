@@ -1,3 +1,5 @@
+parse = require 'try-json-parse'
+
 handleAuth = require './auth/auth.coffee'
 
 mungeCallbacks = (callbacks, n) ->
@@ -14,7 +16,7 @@ module.exports = (proto, message) ->
 
   @emit 'debug', "Receiving: #{ message }"
 
-  req = try JSON.parse message
+  req = parse message
 
   unless req?
     @emit 'warning', new KiteError "Invalid payload! (#{ message })"

@@ -2,6 +2,8 @@ SockJs        = require 'node-sockjs-client'
 SockJsServer  = require '../../../lib/kite-server/sockjs/server.js'
 KiteServer    = require '../../../server'
 
+{ logLevels } = require '../../../logging'
+
 module.exports = new KiteServer
   name            : 'echo'
   username        : 'testuser'
@@ -11,5 +13,6 @@ module.exports = new KiteServer
   serverClass     : SockJsServer
   transportClass  : SockJs
   prefix          : '/echo'
+  logLevel        : logLevels.DEBUG
   api             :
     echo          : (it, echo) -> echo null, it

@@ -13,10 +13,10 @@ test 'disable authentication', (t) ->
   kite.tell 'noAuth'
 
   .then (greeting) ->
-    t.equal greeting, 'yep'
+    t.equal greeting, 'yep', 'got a greeting'
 
   .catch (err) ->
-    t.ok no
+    t.ok no, 'failed to get the greeting'
 
   .then ->
     kite.tell 'yesAuth'

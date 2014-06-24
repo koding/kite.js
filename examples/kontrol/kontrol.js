@@ -43,7 +43,6 @@ math.methods({
 math.listen(5647);
 
 math.register({
-  to:       'http://0.0.0.0:4000',
-  host:     '0.0.0.0',
-  kiteKey:  kiteKey
+  host:       '0.0.0.0',
+  kiteKey:    kiteKey
 });

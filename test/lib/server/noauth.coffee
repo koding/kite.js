@@ -1,6 +1,6 @@
 KiteServer = require '../../../server'
 
-{ disableAuthentication }  = KiteServer
+{ logLevels } = require '../../../logging'
 
 module.exports = new KiteServer
   name        : 'noauth'
@@ -10,6 +10,7 @@ module.exports = new KiteServer
   version     : '1.0.0'
   prefix      : '/echo'
   auth        : no
+  logLevel    : logLevels.DEBUG
   api         :
     noAuth    : (callback) -> callback null, 'yep'
     yesAuth   :

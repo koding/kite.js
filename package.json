@@ -4,8 +4,8 @@
   "main": "index.js",
   "version": "0.3.1",
   "scripts": {
-    "test": "KITE_KEY=$(cat ./kontrol_client.key) ./node_modules/.bin/tap ./test/index.js",
-    "postpublish": "gulp"
+    "test": "KITE_HOME=. KITE_KEY=$(cat ./kontrol_client.key) node ./test/index.js",
+    "prepublish": "gulp"
   },
   "author": {
     "name": "Koding Team",
@@ -41,7 +41,8 @@
     "cli-color": "^0.3.2",
     "minimist": "0.0.8",
     "sockjs": "^0.3.9",
-    "node-sockjs-client": "1.0.6"
+    "node-sockjs-client": "1.0.6",
+    "try-json-parse": "^0.1.0"
   },
   "devDependencies": {
     "browserify": "~3.32.0",

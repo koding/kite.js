@@ -2,7 +2,7 @@ test = require 'tape'
 fs = require 'fs'
 { join: joinPath } = require 'path'
 
-kiteKey = fs.createReadStream joinPath(process.env.HOME, './.kite/kite.key'), 'utf-8'
+kiteKey = fs.createReadStream joinPath(process.env.KITE_HOME, './kontrol_client.key'), 'utf-8'
 
 test 'kontrol: register to kontrol', (t) ->
   t.plan 8
@@ -11,18 +11,13 @@ test 'kontrol: register to kontrol', (t) ->
 
   server.listen 7777
 
-  kontrolUrl = 'http://localhost:4000/kite'
-
-  server.register
-    to: kontrolUrl
-    host: '0.0.0.0'
-    kiteKey: kiteKey
+  server.register { host: '0.0.0.0', kiteKey }
 
   .then ->
-    t.ok yes
+    t.ok yes, 'able to register to kontrol'
 
-  .catch ->
-    t.ok no
+  .catch (err) ->
+    t.ok no, 'failed to register to kontrol'
 
   .finally ->
 
@@ -31,23 +26,23 @@ test 'kontrol: register to kontrol', (t) ->
     Kite = require '../promises.js'
 
     k = new Kontrol
-      url: kontrolUrl
-      transportClass: SockJs
-      username: 'testuser'
-      auth:
-        type: 'kiteKey'
-        key: process.env.KITE_KEY
+      url             : 'http://localhost:4000/kite'
+      transportClass  : SockJs
+      username        : 'testuser'
+      auth            :
+        type          : 'kiteKey'
+        key           : process.env.KITE_KEY
 
     k.fetchKite
-      query:
-        name: 'echo'
-        username: 'testuser'
-        region: 'vagrant'
-        version: '1.0.0'
-        environment: 'vagrant'
+      query           :
+        name          : 'echo'
+        username      : 'testuser'
+        region        : 'vagrant'
+        version       : '1.0.0'
+        environment   : 'vagrant'
 
     .then (kite) ->
-      t.ok kite instanceof Kite
+      t.ok kite instanceof Kite, 'it is an instance of the Kite constructor'
 
       oldToken = null
 
@@ -56,31 +51,31 @@ test 'kontrol: register to kontrol', (t) ->
       kite.tell 'echo', 'ECHO'
 
       .then (echo) ->
-        t.equal echo, 'ECHO'
+        t.equal echo, 'ECHO', 'the echo method faithfully echoed'
 
       .catch ->
-        t.ok no
+        t.ok no, 'could not echo'
 
       .then ->
         oldToken = kite.getToken()
-        t.ok oldToken?
+        t.ok oldToken?, 'the old token was defined'
         kite.expireToken()
 
       .then (token) ->
-        t.ok token?
-        t.notEqual token, oldToken
-        t.equal token, kite.getToken()
+        t.ok token?, 'the new token is defined'
+        t.notEqual token, oldToken, 'the new token is different than the old token'
+        t.equal token, kite.getToken(), 'the new token is equal to the current token of the kite'
         kite.tell 'echo', 'HELLO'
 
       .then (hello) ->
-        t.equal hello, 'HELLO'
+        t.equal hello, 'HELLO', 'the echo method still works after swapping the token'
 
       .finally ->
         kite.disconnect()
 
     .catch (err) ->
       console.log 'error', err
-      t.ok no
+      t.ok no, 'could not fetch kite'
 
     .finally ->
       k.disconnect()

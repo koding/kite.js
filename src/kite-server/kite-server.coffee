@@ -22,6 +22,8 @@ module.exports = class KiteServer extends EventEmitter
 
   @serverClass = require './websocket/server.coffee'
 
+  { getKontrolClaims } = require '../util.coffee'
+
   constructor: (options) ->
     return new KiteServer api  unless this instanceof KiteServer
     @options = options
@@ -82,13 +84,13 @@ module.exports = class KiteServer extends EventEmitter
     @kontrol?.disconnect()
     @kontrol = null
 
-  register: ({ to: u, host: h, kiteKey: k }) ->
+  register: ({ kontrolURL: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
     Promise.all([
       Promise.cast u
       Promise.cast h
       @normalizeKiteKey k
-    ]).spread (kontrolUri, host, key) =>
+    ]).spread (userKontrolUri, host, key) =>
       { name, username, environment, version, region, hostname, logLevel, transportClass, secure } = @options
 
       Server = @getServerClass()
@@ -103,8 +105,10 @@ module.exports = class KiteServer extends EventEmitter
 
       @key = key
 
+      { kontrolURL } = getKontrolClaims @key
+
       @kontrol = new Kontrol
-        url             : kontrolUri
+        url             : userKontrolUri ? kontrolURL
         auth            : { type: 'kiteKey', key }
         name            : name
         username        : username
