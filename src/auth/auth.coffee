@@ -6,7 +6,7 @@ whitelist = require './whitelist.coffee'
 
 module.exports = Promise.method (method, auth, kiteKey) ->
   unless auth?
-    return  if method in whitelist
+    return  if (method in whitelist) or !@api?[method].mustAuth
     throw new Error "Access denied!"
 
   { type, key } = auth

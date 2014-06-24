@@ -31,7 +31,7 @@ module.exports = (proto, message) ->
 
   @emit 'debug', "Authenticating request"
 
-  handleAuth(method, auth, @key).then (token) =>
+  handleAuth.call(this, method, auth, @key).then (token) =>
     @emit 'debug', "Authentication passed"
 
     withArgs ?= []

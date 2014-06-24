@@ -41,7 +41,19 @@ module.exports = class KiteServer extends EventEmitter
 
   method: (methodName, fn) ->
     @api ?= do require './default-api.coffee'
-    @api[methodName] = fn
+
+    if 'function' is typeof fn
+      func = fn
+    else if 'function' is typeof fn.func
+      { func, auth } = fn
+    else
+      throw new Error """
+        Argument must be a function or an object with a func property
+        """
+
+    func.mustAuth = auth ? @options.auth ? yes
+
+    @api[methodName] = func
 
   methods: (methods) ->
     @method methodName, fn for methodName, fn of methods

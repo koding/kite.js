@@ -1,4 +1,4 @@
-KiteServer    = require '../../../server'
+KiteServer = require '../../../server'
 
 module.exports = new KiteServer
   name        : 'echo'
@@ -7,5 +7,6 @@ module.exports = new KiteServer
   region      : 'vagrant'
   version     : '1.0.0'
   prefix      : '/echo'
+  auth        : no
   api         :
     echo      : (it, echo) -> echo null, it
