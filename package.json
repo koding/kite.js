@@ -2,7 +2,7 @@
   "name": "kite.js",
   "description": "Kite client library",
   "main": "index.js",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "scripts": {
     "test": "KITE_HOME=. KITE_KEY=$(cat ./kontrol_client.key) node ./test/index.js",
     "prepublish": "gulp"
