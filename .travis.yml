@@ -6,7 +6,7 @@ cache: false
 install:
   - npm install
   - gulp
-  - sh run-kontrol.sh
+  - sh ./scripts/run-kontrol.sh
 before_script:
   - sleep 10
   - curl http://0.0.0.0:4000/kite
