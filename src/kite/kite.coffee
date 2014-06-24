@@ -83,7 +83,7 @@ module.exports = class Kite extends EventEmitter
       setTimeout (@bound 'expireToken'), renewMs
 
   expireToken: -> @emit 'tokenExpired'
-  
+
   setToken: (token) ->
     # FIXME: this setter is not symettrical with the getter
     throw new Error "Invalid auth type!"  unless @options.auth?.type is 'token'
@@ -224,18 +224,6 @@ module.exports = class Kite extends EventEmitter
 
   ping: (callback) ->
     @tell 'kite.ping', callback
-
-  # helpers:
-  now = ->
-    now = new Date
-    new Date(
-      now.getUTCFullYear()
-      now.getUTCMonth()
-      now.getUTCDate()
-      now.getUTCHours()
-      now.getUTCMinutes()
-      now.getUTCSeconds()
-    )
 
   # static helpers:
   @disconnect = (kites...) ->
