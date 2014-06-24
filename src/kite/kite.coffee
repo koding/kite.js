@@ -7,15 +7,19 @@ module.exports = class Kite extends EventEmitter
   { @version } = require '../../package.json'
 
   dnodeProtocol = require 'dnode-protocol'
+  WebSocket     = require 'ws'
+  atob          = require 'atob'
 
   wrapApi = require './wrap-api.coffee'
   handleIncomingMessage = require '../incoming-message-handler.coffee'
 
   enableLogging = require '../logging/logging.coffee'
 
+  Timeout = require '../delayed/timeout.coffee'
   KiteError = require '../error.coffee'
-  # expose the error object for it's predicates
+  # expose the error object for its predicates
   @Error = KiteError
+  { now } = require '../util.coffee'
 
   # ready states:
   [ NOTREADY, READY, CLOSED ] = [0,1,3]
@@ -44,6 +48,8 @@ module.exports = class Kite extends EventEmitter
     @options.url += @options.prefix  if @options.prefix
 
     enableLogging @options.name, this, @options.logLevel
+    # refresh expired tokens
+    @expireTokenOnExpiry()
 
     @readyState = NOTREADY
 
@@ -58,9 +64,31 @@ module.exports = class Kite extends EventEmitter
 
     @connect()  if @options.autoConnect
 
-    @currentToken = null
+  getToken: ->
+    @options.auth.key
 
-  getToken: -> @currentToken
+  expireTokenOnExpiry: ->
+    { auth: { key: token }} = @options
+    [ _, claimsA ] = token.split '.'
+
+    claims = try JSON.parse atob claimsA
+
+    if claims?.exp
+      # the `exp` is measured in seconds since the UNIX epoch; convert to ms
+      expMs = claims.exp * 1000
+      nowMs = +now()
+      # renew token before it expires:
+      earlyMs = 5 * 60 * 1000 # 5 min
+      renewMs = expMs - nowMs - earlyMs
+      setTimeout (@bound 'expireToken'), renewMs
+
+  expireToken: -> @emit 'tokenExpired'
+  
+  setToken: (token) ->
+    # FIXME: this setter is not symettrical with the getter
+    throw new Error "Invalid auth type!"  unless @options.auth?.type is 'token'
+    @options.auth.key = token
+    @emit 'tokenSet', token
 
   # connection state:
   connect: ->
@@ -78,9 +106,9 @@ module.exports = class Kite extends EventEmitter
     return
 
   disconnect: (reconnect = false) ->
-    if @heartbeatHandle
-      clearInterval @heartbeatHandle
-      @heartbeatHandle = null
+    for handle in ['heartbeatHandle', 'expiryHandle'] when @[handle]?
+      @[handle].clear()
+      @[handle] = null
     @options.autoReconnect = !!reconnect
     @ws.close()
     @emit 'notice', "Disconnecting from #{ @options.url }"
@@ -133,10 +161,7 @@ module.exports = class Kite extends EventEmitter
     responseCallback  : (response) =>
       { error: rawErr, result } = response
 
-      err =
-        if rawErr?
-        then makeProperError rawErr
-        else null
+      err = if rawErr? then makeProperError rawErr else null
 
       callback err, result
 
@@ -148,6 +173,36 @@ module.exports = class Kite extends EventEmitter
     scrubbed.method = method
 
     @proto.emit 'request', scrubbed
+    return
+
+  # token expiry:
+
+  expireTokenOnExpiry: ->
+    return  unless @options.auth?.type is 'token'
+
+    { auth: { key: token }} = @options
+
+    [ _, claimsA ] = token.split '.'
+
+    claims = try JSON.parse atob claimsA
+
+    if claims?.exp
+      # the `exp` is measured in seconds since the UNIX epoch; convert to ms
+      expMs = claims.exp * 1000
+      nowMs = +now()
+      # renew token before it expires:
+      earlyMs = 5 * 60 * 1000 # 5 min
+      renewMs = expMs - nowMs - earlyMs
+      @expiryHandle = new Timeout (@bound 'expireToken'), renewMs
+    return
+
+  expireToken: (callback) ->
+    if callback?
+      @once 'tokenSet', (newToken) -> callback null, newToken
+    @emit 'tokenExpired'
+    if @expiryHandle
+      @expiryHandle.clear()
+      @expiryHandle = null
     return
 
   # util:
@@ -169,6 +224,18 @@ module.exports = class Kite extends EventEmitter
 
   ping: (callback) ->
     @tell 'kite.ping', callback
+
+  # helpers:
+  now = ->
+    now = new Date
+    new Date(
+      now.getUTCFullYear()
+      now.getUTCMonth()
+      now.getUTCDate()
+      now.getUTCHours()
+      now.getUTCMinutes()
+      now.getUTCSeconds()
+    )
 
   # static helpers:
   @disconnect = (kites...) ->

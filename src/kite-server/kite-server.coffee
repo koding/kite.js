@@ -113,9 +113,7 @@ module.exports = class KiteServer extends EventEmitter
   normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
     when 'string' is typeof src
       fs.readFileAsync(src, enc)
-        .catch (err) ->
-          return src  if err.code is 'ENOENT' # assume string itself is key
-          throw err
+        .catch (KiteError.codeIs 'ENOENT'), (err) -> src
     when 'function' is typeof src.pipe
       toArray(src).then (arr) -> arr.join '\n'
     else throw new Error """
