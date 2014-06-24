@@ -5,7 +5,7 @@ fs = require 'fs'
 kiteKey = fs.createReadStream joinPath(process.env.HOME, './.kite/kite.key'), 'utf-8'
 
 test 'kontrol: register to kontrol', (t) ->
-  t.plan 6
+  t.plan 8
 
   server = require './lib/server/sockjs.coffee'
 
@@ -57,9 +57,11 @@ test 'kontrol: register to kontrol', (t) ->
 
       .then ->
         oldToken = kite.getToken()
+        t.notEqual oldToken, undefined
         kite.expireToken()
 
       .then (token) ->
+        t.notEqual token, undefined
         t.notEqual token, oldToken
         t.equal token, kite.getToken()
         kite.tell 'echo', 'HELLO'
