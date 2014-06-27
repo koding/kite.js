@@ -1,6 +1,6 @@
-{ EventEmitter } = require 'events'
 { Server: WebSocketServer } = require 'ws'
 
+EventEmitter = require '../../event-emitter.coffee'
 Session = require './session.coffee'
 
 module.exports = class Server extends EventEmitter

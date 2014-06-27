@@ -1,4 +1,4 @@
-{ EventEmitter } = require 'events'
+EventEmitter = require '../../event-emitter.coffee'
 
 module.exports = class Session extends EventEmitter
 

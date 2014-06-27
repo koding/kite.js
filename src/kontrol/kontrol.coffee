@@ -1,6 +1,6 @@
 "use strict"
 
-{ EventEmitter } = require 'events'
+EventEmitter = require '../event-emitter.coffee'
 
 module.exports = class Kontrol extends EventEmitter
 
@@ -38,7 +38,9 @@ module.exports = class Kontrol extends EventEmitter
       prefix          : prefix
 
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
-    @kite.on 'connected', @emit.bind this, 'connected'
+    @kite.on 'open', @emit.bind this, 'open'
+
+    return
 
   createKite: ({ kite: kiteDescriptor, token, url }) ->
     kite = new @constructor.Kite

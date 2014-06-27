@@ -25,7 +25,7 @@ enableLogging = (name = "kite", emitter, logLevel = INFO) ->
     emitter.on 'error', createLogger 'ERROR', color.red, error
 
   if WARNING <= logLevel
-    emitter.on 'warn', createLogger 'WARN', color.yellow, warn
+    emitter.on 'warning', createLogger 'WARN', color.yellow, warn
 
   if NOTICE <= logLevel
     emitter.on 'notice', createLogger 'NOTICE', color.green, info

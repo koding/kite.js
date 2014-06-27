@@ -1,8 +1,8 @@
-{ EventEmitter } = require 'events'
 util = require 'util'
 sockJS = require 'sockjs'
 http = require 'http'
 
+EventEmitter = require '../../event-emitter.coffee'
 Session = require './session.js'
 
 module.exports = class Server extends EventEmitter

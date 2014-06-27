@@ -1,8 +1,8 @@
 "use strict"
 
-{ EventEmitter } = require 'events'
-
 SockJS = require 'node-sockjs-client'
+
+EventEmitter = require '../event-emitter.coffee'
 
 module.exports = class KiteServer extends EventEmitter
 
@@ -118,7 +118,7 @@ module.exports = class KiteServer extends EventEmitter
         hostname        : hostname
         logLevel        : logLevel
         transportClass  : transportClass
-      .on 'connected', =>
+      .on 'open', =>
         @emit 'info', "Connected to Kontrol"
 
       kiteURL = "#{ scheme }://#{ host }:#{ @port }/#{ @options.name }"

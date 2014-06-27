@@ -1,6 +1,6 @@
 "use strict"
 
-{ EventEmitter } = require 'events'
+EventEmitter = require '../event-emitter.coffee'
 
 module.exports = class Kite extends EventEmitter
 
@@ -79,7 +79,10 @@ module.exports = class Kite extends EventEmitter
     { url, transportClass, transportOptions } = @options
     konstructor = transportClass ? @constructor.transportClass
     options = transportOptions ? @constructor.transportOptions
-    @ws = new konstructor url, null, options
+    @ws =
+      if konstructor is WebSocket
+      then new konstructor url # websocket will whine if extra arguments are passed
+      else new konstructor url, null, options
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
     @ws.addEventListener 'message', @bound 'onMessage'
@@ -100,15 +103,15 @@ module.exports = class Kite extends EventEmitter
   # event handlers:
   onOpen: ->
     @readyState = READY
-    @emit 'connected'
-    @emit 'ready'
+    # FIXME: the following is ridiculous.
+    @emit 'open'
     @emit 'notice', "Connected to Kite: #{ @options.url }"
     @clearBackoffTimeout()
     return
 
   onClose: ->
     @readyState = CLOSED
-    @emit 'disconnected'
+    @emit 'close'
 
     dcInfo = "#{ @options.url }: disconnected"
     # enable below to autoReconnect when the socket has been closed
@@ -202,7 +205,7 @@ module.exports = class Kite extends EventEmitter
   ready: (callback) ->
     if @readyState is READY
     then process.nextTick callback
-    else @once 'ready', callback
+    else @once 'open', callback
     return
 
   ping: (callback) ->
