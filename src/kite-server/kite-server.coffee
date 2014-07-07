@@ -120,6 +120,8 @@ module.exports = class KiteServer extends EventEmitter
         transportClass  : transportClass
       .on 'open', =>
         @emit 'info', "Connected to Kontrol"
+      .on 'error', (err) =>
+        @emit 'error', err
 
       kiteURL = "#{ scheme }://#{ host }:#{ @port }/#{ @options.name }"
 
