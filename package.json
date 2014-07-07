@@ -29,7 +29,7 @@
   "repository": "https://github.com/koding/kite.js.git",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "1.1.0",
+    "bluebird": "2.2.1",
     "dnode-protocol": "~0.2.2",
     "ws": "~0.4.31",
     "node-uuid": "^1.4.1",
