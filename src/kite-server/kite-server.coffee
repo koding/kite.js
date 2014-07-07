@@ -86,11 +86,10 @@ module.exports = class KiteServer extends EventEmitter
 
   register: ({ kontrolURL: u, host: h, kiteKey: k }) ->
     throw new Error "Already registered!"  if @kontrol?
-    Promise.all([
-      Promise.cast u
-      Promise.cast h
-      @normalizeKiteKey k
-    ]).spread (userKontrolURL, host, key) =>
+    url     = Promise.cast u
+    host    = Promise.cast h
+    kiteKey = @normalizeKiteKey k
+    Promise.join url, host, kiteKey, (userKontrolURL, host, key) =>
       { name, username, environment, version, region, hostname, logLevel, transportClass, secure } = @options
 
       Server = @getServerClass()
