@@ -104,13 +104,13 @@ module.exports = class KiteServer extends EventEmitter
 
       @key = key
 
-      { kontrolURL } = getKontrolClaims @key
+      { kontrolURL, sub: keyUsername } = getKontrolClaims @key
 
       @kontrol = new Kontrol
         url             : userKontrolURL ? kontrolURL
         auth            : { type: 'kiteKey', key }
         name            : name
-        username        : username
+        username        : username ? keyUsername
         environment     : environment
         version         : version
         region          : region
