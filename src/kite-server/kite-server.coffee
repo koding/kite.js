@@ -12,6 +12,7 @@ module.exports = class KiteServer extends EventEmitter
   dnodeProtocol = require 'dnode-protocol'
   toArray = Promise.promisify require 'stream-to-array'
   fs = Promise.promisifyAll require 'fs'
+  { join: joinPath } = require 'path'
 
   KiteError = require '../error.coffee'
   Kontrol = require '../kontrol-as-promised/kontrol.coffee'
