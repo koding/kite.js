@@ -127,7 +127,7 @@ module.exports = class KiteServer extends EventEmitter
       @kontrol.register(url: kiteURL).then =>
         @emit 'info', "Registered to Kontrol with URL: #{ kiteURL }"
 
-  normalizeKiteKey: Promise.method (src, enc = "utf-8") -> switch
+  normalizeKiteKey: Promise.method (src = @defaultKiteKey(), enc = "utf-8") -> switch
     when 'string' is typeof src
       fs.readFileAsync(src, enc)
         .catch (KiteError.codeIs 'ENOENT'), (err) -> src
@@ -136,6 +136,9 @@ module.exports = class KiteServer extends EventEmitter
     else throw new Error """
       Don't know how to normalize the kite key: #{ src }
       """
+
+  defaultKiteKey: ->
+    joinPath process.env.HOME, '.kite/kite.key'
 
   onConnection: (ws) ->
     proto = dnodeProtocol @api
