@@ -12,6 +12,7 @@ echo "Installing etcd"
 test -d "_etcd" || git clone https://github.com/coreos/etcd _etcd
 rm -rf _etcd/kontrol_test ||: #remove previous folder
 cd _etcd; ./build; ./bin/etcd --name=kontrol --data-dir=kontrol_test &
+cd -
 
 go get -u github.com/koding/kite
 echo "downloading dependencies of github.com/koding/kite"
