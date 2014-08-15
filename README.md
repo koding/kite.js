@@ -130,3 +130,7 @@ Given the numeric `watcherID` handle provided by `watchKites`, `cancelWatcher` c
 ## k.createKite(kiteDescriptor) : Kite
 
 Given a kite descriptor, this method will instantiate a proper `Kite` instance.
+
+## License
+
+The MIT License (MIT) - see LICENSE for more details
