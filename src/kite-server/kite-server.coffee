@@ -139,7 +139,9 @@ module.exports = class KiteServer extends EventEmitter
       """
 
   defaultKiteKey: ->
-    joinPath process.env.HOME, '.kite/kite.key'
+    { HOME } = process.env
+    throw new Error "Couldn't find kite.key"  unless HOME?
+    joinPath HOME, '.kite/kite.key'
 
   onConnection: (ws) ->
     proto = dnodeProtocol @api
