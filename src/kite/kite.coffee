@@ -22,7 +22,7 @@ module.exports = class Kite extends EventEmitter
   { now } = require '../util.coffee'
 
   # ready states:
-  [ NOTREADY, READY, CLOSED ] = [0,1,3]
+  [ NOTREADY, READY, CLOSED, CONNECTING ] = [0,1,3,5]
 
   # error states:
   [ OKAY, ERROR ] = [0,1]
@@ -75,7 +75,8 @@ module.exports = class Kite extends EventEmitter
 
   # connection state:
   connect: ->
-    return  if @readyState is READY
+    return  if @readyState in [CONNECTING, READY]
+    @readyState = CONNECTING
     { url, transportClass, transportOptions } = @options
     konstructor = transportClass ? @constructor.transportClass
     options = transportOptions ? @constructor.transportOptions
