@@ -18,4 +18,4 @@ go run $KODINGROOT/kite/testutil/writekey/main.go -stdout > kontrol_client.key
 go run $KODINGROOT/kite/kontrol/kontrol/main.go -public-key ./test/data/test_key.pub -private-key ./test/data/test_key.priv -init -username testuser -kontrol-url "http://0.0.0.0:4000"
 
 # run essential kites
-go run $KODINGROOT/kite/kontrol/kontrol/main.go -public-key ./test/data/test_key.pub -private-key ./test/data/test_key.priv -data-dir /tmp/kontrol-data &
+go run $KODINGROOT/kite/kontrol/kontrol/main.go -public-key ./test/data/test_key.pub -private-key ./test/data/test_key.priv &
