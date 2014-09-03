@@ -1,5 +1,7 @@
 "use strict"
 
+Timeout = require '../delayed/timeout.coffee'
+
 module.exports = (options = {}) ->
   backoff = options.backoff ? {}
   totalReconnectAttempts = 0
@@ -11,12 +13,18 @@ module.exports = (options = {}) ->
   @clearBackoffTimeout = ->
     totalReconnectAttempts = 0
 
+  @clearBackoffHandle = ->
+    if @backoffHandle?
+      @backoffHandle.clear()
+      @backoffHandle = null
+
   @setBackoffTimeout = (fn) =>
+    @clearBackoffHandle()
     if totalReconnectAttempts < maxReconnectAttempts
       timeout = Math.min initalDelayMs * Math.pow(
         multiplyFactor, totalReconnectAttempts
       ), maxDelayMs
-      setTimeout fn, timeout
+      @backoffHandle = new Timeout fn, timeout
       totalReconnectAttempts++
     else
       @emit "backoffFailed"

@@ -27,6 +27,9 @@ module.exports = class Kite extends EventEmitter
   # error states:
   [ OKAY, ERROR ] = [0,1]
 
+  # timer handles:
+  TIMER_HANDLES = ['heartbeatHandle', 'expiryHandle', 'backoffHandle']
+
   { v4: uniqueId } = require 'node-uuid'
 
   @transportClass = require 'ws'
@@ -93,7 +96,7 @@ module.exports = class Kite extends EventEmitter
     return
 
   disconnect: (reconnect = false) ->
-    for handle in ['heartbeatHandle', 'expiryHandle'] when @[handle]?
+    for handle in TIMER_HANDLES when @[handle]?
       @[handle].clear()
       @[handle] = null
     @options.autoReconnect = !!reconnect
