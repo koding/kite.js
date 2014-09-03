@@ -4,6 +4,10 @@ set -x
 
 KODINGROOT=$GOPATH/src/github.com/koding
 
+rm -rf _etcd/kontrol_test ||: #remove previous folder
+cd _etcd; ./build; ./bin/etcd --name=kontrol --data-dir=kontrol_test &
+cd -
+
 killall main || true
 
 # delete existing kite.key
