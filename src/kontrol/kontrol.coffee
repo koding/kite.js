@@ -42,7 +42,10 @@ module.exports = class Kontrol extends EventEmitter
 
     return
 
-  createKite: ({ kite: kiteDescriptor, token, url }) ->
+  createKite: ({ kite: kiteDescriptor, token, url, transportOptions }) ->
+
+    transportOptions ?= @options.transportOptions
+
     kite = new @constructor.Kite
       username         : kiteDescriptor.username
       environment      : kiteDescriptor.environment
@@ -56,7 +59,7 @@ module.exports = class Kontrol extends EventEmitter
         type           : 'token'
         key            : token
       transportClass   : @options.transportClass
-      transportOptions : @options.transportOptions
+      transportOptions : transportOptions
     .on 'tokenExpired', =>
       @renewToken kite, kiteDescriptor
 
