@@ -100,7 +100,7 @@ module.exports = class Kite extends EventEmitter
       @[handle].clear()
       @[handle] = null
     @options.autoReconnect = !!reconnect
-    @ws.close()
+    @ws?.close()
     @emit 'notice', "Disconnecting from #{ @options.url }"
     return
 
@@ -110,7 +110,7 @@ module.exports = class Kite extends EventEmitter
     # FIXME: the following is ridiculous.
     @emit 'open'
     @emit 'notice', "Connected to Kite: #{ @options.url }"
-    @clearBackoffTimeout()
+    @clearBackoffTimeout?()
     return
 
   onClose: ->
