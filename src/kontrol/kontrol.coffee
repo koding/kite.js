@@ -41,17 +41,24 @@ module.exports = class Kontrol extends EventEmitter
 
     return
 
-  createKite: ({ kite: kiteDescriptor, token, url, transportOptions }) ->
+  createKite: (options) ->
+
+    { kite: kiteDescriptor, token, transportOptions
+      autoConnect, autoReconnect, url } = options
 
     transportOptions ?= @options.transportOptions
+    autoConnect      ?= no
+    autoReconnect    ?= yes
 
     kite = new @constructor.Kite
+      logLevel         : @options.logLevel
       username         : kiteDescriptor.username
       environment      : kiteDescriptor.environment
       version          : kiteDescriptor.version
       region           : kiteDescriptor.region
       hostname         : kiteDescriptor.hostname
-      autoConnect      : no
+      autoConnect      : autoConnect
+      autoReconnect    : autoReconnect
       name             : kiteDescriptor.name
       url              : url
       auth             :
