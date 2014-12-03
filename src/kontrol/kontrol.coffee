@@ -21,24 +21,23 @@ module.exports = class Kontrol extends EventEmitter
     @authenticate()  if @options.autoConnect
 
   authenticate: (@options = @options) ->
-    { url, auth, username, environment, version, region, hostname, name, logLevel, transportClass, transportOptions, prefix } = @options
 
-    @kite = new @constructor.Kite
-      username        : username
-      environment     : environment
-      version         : version
-      region          : region
-      hostname        : hostname
-      name            : name ? 'kontrol'
-      url             : url
-      auth            : auth
-      logLevel        : logLevel
-      transportClass  : transportClass
-      transportOptions: transportOptions
-      prefix          : prefix
+    { url, auth, username, environment,
+      version, region, hostname, name,
+      logLevel, transportClass,
+      transportOptions, prefix } = @options
+
+    name ?= 'kontrol'
+
+    @kite = new @constructor.Kite {
+      url, auth, username, environment,
+      version, region, hostname, name,
+      logLevel, transportClass,
+      transportOptions, prefix
+    }
 
     @kite.on 'error', @emit.bind this, 'error'  # forward kite error events
-    @kite.on 'open', @emit.bind this, 'open'
+    @kite.on 'open',  @emit.bind this, 'open'
 
     return
 
