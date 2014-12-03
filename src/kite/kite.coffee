@@ -113,9 +113,9 @@ module.exports = class Kite extends EventEmitter
     @clearBackoffTimeout?()
     return
 
-  onClose: ->
+  onClose: (event)->
     @readyState = CLOSED
-    @emit 'close'
+    @emit 'close', event
 
     dcInfo = "#{ @options.url }: disconnected"
     # enable below to autoReconnect when the socket has been closed
