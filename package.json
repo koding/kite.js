@@ -1,80 +1,21 @@
 {
   "name": "kite.js",
-  "description": "Kite client library",
-  "main": "index.js",
-  "version": "0.3.9",
-  "scripts": {
-    "test": "KITE_HOME=. KITE_KEY=$(cat ./kontrol_client.key) node ./test/index.js",
-    "prepublish": "gulp"
-  },
-  "author": {
-    "name": "Koding Team",
-    "email": "team@koding.com",
-    "website": "https://koding.com"
-  },
-  "contributors": [
-    {
-      "name": "Fatih Arslan",
-      "email": "fatih@koding.com"
-    },
-    {
-      "name": "Cenk Alti",
-      "email": "cenk@koding.com"
-    },
-    {
-      "name": "Christopher Thorn",
-      "email": "chris@koding.com"
-    }
-  ],
-  "repository": "https://github.com/koding/kite.js.git",
+  "description": "kite client for browser",
+  "main": "index.coffee",
+  "version": "0.4.0-rc1",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "2.2.1",
-    "dnode-protocol": "~0.2.2",
-    "ws": "~0.4.31",
-    "node-uuid": "^1.4.1",
+    "atob": "^1.1.2",
+    "bluebird": "^2.8.2",
+    "dnode-protocol": "^0.2.2",
     "jwt-simple": "^0.2.0",
-    "gulp": "^3.6.1",
-    "stream-to-array": "^1.0.0",
-    "request": "^2.34.0",
-    "atob": "^1.1.0",
-    "cli-color": "^0.3.2",
-    "minimist": "0.0.8",
-    "sockjs": "^0.3.9",
-    "node-sockjs-client": "1.0.7",
-    "try-json-parse": "^0.1.0"
+    "node-uuid": "^1.4.2",
+    "try-json-parse": "^0.1.1",
+    "ws": "^0.6.5"
   },
   "devDependencies": {
-    "browserify": "~3.32.0",
-    "coffee-script": "~1.7.1",
-    "coffeeify": "~0.6.0",
-    "gulp": "^3.5.6",
-    "gulp-coffee": "^1.4.1",
-    "gulp-uglify": "^0.2.1",
-    "gulp-if": "0.0.5",
-    "gulp-rename": "^1.2.0",
-    "browserify-shim": "^3.3.1",
-    "gulp-util": "^2.2.14",
-    "gulp-replace": "^0.2.0",
-    "vinyl-source-stream": "^0.1.1",
-    "ecstatic": "^0.5.3",
-    "gulp-concat": "^2.2.0",
-    "tap": "^0.4.11",
-    "tape": "^2.13.3"
-  },
-  "browser": {
-    "./src/logging/logging.coffee": "./src/logging/browser.coffee"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-shim"
-    ]
-  },
-  "browserify-shim": {
-    "bluebird": "global:Promise",
-    "sockjs": "global:SockJS",
-    "ws": "global:WebSocket",
-    "node-uuid": "global:uuid",
-    "atob": "global:atob"
+    "browserify": "^8.1.1",
+    "coffeeify": "^1.0.0",
+    "uglify-js": "^2.4.16"
   }
 }

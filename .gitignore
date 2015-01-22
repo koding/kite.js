@@ -1,7 +1,2 @@
-/static/browser
-/browser-min
-/lib
-/node_modules
-.DS_Store
-/examples/kontrol/kite.key
-/kontrol_client.key
+node_modules
+npm-debug.log
