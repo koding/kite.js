@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "browserify": "^8.1.1",
+    "browserify-versionify": "^1.0.3",
     "coffeeify": "^1.0.0",
     "uglify-js": "^2.4.16"
   }

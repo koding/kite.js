@@ -117,7 +117,7 @@ module.exports = Kite = (function(_super) {
 
   __extends(Kite, _super);
 
-  Kite.version = '__VERSION__';
+  Kite.version = '0.4.0-rc1';
 
   Kite.Error = KiteError;
 

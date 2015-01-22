@@ -7,15 +7,21 @@ dist: clean kite kontrol bundle
 	@mv bundle.* dist
 
 kite:
-	@$(BIN)/browserify -t coffeeify --extension=".coffee" \
+	@$(BIN)/browserify \
+		-t coffeeify --extension=".coffee" \
+		-t browserify-versionify \
 		-o kite.js --standalone Kite lib/kite/index.coffee
 
 kontrol:
-	@$(BIN)/browserify -t coffeeify --extension=".coffee" \
+	@$(BIN)/browserify \
+		-t coffeeify --extension=".coffee" \
+		-t browserify-versionify \
 		-o kontrol.js --standalone Kontrol lib/kontrol/index.coffee
 
 bundle:
-	@$(BIN)/browserify -t coffeeify --extension=".coffee" \
+	@$(BIN)/browserify \
+		-t coffeeify --extension=".coffee" \
+		-t browserify-versionify \
 		-o bundle.js --standalone kite lib/index.coffee
 	@$(BIN)/uglifyjs bundle.js \
 		--mangle -c hoist_vars=true,if_return=true \
