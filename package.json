@@ -2,7 +2,7 @@
   "name": "kite.js",
   "description": "kite client for browser",
   "main": "index.coffee",
-  "version": "0.4.0-rc1",
+  "version": "0.4.0-rc2",
   "license": "MIT",
   "dependencies": {
     "atob": "^1.1.2",
