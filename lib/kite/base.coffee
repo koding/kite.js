@@ -14,7 +14,7 @@ bound_ = require './bound'
 
 module.exports = class Kite extends Emitter
 
-  @version = '__VERSION__'
+  @version = '0.4.0-rc1'
   @Error = KiteError
   @transportClass = WebSocket
   [ NOTREADY, READY, CLOSED, CONNECTING ] = [0, 1, 3, 5]

@@ -814,7 +814,7 @@ KiteError = require('../kite/error');
 module.exports = Kontrol = (function(_super) {
   __extends(Kontrol, _super);
 
-  Kontrol.version = '_VERSION_';
+  Kontrol.version = '0.4.0-rc1';
 
   Kontrol.Kite = Kite;
 

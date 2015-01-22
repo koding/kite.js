@@ -4,7 +4,7 @@ KiteError = require '../kite/error'
 
 module.exports = class Kontrol extends Emitter
 
-  @version = '_VERSION_'
+  @version = '0.4.0-rc1'
 
   @Kite = Kite
 
