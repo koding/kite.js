@@ -4,9 +4,25 @@ A [Kite](https://github.com/koding/kite) client library for the browser and node
 
 # installation
 
-``` sh
+```sh
 npm install kite.js
 ```
+
+or via git:
+
+```sh
+git clone git://github.com/koding/kite.js.git
+npm i
+```
+
+This would automatically fire the initial build for you. Or else once you clone the repository you can do:
+
+```sh
+gulp browserify kite
+```
+
+which compiles a build for the browser, and you can find the output under `./static/browser/`
+
 
 # requiring kite.js
 
