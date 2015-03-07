@@ -1,30 +1,13 @@
-BIN=./node_modules/.bin
+SRC=$(shell find lib -name "*.coffee")
+TARGETS=$(patsubst %.coffee,build/%.js,$(SRC))
 
-dist: clean kite kontrol bundle
-	@mkdir -p dist
-	@mv kite.js dist
-	@mv kontrol.js dist
-	@mv bundle.* dist
+all: clean prepublish
 
-kite:
-	@$(BIN)/browserify \
-		-t coffeeify --extension=".coffee" \
-		-o kite.js --standalone Kite lib/kite/index.coffee
+prepublish: $(TARGETS)
 
-kontrol:
-	@$(BIN)/browserify \
-		-t coffeeify --extension=".coffee" \
-		-o kontrol.js --standalone Kontrol lib/kontrol/index.coffee
-
-bundle:
-	@$(BIN)/browserify \
-		-t coffeeify --extension=".coffee" \
-		-o bundle.js --standalone kite lib/index.coffee
-	@$(BIN)/uglifyjs bundle.js \
-		--mangle -c hoist_vars=true,if_return=true \
-		--screw-ie8 \
-		-o bundle.min.js \
-		--source-map bundle.min.map --source-map-include-sources
+build/%.js: %.coffee
+	@mkdir -p $(@D)
+	@coffee -p -b $< >$@
 
 clean:
-	@rm -fr dist
+	@rm -fr build

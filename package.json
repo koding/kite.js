@@ -1,9 +1,12 @@
 {
   "name": "kite.js",
   "description": "kite client for browser",
-  "main": "index.coffee",
-  "version": "v0.3.11-browser",
-  "license": "MIT",
+  "private": true,
+  "main": "build/lib/index.js",
+  "version": "0.5.0",
+  "scripts": {
+    "prepublish": "make all"
+  },
   "dependencies": {
     "atob": "^1.1.2",
     "bluebird": "^2.8.2",
@@ -13,9 +16,5 @@
     "try-json-parse": "^0.1.1",
     "ws": "^0.6.5"
   },
-  "devDependencies": {
-    "browserify": "^8.1.1",
-    "coffeeify": "^1.0.0",
-    "uglify-js": "^2.4.16"
-  }
+  "license": "MIT"
 }
