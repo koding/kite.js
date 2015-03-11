@@ -18,7 +18,7 @@ npm i
 This would automatically fire the initial build for you. Or else once you clone the repository you can do:
 
 ```sh
-gulp browserify kite
+gulp 'browserify kite'
 ```
 
 which compiles a build for the browser, and you can find the output under `./static/browser/`
