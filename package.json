@@ -15,5 +15,18 @@
     "try-json-parse": "^0.1.1",
     "ws": "^0.6.5"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koding/kite.js.git"
+  },
+  "keywords": [
+    "kite",
+    "rpc"
+  ],
+  "author": "Chris Thorn <chris@koding.com>",
+  "bugs": {
+    "url": "https://github.com/koding/kite.js/issues"
+  },
+  "homepage": "https://github.com/koding/kite.js"
 }
