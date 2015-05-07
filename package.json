@@ -1,7 +1,6 @@
 {
   "name": "kite.js",
   "description": "kite client for browser",
-  "private": true,
   "main": "build/lib/index.js",
   "version": "0.5.0",
   "scripts": {
