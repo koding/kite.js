@@ -55,6 +55,7 @@
     "gulp-if": "^2.0.0",
     "gulp-rename": "^1.2.0",
     "gulp-replace": "^0.5.4",
+    "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.1",
     "gulp-util": "^3.0.7",
     "tap": "^5.0.0",
