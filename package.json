@@ -24,6 +24,14 @@
     {
       "name": "Christopher Thorn",
       "email": "chris@koding.com"
+    },
+    {
+      "name": "Gökmen Göksel",
+      "email": "gokmen@koding.com"
+    },
+    {
+      "name": "Sinan Yasar",
+      "email": "sinan@koding.com"
     }
   ],
   "repository": "https://github.com/koding/kite.js.git",
