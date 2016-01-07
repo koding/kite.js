@@ -13,5 +13,5 @@ install:
   - export GOROOT=/usr/local/go
   - sh ./scripts/run-kontrol.sh
 before_script:
-  - sleep 10
+  - sleep 30
   - curl http://0.0.0.0:4000/kite
