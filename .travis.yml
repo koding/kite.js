@@ -7,7 +7,7 @@ cache: false
 install:
   - npm install
   - gulp
-  - curl -s https://storage.googleapis.com/golang/go1.3.linux-amd64.tar.gz | sudo tar -v -C /usr/local -xz
+  - curl -s https://storage.googleapis.com/golang/go1.5.linux-amd64.tar.gz | sudo tar -v -C /usr/local -xz
   - PATH="/usr/local/go/bin:$PATH"
   - export GOPATH=`pwd`/go
   - export GOROOT=/usr/local/go
