@@ -7,83 +7,58 @@ coffee      = require 'gulp-coffee'
 util        = require 'gulp-util'
 replace     = require 'gulp-replace'
 source      = require 'vinyl-source-stream'
+sourcemaps  = require 'gulp-sourcemaps'
 coffeeify   = require 'coffeeify'
 http        = require 'http'
 ecstatic    = require 'ecstatic'
 { spawn }   = require 'child_process'
 
-coffee4Node = -> (coffee bare: yes, sourceMap: yes).on 'error', util.log
+coffee4Node = -> (coffee bare: yes).on 'error', util.log
+buildLib    = (glob, dest) ->
+  gulp.src glob
+    .pipe sourcemaps.init()
+    .pipe coffee4Node()
+    .pipe sourcemaps.write './'
+    .pipe replace '.coffee', '.js'
+    .pipe gulp.dest dest
 
 # Build for node
 
 gulp.task 'build commons', ->
-  gulp.src 'src/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib'
+  buildLib 'src/*.coffee', './lib'
 
 gulp.task 'build logging', ->
-  gulp.src 'src/logging/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/logging'
+  buildLib 'src/logging/*.coffee', 'lib/logging'
 
 gulp.task 'build delayed', ->
-  gulp.src 'src/delayed/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/delayed'
+  buildLib 'src/delayed/*.coffee', 'lib/delayed'
 
 gulp.task 'build kite', ->
-  gulp.src 'src/kite/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite'
+  buildLib 'src/kite/*.coffee', 'lib/kite'
 
 gulp.task 'build kite as promised', ->
-  gulp.src 'src/kite-as-promised/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite-as-promised'
+  buildLib 'src/kite-as-promised/*.coffee', 'lib/kite-as-promised'
 
 gulp.task 'build kontrol', ->
-  gulp.src 'src/kontrol/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kontrol'
+  buildLib 'src/kontrol/*.coffee', 'lib/kontrol'
 
 gulp.task 'build kontrol as promised', ->
-  gulp.src 'src/kontrol-as-promised/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kontrol-as-promised'
+  buildLib 'src/kontrol-as-promised/*.coffee', 'lib/kontrol-as-promised'
 
 gulp.task 'build kite server', [
   'build websocket server adapter'
   'build sockjs server adapter'
 ], ->
-  gulp.src 'src/kite-server/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite-server'
+  buildLib 'src/kite-server/*.coffee', 'lib/kite-server'
 
 gulp.task 'build websocket server adapter', ->
-  gulp.src 'src/kite-server/websocket/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite-server/websocket'
+  buildLib 'src/kite-server/websocket/*.coffee', 'lib/kite-server/websocket'
 
 gulp.task 'build sockjs server adapter', ->
-  gulp.src 'src/kite-server/sockjs/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/kite-server/sockjs'
+  buildLib 'src/kite-server/sockjs/*.coffee', 'lib/kite-server/sockjs'
 
 gulp.task 'build auth', ->
-  gulp.src 'src/auth/*.coffee'
-    .pipe coffee4Node()
-    .pipe replace '.coffee', '.js'
-    .pipe gulp.dest 'lib/auth'
+  buildLib 'src/auth/*.coffee', 'lib/auth'
 
 # Build for the browser
 gulp.task 'browserify kite', ->
