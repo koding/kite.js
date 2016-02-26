@@ -7,9 +7,9 @@
   DEBUG
 ] = [0..5]
 
-error = console.error.bind console
-warn = console.warn.bind console
-info = console.info.bind console
+error = -> console.error.apply console, arguments
+warn = -> console.warn.apply console, arguments
+info = -> console.info.apply console, arguments
 
 enableLogging = (name = "kite", emitter, logLevel = INFO) ->
 

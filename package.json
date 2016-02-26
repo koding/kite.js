@@ -2,7 +2,7 @@
   "name": "kite.js",
   "description": "kite client for browser",
   "main": "build/lib/index.js",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "scripts": {
     "prepublish": "make all"
   },
