@@ -3,11 +3,17 @@ var CRITICAL, DEBUG, ERROR, INFO, NOTICE, WARNING, enableLogging, error, info, w
 
 _ref = [0, 1, 2, 3, 4, 5], CRITICAL = _ref[0], ERROR = _ref[1], WARNING = _ref[2], NOTICE = _ref[3], INFO = _ref[4], DEBUG = _ref[5];
 
-error = console.error.bind(console);
+error = function() {
+  return console.error.apply(console, arguments);
+};
 
-warn = console.warn.bind(console);
+warn = function() {
+  return console.warn.apply(console, arguments);
+};
 
-info = console.info.bind(console);
+info = function() {
+  return console.info.apply(console, arguments);
+};
 
 enableLogging = function(name, emitter, logLevel) {
   var createLogger;
