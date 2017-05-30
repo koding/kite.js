@@ -4,7 +4,7 @@ KiteError = require '../kite/error'
 
 module.exports = class Kontrol extends Emitter
 
-  @version = '0.4.0-rc1'
+  @version = '1.0.0'
 
   @Kite = Kite
 
@@ -142,16 +142,21 @@ module.exports = class Kontrol extends Emitter
     changes.emit eventName, kite
     return
 
+  getPath = (query) ->
+    {
+      username = ''
+      environment = ''
+      name = ''
+      version = ''
+      region = ''
+      hostname = ''
+      id  = ''
+    } = query
+
+    "#{username}/#{environment}/#{name}/#{version}/#{region}/#{hostname}/#{id}"
+
   createKiteNotFoundError: (query) ->
-    { username, environment, name, version, region, hostname, id } = query
-    new KiteError "No kite found! query: #{
-      username    ? '' }/#{
-      environment ? '' }/#{
-      name        ? '' }/#{
-      version     ? '' }/#{
-      region      ? '' }/#{
-      hostname    ? '' }/#{
-      id          ? '' }"
+    new KiteError "No kite found for query: #{getPath query}"
 
   connect: -> @kite.connect()
 
@@ -163,4 +168,3 @@ module.exports = class Kontrol extends Emitter
   @actions      =
     REGISTER    : 'register'
     DEREGISTER  : 'deregister'
-
