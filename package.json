@@ -1,32 +1,63 @@
 {
   "name": "kite.js",
   "description": "kite client for browser",
-  "main": "build/lib/index.js",
-  "version": "0.5.2",
+  "main": "lib/index.js",
+  "version": "1.0.0",
   "scripts": {
-    "prepublish": "make all"
+    "clean": "rm -rf lib",
+    "test": "./node_modules/mocha/bin/_mocha --reporter spec --compilers coffee:coffee-script/register",
+    "test:watch": "npm test -- --watch",
+    "build:watch": "./node_modules/coffee-script/bin/coffee --no-header -o lib -wbc src",
+    "build:lib": "./node_modules/coffee-script/bin/coffee --no-header -o lib -bc src",
+    "build": "npm run build:lib",
+    "bundle": "npm run prepublish && browserify -i ws -g uglifyify lib/bundle.js -o dist/bundle.js",
+    "prepublish": "npm run clean && npm run build",
+    "postpublish": "npm run clean"
+  },
+  "devDependencies": {
+    "browserify": "latest",
+    "coffee-script": "^1.12.6",
+    "expect": "^1.20.2",
+    "mocha": "^3.4.2",
+    "uglifyify": "^3.0.4"
+  },
+  "directories": {
+    "test": "test"
   },
   "dependencies": {
-    "atob": "^1.1.2",
-    "bluebird": "^2.8.2",
+    "atob": "^2.0.3",
+    "bluebird": "^3.5.0",
     "dnode-protocol": "^0.2.2",
-    "jwt-simple": "^0.2.0",
-    "node-uuid": "^1.4.2",
+    "jwt-simple": "^0.5.1",
+    "uuid": "^3.0.1",
     "try-json-parse": "^0.1.1",
-    "ws": "^0.6.5"
+    "ws": "^3.0.0"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/koding/kite.js.git"
+    "url": "git+https://github.com/koding/kite.js.git"
   },
   "keywords": [
     "kite",
+    "dnode",
     "rpc"
   ],
-  "author": "Chris Thorn <chris@koding.com>",
+  "author": "Koding Developers <info@koding.com>",
+  "maintainers": [
+    {
+      "name": "Gokmen Goksel",
+      "email": "gokmen@goksel.me",
+      "url": "https://github.com/gokmen"
+    },
+    {
+      "name": "Umut Sirin",
+      "email": "umut@koding.com",
+      "url": "https://github.com/usirin"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/koding/kite.js/issues"
   },
-  "homepage": "https://github.com/koding/kite.js"
+  "homepage": "https://github.com/koding/kite.js#readme"
 }

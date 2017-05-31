@@ -1,7 +1,7 @@
 dnode = require 'dnode-protocol'
-WebSocket = require 'ws'
+WebSocket = window?.WebSocket ? require 'ws'
 atob = require 'atob'
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 Emitter = require('events').EventEmitter
 now = require './now'
 backoff = require './backoff'
@@ -14,7 +14,7 @@ bound_ = require './bound'
 
 module.exports = class Kite extends Emitter
 
-  @version = '0.4.0-rc1'
+  @version = '1.0.0'
   @Error = KiteError
   @transportClass = WebSocket
   [ NOTREADY, READY, CLOSED, CONNECTING ] = [0, 1, 3, 5]
@@ -68,7 +68,8 @@ module.exports = class Kite extends Emitter
     options = transportOptions ? @constructor.transportOptions
     @ws =
       if konstructor is WebSocket
-      then new konstructor url # websocket will whine if extra arguments are passed
+      # websocket will whine if extra arguments are passed
+      then new konstructor url
       else new konstructor url, null, options
     @ws.addEventListener 'open',    @bound 'onOpen'
     @ws.addEventListener 'close',   @bound 'onClose'
@@ -130,9 +131,9 @@ module.exports = class Kite extends Emitter
     kite              : @getKiteInfo params
     authentication    : @options.auth
     withArgs          : params
-    responseCallback  : (response) =>
-      { error: rawErr, result } = response
+    responseCallback  : (response) ->
 
+      { error: rawErr, result } = response
       err = if rawErr? then makeProperError rawErr else null
 
       callback err, result
