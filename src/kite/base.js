@@ -198,12 +198,8 @@ module.exports = Kite = (() => {
     }
 
     expireTokenOnExpiry() {
-      if (
-        (this.options.auth != null ? this.options.auth.type : undefined) !==
-        'token'
-      ) {
-        return
-      }
+      const { auth = {} } = this.options
+      if (auth.type !== 'token') return
 
       const { auth: { key: token } } = this.options
 

@@ -1,7 +1,7 @@
 const Timeout = require('./timeout')
 
 module.exports = function(options = {}) {
-  const { backoff = {} } = options.backoff
+  const { backoff = {} } = options
   let totalReconnectAttempts = 0
   const initalDelayMs = backoff.initialDelayMs != null
     ? backoff.initialDelayMs

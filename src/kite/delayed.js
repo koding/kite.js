@@ -17,7 +17,7 @@ module.exports = Delayed = (() => {
     constructor(fn, ms, ...params) {
       this.fn = fn
       this.ms = ms
-      this.params = params
+      this.params = Array.from(params)
       Delayed.handles.push(this)
       this.begin()
     }
