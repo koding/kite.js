@@ -10,7 +10,7 @@ module.exports = Kite = (() => {
 
     tell (method, params, callback) {
       return new Promise((resolve, reject) =>
-        Kite.prototype.__proto__.tell.call(this, method, params, (err, result) => {
+        super.tell(method, params, (err, result) => {
           if (err) {
             return reject(err)
           }
@@ -20,7 +20,7 @@ module.exports = Kite = (() => {
     }
 
     ready (callback) {
-      return new Promise(resolve => Kite.prototype.__proto__.ready.call(this, resolve)).nodeify(callback)
+      return new Promise(resolve => super.ready(resolve)).nodeify(callback)
     }
   }
   Kite.initClass()

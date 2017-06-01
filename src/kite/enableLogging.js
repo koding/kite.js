@@ -1,14 +1,8 @@
 const [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG] = Array.from([0, 1, 2, 3, 4, 5])
 
-const error = function (...args) {
-  return console.error(...args)
-}
-const warn = function (...args) {
-  return console.warn(...args)
-}
-const info = function (...args) {
-  return console.info(...args)
-}
+const error = (...args) => console.error(...args)
+const warn = (...args) => console.warn(...args)
+const info = (...args) => console.info(...args)
 
 const enableLogging = (name = 'kite', emitter, logLevel = INFO) => {
   const createLogger = (category, fn) => (...messages) => fn(`[${name}] ${category}\t${messages.join(' ')}`)
