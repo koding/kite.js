@@ -1,4 +1,4 @@
-const Emitter = require('../../src/kite/emitter')
+const Emitter = require('../kite/emitter')
 
 module.exports = class Session extends Emitter {
   constructor(connection) {
