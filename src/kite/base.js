@@ -1,8 +1,6 @@
 let Kite
 const dnode = require('dnode-protocol')
-const WebSocket = (typeof window !== 'undefined' && window !== null ? window.WebSocket : undefined) != null
-  ? typeof window !== 'undefined' && window !== null ? window.WebSocket : undefined
-  : require('ws')
+const WebSocket = require('ws')
 const atob = require('atob')
 const uuid = require('uuid')
 const Emitter = require('events').EventEmitter
@@ -98,12 +96,10 @@ module.exports = Kite = (() => {
       }
       this.readyState = CONNECTING
       const { url, transportClass, transportOptions } = this.options
-      const konstructor = transportClass != null ? transportClass : this.constructor.transportClass
+      const Konstructor = transportClass != null ? transportClass : this.constructor.transportClass
       const options = transportOptions != null ? transportOptions : this.constructor.transportOptions
-      this.ws = konstructor === WebSocket
-        ? // websocket will whine if extra arguments are passed
-          new konstructor(url)
-        : new konstructor(url, null, options)
+      // websocket will whine if extra arguments are passed
+      this.ws = Konstructor === WebSocket ? new Konstructor(url) : new Konstructor(url, null, options)
       this.ws.addEventListener('open', this.bound('onOpen'))
       this.ws.addEventListener('close', this.bound('onClose'))
       this.ws.addEventListener('message', this.bound('onMessage'))

@@ -2,11 +2,15 @@
   "name": "kite.js",
   "description": "kite client for browser",
   "main": "src/index.js",
+  "browser": {
+    "ws": "./lib/ws-browser.js"
+  },
   "version": "1.0.0",
   "scripts": {
     "test": "mocha --reporter spec",
     "test:watch": "npm test -- --watch",
-    "bundle": "browserify -i ws -t babelify -g uglifyify src/bundle.js -o dist/bundle.js",
+    "prebundle": "npm run build",
+    "bundle": "browserify -t babelify -g uglifyify lib/bundle.js -o dist/bundle.js",
     "lint": "eslint .",
     "fix": "eslint . --fix"
   },
