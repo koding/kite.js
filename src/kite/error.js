@@ -1,7 +1,9 @@
-let KiteError
-module.exports = KiteError = class KiteError extends Error {
+module.exports = class KiteError extends Error {
   constructor (message) {
+    super()
+
     Error.call(this)
+
     this.message = message
     this.name = 'KiteError'
   }

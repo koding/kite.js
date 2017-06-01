@@ -38,9 +38,7 @@ module.exports = Kite = (() => {
     }
 
     constructor (options) {
-      if (!(this instanceof Kite)) {
-        return new Kite(options)
-      }
+      super()
 
       this.id = uuid.v4()
       this.options = typeof options === 'string' ? { url: options } : options

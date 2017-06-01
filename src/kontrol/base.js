@@ -37,9 +37,7 @@ module.exports = Kontrol = (() => {
     }
 
     constructor (options) {
-      if (!(this instanceof Kontrol)) {
-        return new Kontrol(options)
-      }
+      super()
 
       this.options = options
 

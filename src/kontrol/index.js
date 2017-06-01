@@ -10,13 +10,6 @@ module.exports = Kontrol = (() => {
 
       ['fetchKites', 'fetchKite', 'watchKites', 'cancelWatcher', 'register'].forEach(method => (Kontrol.prototype[method] = Promise.promisify(BaseKontrol.prototype[method])))
     }
-
-    constructor (options) {
-      if (!(this instanceof Kontrol)) {
-        return new Kontrol(options)
-      }
-      super(options)
-    }
   }
   Kontrol.initClass()
   return Kontrol

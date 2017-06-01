@@ -7,12 +7,6 @@ module.exports = Kite = (() => {
     static initClass () {
       this.prototype.expireToken = Promise.promisify(this.prototype.expireToken)
     }
-    constructor (options) {
-      if (!(this instanceof Kite)) {
-        return new Kite(options)
-      }
-      super(options)
-    }
 
     tell (method, params, callback) {
       return new Promise((resolve, reject) =>
