@@ -3,7 +3,7 @@ const dnode = require('dnode-protocol')
 const WebSocket = require('ws')
 const atob = require('atob')
 const uuid = require('uuid')
-const Emitter = require('events').EventEmitter
+const Emitter = require('./emitter')
 const now = require('./now')
 const backoff = require('./backoff')
 const wrap = require('./wrap')
@@ -11,7 +11,6 @@ const handleIncomingMessage = require('./handleIncomingMessage')
 const enableLogging = require('./enableLogging')
 const Timeout = require('./timeout')
 const KiteError = require('./error')
-const bound_ = require('./bound')
 
 const [NOTREADY, READY, CLOSED, CONNECTING] = Array.from([0, 1, 3, 5])
 
@@ -31,8 +30,6 @@ module.exports = Kite = (() => {
         err.code = code
         return err
       }
-
-      this.prototype.bound = bound_
 
       this.prototype.initBackoff = backoff
     }
