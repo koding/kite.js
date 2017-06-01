@@ -1,7 +1,5 @@
 /* global window, WebSocket, MozWebSocket */
-'use strict'
-
-var ws = null
+let ws = null
 
 if (typeof WebSocket !== 'undefined') {
   ws = WebSocket
