@@ -4,11 +4,11 @@ const Promise = require('bluebird')
 
 module.exports = Kite = (() => {
   Kite = class Kite extends BaseKite {
-    static initClass () {
+    static initClass() {
       this.prototype.expireToken = Promise.promisify(this.prototype.expireToken)
     }
 
-    tell (method, params, callback) {
+    tell(method, params, callback) {
       return new Promise((resolve, reject) =>
         super.tell(method, params, (err, result) => {
           if (err) {
@@ -19,7 +19,7 @@ module.exports = Kite = (() => {
       ).nodeify(callback)
     }
 
-    ready (callback) {
+    ready(callback) {
       return new Promise(resolve => super.ready(resolve)).nodeify(callback)
     }
   }

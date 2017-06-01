@@ -1,4 +1,4 @@
 module.exports = {
-  Kite   : require('./kite'),
+  Kite: require('./kite'),
   Kontrol: require('./kontrol'),
 }

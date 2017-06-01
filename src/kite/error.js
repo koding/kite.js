@@ -1,5 +1,5 @@
 module.exports = class KiteError extends Error {
-  constructor (message) {
+  constructor(message) {
     super()
 
     Error.call(this)
@@ -9,11 +9,11 @@ module.exports = class KiteError extends Error {
   }
 
   // the predicates these factories make are useful as bluebird catch guards:
-  static codeIs (code) {
+  static codeIs(code) {
     return err => code === err.code
   }
 
-  static codeIsnt (code) {
+  static codeIsnt(code) {
     return err => code !== err.code
   }
 }

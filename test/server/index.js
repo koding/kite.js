@@ -6,12 +6,12 @@ const Session = require('./session')
 
 module.exports = Server = (() => {
   Server = class Server extends Emitter {
-    static initClass () {
+    static initClass() {
       this.scheme = 'ws'
       this.secureScheme = 'wss'
     }
 
-    constructor (options) {
+    constructor(options) {
       super()
 
       this.options = options
@@ -22,11 +22,11 @@ module.exports = Server = (() => {
       })
     }
 
-    getAddress () {
+    getAddress() {
       return `${this.server.options.host}:${this.server.options.port}`
     }
 
-    close () {
+    close() {
       return this.server != null ? this.server.close() : undefined
     }
   }

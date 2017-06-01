@@ -1,7 +1,7 @@
 const Emitter = require('../../src/kite/emitter')
 
 module.exports = class Session extends Emitter {
-  constructor (connection) {
+  constructor(connection) {
     super()
 
     this.connection = connection
@@ -16,15 +16,15 @@ module.exports = class Session extends Emitter {
     })
   }
 
-  getId () {
+  getId() {
     return `${this.connection._socket.remoteAddress}:${this.connection._socket.remotePort}`
   }
 
-  send (message) {
+  send(message) {
     return this.connection.send(message)
   }
 
-  close () {
+  close() {
     return this.connection.close()
   }
 }

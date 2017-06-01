@@ -6,7 +6,7 @@ const KiteError = require('../kite/error')
 module.exports = Kontrol = (() => {
   let getPath
   Kontrol = class Kontrol extends Emitter {
-    static initClass () {
+    static initClass() {
       this.version = '1.0.0'
 
       this.Kite = Kite
@@ -31,12 +31,12 @@ module.exports = Kontrol = (() => {
       }
 
       this.actions = {
-        REGISTER  : 'register',
+        REGISTER: 'register',
         DEREGISTER: 'deregister',
       }
     }
 
-    constructor (options) {
+    constructor(options) {
       super()
 
       this.options = options
@@ -53,9 +53,22 @@ module.exports = Kontrol = (() => {
       }
     }
 
-    authenticate (options = this.options) {
+    authenticate(options = this.options) {
       this.options = options
-      let { url, auth, username, environment, version, region, hostname, name, logLevel, transportClass, transportOptions, prefix } = this.options
+      let {
+        url,
+        auth,
+        username,
+        environment,
+        version,
+        region,
+        hostname,
+        name,
+        logLevel,
+        transportClass,
+        transportOptions,
+        prefix,
+      } = this.options
 
       if (name == null) {
         name = 'kontrol'
@@ -80,11 +93,18 @@ module.exports = Kontrol = (() => {
       this.kite.on('open', this.emit.bind(this, 'open'))
     }
 
-    createKite (options) {
-      let { kite: kiteDescriptor, token, transportOptions, autoConnect, autoReconnect, url } = options
+    createKite(options) {
+      let {
+        kite: kiteDescriptor,
+        token,
+        transportOptions,
+        autoConnect,
+        autoReconnect,
+        url,
+      } = options
 
       if (transportOptions == null) {
-        ({ transportOptions } = this.options)
+        transportOptions = this.options.transportOptions
       }
       if (autoConnect == null) {
         autoConnect = false
@@ -94,19 +114,19 @@ module.exports = Kontrol = (() => {
       }
 
       const kite = new this.constructor.Kite({
-        logLevel   : this.options.logLevel,
-        username   : kiteDescriptor.username,
+        logLevel: this.options.logLevel,
+        username: kiteDescriptor.username,
         environment: kiteDescriptor.environment,
-        version    : kiteDescriptor.version,
-        region     : kiteDescriptor.region,
-        hostname   : kiteDescriptor.hostname,
+        version: kiteDescriptor.version,
+        region: kiteDescriptor.region,
+        hostname: kiteDescriptor.hostname,
         autoConnect,
         autoReconnect,
-        name       : kiteDescriptor.name,
+        name: kiteDescriptor.name,
         url,
-        auth       : {
+        auth: {
           type: 'token',
-          key : token,
+          key: token,
         },
         transportClass: this.options.transportClass,
         transportOptions,
@@ -117,7 +137,7 @@ module.exports = Kontrol = (() => {
       return kite
     }
 
-    renewToken (kite, query) {
+    renewToken(kite, query) {
       return this.kite.tell('getToken', [query], (err, token) => {
         if (err) {
           // FIXME: what should happen to this error?
@@ -128,11 +148,11 @@ module.exports = Kontrol = (() => {
       })
     }
 
-    createKites (kiteDescriptors, query) {
+    createKites(kiteDescriptors, query) {
       return Array.from(kiteDescriptors).map(k => this.createKite(k))
     }
 
-    fetchKites (args = {}, callback) {
+    fetchKites(args = {}, callback) {
       this.kite.tell('getKites', [args], (err, result) => {
         if (err != null) {
           callback(err)
@@ -148,7 +168,7 @@ module.exports = Kontrol = (() => {
       })
     }
 
-    fetchKite (args = {}, callback) {
+    fetchKite(args = {}, callback) {
       this.fetchKites(args, (err, kites) => {
         if (err != null) {
           callback(err)
@@ -164,7 +184,7 @@ module.exports = Kontrol = (() => {
       })
     }
 
-    watchKites (args = {}, callback) {
+    watchKites(args = {}, callback) {
       const changes = new Emitter()
       args.watchHandler = this.createUpdateHandler(changes)
       this.kite.tell('getKites', [args], (err, result) => {
@@ -183,11 +203,11 @@ module.exports = Kontrol = (() => {
       })
     }
 
-    cancelWatcher (id, callback) {
+    cancelWatcher(id, callback) {
       return this.kite.tell('cancelWatcher', [id], callback)
     }
 
-    createUpdateHandler (changes) {
+    createUpdateHandler(changes) {
       return response => {
         const { err, result } = response
 
@@ -205,20 +225,22 @@ module.exports = Kontrol = (() => {
       }
     }
 
-    createKiteNotFoundError (query) {
+    createKiteNotFoundError(query) {
       return new KiteError(`No kite found for query: ${getPath(query)}`)
     }
 
-    connect () {
+    connect() {
       return this.kite.connect()
     }
 
-    disconnect () {
+    disconnect() {
       return this.kite.disconnect()
     }
 
-    register (url, callback) {
-      return this.kite != null ? this.kite.tell('register', [url], callback) : undefined
+    register(url, callback) {
+      return this.kite != null
+        ? this.kite.tell('register', [url], callback)
+        : undefined
     }
   }
   Kontrol.initClass()

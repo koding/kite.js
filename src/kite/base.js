@@ -18,7 +18,7 @@ module.exports = Kite = (() => {
   let TIMER_HANDLES
   let makeProperError
   Kite = class Kite extends Emitter {
-    static initClass () {
+    static initClass() {
       this.version = '1.0.0'
       this.Error = KiteError
       this.transportClass = WebSocket
@@ -34,7 +34,7 @@ module.exports = Kite = (() => {
       this.prototype.initBackoff = backoff
     }
 
-    constructor (options) {
+    constructor(options) {
       super()
 
       this.id = uuid.v4()
@@ -72,29 +72,35 @@ module.exports = Kite = (() => {
       }
     }
 
-    getToken () {
+    getToken() {
       return this.options.auth.key
     }
 
-    setToken (token) {
+    setToken(token) {
       // FIXME: this setter is not symettrical with the getter
-      if ((this.options.auth != null ? this.options.auth.type : undefined) !== 'token') {
+      if (this.options.auth && this.options.auth === 'token') {
         throw new Error('Invalid auth type!')
       }
       this.options.auth.key = token
       return this.emit('tokenSet', token)
     }
 
-    connect () {
+    connect() {
       if ([CONNECTING, READY].includes(this.readyState)) {
         return
       }
       this.readyState = CONNECTING
       const { url, transportClass, transportOptions } = this.options
-      const Konstructor = transportClass != null ? transportClass : this.constructor.transportClass
-      const options = transportOptions != null ? transportOptions : this.constructor.transportOptions
+      const Konstructor = transportClass != null
+        ? transportClass
+        : this.constructor.transportClass
+      const options = transportOptions != null
+        ? transportOptions
+        : this.constructor.transportOptions
       // websocket will whine if extra arguments are passed
-      this.ws = Konstructor === WebSocket ? new Konstructor(url) : new Konstructor(url, null, options)
+      this.ws = Konstructor === WebSocket
+        ? new Konstructor(url)
+        : new Konstructor(url, null, options)
       this.ws.addEventListener('open', this.bound('onOpen'))
       this.ws.addEventListener('close', this.bound('onClose'))
       this.ws.addEventListener('message', this.bound('onMessage'))
@@ -103,7 +109,7 @@ module.exports = Kite = (() => {
       this.emit('info', `Trying to connect to ${url}`)
     }
 
-    disconnect (reconnect = false) {
+    disconnect(reconnect = false) {
       for (let handle of TIMER_HANDLES) {
         if (this[handle] != null) {
           this[handle].clear()
@@ -117,7 +123,7 @@ module.exports = Kite = (() => {
       this.emit('notice', `Disconnecting from ${this.options.url}`)
     }
 
-    onOpen () {
+    onOpen() {
       this.readyState = READY
       // FIXME: the following is ridiculous.
       this.emit('open')
@@ -127,7 +133,7 @@ module.exports = Kite = (() => {
       }
     }
 
-    onClose (event) {
+    onClose(event) {
       this.readyState = CLOSED
       this.emit('close', event)
 
@@ -141,34 +147,34 @@ module.exports = Kite = (() => {
       this.emit('info', dcInfo)
     }
 
-    onMessage ({ data }) {
+    onMessage({ data }) {
       handleIncomingMessage.call(this, this.proto, data)
     }
 
-    onError (err) {
+    onError(err) {
       console.log(err)
       this.emit('error', 'Websocket error!')
     }
 
-    getKiteInfo (params) {
+    getKiteInfo(params) {
       let left
       return {
-        username   : `${this.options.username != null ? this.options.username : 'anonymous'}`,
+        username: `${this.options.username != null ? this.options.username : 'anonymous'}`,
         environment: `${this.options.environment != null ? this.options.environment : 'browser-environment'}`,
-        name       : `${(left = __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) != null ? __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) : this.options.name) != null ? left : 'browser-kite'}`,
-        version    : `${this.options.version != null ? this.options.version : '1.0.0'}`,
-        region     : `${this.options.region != null ? this.options.region : 'browser-region'}`,
-        hostname   : `${this.options.hostname != null ? this.options.hostname : 'browser-hostname'}`,
-        id         : this.id,
+        name: `${(left = __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) != null ? __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) : this.options.name) != null ? left : 'browser-kite'}`,
+        version: `${this.options.version != null ? this.options.version : '1.0.0'}`,
+        region: `${this.options.region != null ? this.options.region : 'browser-region'}`,
+        hostname: `${this.options.hostname != null ? this.options.hostname : 'browser-hostname'}`,
+        id: this.id,
       }
     }
 
-    wrapMessage (method, params, callback) {
+    wrapMessage(method, params, callback) {
       return {
-        kite          : this.getKiteInfo(params),
+        kite: this.getKiteInfo(params),
         authentication: this.options.auth,
-        withArgs      : params,
-        responseCallback (response) {
+        withArgs: params,
+        responseCallback(response) {
           const { error: rawErr, result } = response
           const err = rawErr != null ? makeProperError(rawErr) : null
 
@@ -177,20 +183,25 @@ module.exports = Kite = (() => {
       }
     }
 
-    tell (method, params, callback) {
+    tell(method, params, callback) {
       // by default, remove this callback after it is called once.
       if (callback.times == null) {
         callback.times = 1
       }
 
-      const scrubbed = this.proto.scrubber.scrub([this.wrapMessage(method, params, callback)])
+      const scrubbed = this.proto.scrubber.scrub([
+        this.wrapMessage(method, params, callback),
+      ])
       scrubbed.method = method
 
       this.proto.emit('request', scrubbed)
     }
 
-    expireTokenOnExpiry () {
-      if ((this.options.auth != null ? this.options.auth.type : undefined) !== 'token') {
+    expireTokenOnExpiry() {
+      if (
+        (this.options.auth != null ? this.options.auth.type : undefined) !==
+        'token'
+      ) {
         return
       }
 
@@ -215,7 +226,7 @@ module.exports = Kite = (() => {
       }
     }
 
-    expireToken (callback) {
+    expireToken(callback) {
       if (callback != null) {
         this.once('tokenSet', newToken => callback(null, newToken))
       }
@@ -226,7 +237,7 @@ module.exports = Kite = (() => {
       }
     }
 
-    ready (callback) {
+    ready(callback) {
       if (this.readyState === READY) {
         process.nextTick(callback)
       } else {
@@ -234,17 +245,17 @@ module.exports = Kite = (() => {
       }
     }
 
-    ping (callback) {
+    ping(callback) {
       return this.tell('kite.ping', callback)
     }
 
-    static disconnect (...kites) {
+    static disconnect(...kites) {
       for (let kite of kites) {
         kite.disconnect()
       }
     }
 
-    static random (kites) {
+    static random(kites) {
       return kites[Math.floor(Math.random() * kites.length)]
     }
   }
@@ -252,6 +263,8 @@ module.exports = Kite = (() => {
   return Kite
 })()
 
-function __guard__ (value, transform) {
-  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null
+    ? transform(value)
+    : undefined
 }

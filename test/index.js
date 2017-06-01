@@ -25,5 +25,4 @@ describe('connection', () =>
     })
 
     expect(kiteInstance).toExist()
-
   }))
