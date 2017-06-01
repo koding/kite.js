@@ -1,25 +1,30 @@
 {
   "name": "kite.js",
   "description": "kite client for browser",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "browser": {
     "ws": "./lib/ws-browser.js"
   },
   "version": "1.0.0",
   "scripts": {
+    "clean": "rm -rf ./lib",
+    "pretest": "npm run clean",
     "test": "mocha --reporter spec",
     "test:watch": "npm test -- --watch",
     "prebundle": "npm run build",
     "bundle": "browserify -t babelify -g uglifyify lib/bundle.js -o dist/bundle.js",
     "lint": "eslint .",
-    "fix": "eslint . --fix"
+    "fix": "eslint . --fix",
+    "prebuild": "npm run clean",
+    "build": "babel src --source-maps --out-dir lib",
+    "build:watch": "babel src --watch --source-maps --out-dir lib",
+    "prepublish": "npm run fix && npm run build"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-core": "6.24.1",
     "babel-eslint": "7.2.3",
     "babel-plugin-add-module-exports": "0.2.1",
-    "babel-plugin-es6-promise": "1.1.1",
     "babel-plugin-syntax-async-functions": "6.13.0",
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-object-assign": "6.22.0",
@@ -31,7 +36,7 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "3.5.0",
-    "eslint-plugin-react": "6.10.3",
+    "eslint-plugin-react": "7.0.1",
     "eslint-plugin-standard": "3.0.1",
     "expect": "^1.20.2",
     "mocha": "^3.4.2",
