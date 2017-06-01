@@ -2,11 +2,16 @@ const Promise = require('bluebird')
 const handleToken = require('./token')
 const whitelist = require('./whitelist')
 
-module.exports = Promise.method(function (method, auth, kiteKey) {
+module.exports = Promise.method(function(method, auth, kiteKey) {
   if (auth == null) {
-    if (whitelist.includes(method) || !(this.api != null ? this.api[method].mustAuth : undefined)) {
+    if (whitelist.includes(method)) {
       return
     }
+
+    if (this.api && this.api[method] && this.api[method].mustAuth) {
+      return
+    }
+
     throw new Error('Access denied!')
   }
 

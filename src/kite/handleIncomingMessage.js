@@ -18,7 +18,7 @@ const mungeCallbacks = (callbacks, n) => {
   return callbacks
 }
 
-module.exports = function (proto, message) {
+module.exports = function(proto, message) {
   let responseCallback
   let withArgs
   this.emit('debug', `Receiving: ${message}`)
@@ -33,7 +33,10 @@ module.exports = function (proto, message) {
   let { arguments: args, links, callbacks, method, authentication: auth } = req
 
   if (args.length > 0) {
-    [{ withArgs, responseCallback, authentication: auth }] = Array.from(args)
+    const [firstArg] = Array.from(args)
+    withArgs = firstArg.withArgs
+    responseCallback = firstArg.responseCallback
+    auth = firstArg.authentication
   }
 
   if (withArgs == null && responseCallback == null) {
@@ -46,7 +49,7 @@ module.exports = function (proto, message) {
   return handleAuth
     .call(this, method, auth, this.key)
     .then(
-      function (token) {
+      function(token) {
         this.emit('debug', 'Authentication passed')
 
         if (withArgs == null) {
@@ -75,13 +78,13 @@ module.exports = function (proto, message) {
       }.bind(this)
     )
     .catch(
-      function (err) {
+      function(err) {
         this.emit('debug', 'Authentication failed')
 
         mungeCallbacks(callbacks, 1)
 
         return proto.handle({
-          method   : 'kite.echo',
+          method: 'kite.echo',
           arguments: [err, responseCallback],
           links,
           callbacks,

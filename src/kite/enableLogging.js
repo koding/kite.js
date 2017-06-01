@@ -1,11 +1,19 @@
-const [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG] = Array.from([0, 1, 2, 3, 4, 5])
+const [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG] = Array.from([
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+])
 
 const error = (...args) => console.error(...args)
 const warn = (...args) => console.warn(...args)
 const info = (...args) => console.info(...args)
 
 const enableLogging = (name = 'kite', emitter, logLevel = INFO) => {
-  const createLogger = (category, fn) => (...messages) => fn(`[${name}] ${category}\t${messages.join(' ')}`)
+  const createLogger = (category, fn) => (...messages) =>
+    fn(`[${name}] ${category}\t${messages.join(' ')}`)
 
   if (CRITICAL <= logLevel) {
     emitter.on('critical', createLogger('CRITICAL', error))

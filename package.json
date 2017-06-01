@@ -8,16 +8,19 @@
   "version": "1.0.0",
   "scripts": {
     "clean": "rm -rf ./lib",
-    "test": "mocha --reporter spec",
+    "test": "mocha --reporter spec 'src/**/*.test.js'",
     "test:watch": "npm test -- --watch",
     "prebundle": "npm run build",
     "bundle": "browserify -t babelify -g uglifyify lib/bundle.js -o dist/bundle.js",
     "lint": "eslint .",
-    "fix": "eslint . --fix",
     "prebuild": "npm run clean",
     "build": "babel src --source-maps --out-dir lib",
     "build:watch": "babel src --watch --source-maps --out-dir lib",
-    "prepublish": "npm run fix && npm run build"
+    "prepublish": "npm run format:all && npm run test && npm run build",
+    "format:single": "prettier --single-quote --trailing-comma es5 --no-semi --write",
+    "format:all": "prettier --single-quote --trailing-comma es5 --no-semi --write 'src/**/*.js'",
+    "format:check:single": "prettier --single-quote --trailing-comma es5 --no-semi --list-different",
+    "format:check:all": "prettier --single-quote --trailing-comma es5 --no-semi --list-different 'src/**/*.js'"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
@@ -39,6 +42,7 @@
     "eslint-plugin-standard": "3.0.1",
     "expect": "^1.20.2",
     "mocha": "^3.4.2",
+    "prettier": "^1.3.1",
     "uglifyify": "^3.0.4"
   },
   "directories": {

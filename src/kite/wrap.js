@@ -1,6 +1,6 @@
 const Interval = require('./interval')
 
-module.exports = function (userlandApi = {}) {
+module.exports = function(userlandApi = {}) {
   const api = ['error', 'info', 'log', 'warn'].reduce((api, method) => {
     api[method] = console[method].bind(console)
     return api
