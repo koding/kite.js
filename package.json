@@ -8,7 +8,6 @@
   "version": "1.0.0",
   "scripts": {
     "clean": "rm -rf ./lib",
-    "pretest": "npm run clean",
     "test": "mocha --reporter spec",
     "test:watch": "npm test -- --watch",
     "prebundle": "npm run build",
