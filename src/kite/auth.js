@@ -1,5 +1,4 @@
 const Promise = require('bluebird')
-const atob = require('atob')
 const handleToken = require('./token')
 const whitelist = require('./whitelist')
 

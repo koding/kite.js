@@ -1,7 +1,6 @@
-let Interval
 const Delayed = require('./delayed')
 
-module.exports = Interval = class Interval extends Delayed {
+module.exports = class Interval extends Delayed {
   begin () {
     return (this.handle = setInterval(this.fn, this.ms, ...Array.from(this.params)))
   }

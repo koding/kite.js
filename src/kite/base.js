@@ -15,6 +15,8 @@ const Timeout = require('./timeout')
 const KiteError = require('./error')
 const bound_ = require('./bound')
 
+const [NOTREADY, READY, CLOSED, CONNECTING] = Array.from([0, 1, 3, 5])
+
 module.exports = Kite = (() => {
   let TIMER_HANDLES
   let makeProperError
@@ -23,8 +25,6 @@ module.exports = Kite = (() => {
       this.version = '1.0.0'
       this.Error = KiteError
       this.transportClass = WebSocket
-      const [NOTREADY, READY, CLOSED, CONNECTING] = Array.from([0, 1, 3, 5])
-      const [OKAY, ERROR] = Array.from([0, 1])
       TIMER_HANDLES = ['heartbeatHandle', 'expiryHandle', 'backoffHandle']
 
       makeProperError = ({ type, message, code }) => {
@@ -205,7 +205,7 @@ module.exports = Kite = (() => {
 
       const { auth: { key: token } } = this.options
 
-      const [_, claimsA] = Array.from(token.split('.'))
+      const claimsA = token.split('.')[1]
 
       const claims = (() => {
         try {

@@ -7,7 +7,7 @@ module.exports = function (userlandApi = {}) {
   }, {})
   api['kite.heartbeat'] = (duration, ping, callback) => {
     this.heartbeatHandle = new Interval(ping, duration * 1000)
-    return callback({ error: null })
+    return callback(null)
   }
   for (let method of Object.keys(userlandApi || {})) {
     const fn = userlandApi[method]

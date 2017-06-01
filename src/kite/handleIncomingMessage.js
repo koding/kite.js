@@ -1,5 +1,6 @@
 const parse = require('try-json-parse')
 const handleAuth = require('./auth')
+const KiteError = require('./error')
 
 const mungeCallbacks = (callbacks, n) => {
   // FIXME: this is an ugly hack; there must be a better way to implement it:
@@ -32,8 +33,7 @@ module.exports = function (proto, message) {
   let { arguments: args, links, callbacks, method, authentication: auth } = req
 
   if (args.length > 0) {
-    let kite;
-    [{ withArgs, responseCallback, kite, authentication: auth }] = Array.from(args)
+    [{ withArgs, responseCallback, authentication: auth }] = Array.from(args)
   }
 
   if (withArgs == null && responseCallback == null) {

@@ -1,6 +1,3 @@
-const atob = require('atob')
-const parse = require('try-json-parse')
-
 module.exports =
   Object.defineProperty ||
   ((ctx, name, { value }) => {
