@@ -13,6 +13,7 @@ const KiteError = require('./error')
 
 const {
   Event,
+  AuthType,
   TimerHandles,
   State: { NOTREADY, READY, CLOSED, CONNECTING },
 } = require('../constants')
@@ -68,7 +69,7 @@ class Kite extends Emitter {
 
   setToken(token) {
     // FIXME: this setter is not symettrical with the getter
-    if (this.options.auth && this.options.auth === 'token') {
+    if (this.options.auth && this.options.auth === AuthType.token) {
       throw new Error('Invalid auth type!')
     }
     this.options.auth.key = token
@@ -189,7 +190,7 @@ class Kite extends Emitter {
 
   expireTokenOnExpiry() {
     const { auth = {} } = this.options
-    if (auth.type !== 'token') return
+    if (auth.type !== AuthType.token) return
 
     const { auth: { key: token } } = this.options
 
