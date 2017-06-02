@@ -1,4 +1,5 @@
 const {
+  Event,
   DebugLevel: { CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG },
 } = require('../constants')
 
@@ -11,27 +12,27 @@ const enableLogging = (name = 'kite', emitter, logLevel = INFO) => {
     fn(`[${name}] ${category}\t${messages.join(' ')}`)
 
   if (CRITICAL <= logLevel) {
-    emitter.on('critical', createLogger('CRITICAL', error))
+    emitter.on(Event.critical, createLogger('CRITICAL', error))
   }
 
   if (ERROR <= logLevel) {
-    emitter.on('error', createLogger('ERROR', error))
+    emitter.on(Event.error, createLogger('ERROR', error))
   }
 
   if (WARNING <= logLevel) {
-    emitter.on('warn', createLogger('WARN', warn))
+    emitter.on(Event.warn, createLogger('WARN', warn))
   }
 
   if (NOTICE <= logLevel) {
-    emitter.on('notice', createLogger('NOTICE', info))
+    emitter.on(Event.notice, createLogger('NOTICE', info))
   }
 
   if (INFO <= logLevel) {
-    emitter.on('info', createLogger('INFO', info))
+    emitter.on(Event.info, createLogger('INFO', info))
   }
 
   if (DEBUG <= logLevel) {
-    return emitter.on('debug', createLogger('DEBUG', info))
+    return emitter.on(Event.debug, createLogger('DEBUG', info))
   }
 }
 
