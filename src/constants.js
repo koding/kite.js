@@ -48,3 +48,14 @@ export const Backoff = {
   MULTIPLY_FACTOR: 1.4,
   INITIAL_DELAY: 700, // ms,
 }
+
+export const Defaults = {
+  KiteInfo: {
+    username: 'anonymous',
+    environment: 'browser-environment',
+    name: 'browser-kite',
+    version: '1.0.0',
+    region: 'browser-region',
+    hostname: 'browser-hostname',
+  },
+}

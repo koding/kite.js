@@ -14,6 +14,7 @@ const KiteError = require('./error')
 const {
   Event,
   AuthType,
+  Defaults,
   TimerHandles,
   State: { NOTREADY, READY, CLOSED, CONNECTING },
 } = require('../constants')
@@ -150,12 +151,12 @@ class Kite extends Emitter {
   getKiteInfo(params) {
     let left
     return {
-      username: `${this.options.username != null ? this.options.username : 'anonymous'}`,
-      environment: `${this.options.environment != null ? this.options.environment : 'browser-environment'}`,
-      name: `${(left = __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) != null ? __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) : this.options.name) != null ? left : 'browser-kite'}`,
-      version: `${this.options.version != null ? this.options.version : '1.0.0'}`,
-      region: `${this.options.region != null ? this.options.region : 'browser-region'}`,
-      hostname: `${this.options.hostname != null ? this.options.hostname : 'browser-hostname'}`,
+      username: `${this.options.username != null ? this.options.username : Defaults.KiteInfo.username}`,
+      environment: `${this.options.environment != null ? this.options.environment : Defaults.KiteInfo.environment}`,
+      name: `${(left = __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) != null ? __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) : this.options.name) != null ? left : Defaults.KiteInfo.name}`,
+      version: `${this.options.version != null ? this.options.version : Defaults.KiteInfo.version}`,
+      region: `${this.options.region != null ? this.options.region : Defaults.KiteInfo.region}`,
+      hostname: `${this.options.hostname != null ? this.options.hostname : Defaults.KiteInfo.hostname}`,
       id: this.id,
     }
   }
@@ -247,7 +248,7 @@ class Kite extends Emitter {
   }
 }
 
-Kite.version = '1.0.0'
+Kite.version = Defaults.KiteInfo.version
 Kite.Error = KiteError
 Kite.transportClass = WebSocket
 Kite.prototype.initBackoff = backoff
