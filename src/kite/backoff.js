@@ -1,19 +1,27 @@
 const Timeout = require('./timeout')
-const { Event } = require('../constants')
+const {
+  Backoff: {
+    MAX_DELAY,
+    MAX_RECONNECT_ATTEMPTS,
+    MULTIPLY_FACTOR,
+    INITIAL_DELAY,
+  },
+  Event,
+} = require('../constants')
 
 module.exports = function(options = {}) {
   const { backoff = {} } = options
   let totalReconnectAttempts = 0
   const initalDelayMs = backoff.initialDelayMs != null
     ? backoff.initialDelayMs
-    : 700
+    : INITIAL_DELAY
   const multiplyFactor = backoff.multiplyFactor != null
     ? backoff.multiplyFactor
-    : 1.4
-  const maxDelayMs = backoff.maxDelayMs != null ? backoff.maxDelayMs : 1000 * 15 // 15 seconds
+    : MULTIPLY_FACTOR
+  const maxDelayMs = backoff.maxDelayMs != null ? backoff.maxDelayMs : MAX_DELAY
   const maxReconnectAttempts = backoff.maxReconnectAttempts != null
     ? backoff.maxReconnectAttempts
-    : 50
+    : MAX_RECONNECT_ATTEMPTS
 
   this.clearBackoffTimeout = () => (totalReconnectAttempts = 0)
 
