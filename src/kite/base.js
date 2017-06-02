@@ -12,17 +12,18 @@ const enableLogging = require('./enableLogging')
 const Timeout = require('./timeout')
 const KiteError = require('./error')
 
-const [NOTREADY, READY, CLOSED, CONNECTING] = Array.from([0, 1, 3, 5])
+const {
+  TimerHandles,
+  State: { NOTREADY, READY, CLOSED, CONNECTING },
+} = require('../constants')
 
 module.exports = Kite = (() => {
-  let TIMER_HANDLES
   let makeProperError
   Kite = class Kite extends Emitter {
     static initClass() {
       this.version = '1.0.0'
       this.Error = KiteError
       this.transportClass = WebSocket
-      TIMER_HANDLES = ['heartbeatHandle', 'expiryHandle', 'backoffHandle']
 
       makeProperError = ({ type, message, code }) => {
         const err = new KiteError(message)
@@ -110,7 +111,7 @@ module.exports = Kite = (() => {
     }
 
     disconnect(reconnect = false) {
-      for (let handle of TIMER_HANDLES) {
+      for (let handle of TimerHandles) {
         if (this[handle] != null) {
           this[handle].clear()
           this[handle] = null

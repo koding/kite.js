@@ -1,4 +1,5 @@
 const Timeout = require('./timeout')
+const { Event } = require('../constants')
 
 module.exports = function(options = {}) {
   const { backoff = {} } = options
@@ -33,7 +34,7 @@ module.exports = function(options = {}) {
       this.backoffHandle = new Timeout(fn, timeout)
       return totalReconnectAttempts++
     } else {
-      return this.emit('backoffFailed')
+      return this.emit(Event.BackOffFailed)
     }
   })
 }
