@@ -22,6 +22,7 @@ export const KnownEvents = [
   'open',
   'debug',
 ]
+
 export const Event = asObjectOf(KnownEvents)
 
 export const KnownAuthTypes = ['token']
@@ -30,10 +31,20 @@ export const AuthType = asObjectOf(KnownAuthTypes)
 export const TimerHandles = ['heartbeatHandle', 'expiryHandle', 'backoffHandle']
 export const WhiteList = ['kite.heartbeat', 'kite.ping']
 
-const [NOTREADY, READY, CLOSED, CONNECTING] = Array.from([0, 1, 3, 5])
-export const State = { NOTREADY, READY, CLOSED, CONNECTING }
+export const State = { NOTREADY: 0, READY: 1, CLOSED: 3, CONNECTING: 5 }
 
-const [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG] = Array.from(
-  Array(6).keys()
-)
-export const DebugLevel = { CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG }
+export const DebugLevel = {
+  CRITICAL: 0,
+  ERROR: 1,
+  WARNING: 2,
+  NOTICE: 3,
+  INFO: 4,
+  DEBUG: 5,
+}
+
+export const Backoff = {
+  MAX_DELAY: 1000 * 15, // 15 seconds,
+  MAX_RECONNECT_ATTEMPTS: 50,
+  MULTIPLY_FACTOR: 1.4,
+  INITIAL_DELAY: 700, // ms,
+}
