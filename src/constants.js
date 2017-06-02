@@ -5,7 +5,23 @@ function asObjectOf(list) {
   }, {})
 }
 
-export const KnownEvents = ['BackOffFailed']
+export const KnownEvents = [
+  'backOffFailed',
+
+  'tokenExpired',
+  'tokenSet',
+
+  'message',
+  'request',
+
+  'critical',
+  'notice',
+  'error',
+  'warn',
+  'info',
+  'open',
+  'debug',
+]
 export const Event = asObjectOf(KnownEvents)
 
 export const KnownAuthTypes = ['token']

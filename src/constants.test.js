@@ -5,6 +5,24 @@ describe('constants', () =>
   it('should expose required constants', () => {
     expect(constants.Event).toExist()
     expect(Object.keys(constants.Event)).toEqual(constants.KnownEvents)
+    const requiredEvents = [
+      'backOffFailed',
+      'tokenExpired',
+      'tokenSet',
+      'request',
+      'message',
+      'critical',
+      'notice',
+      'error',
+      'warn',
+      'info',
+      'open',
+      'debug',
+    ]
+
+    requiredEvents.forEach(event =>
+      expect(constants.KnownEvents.includes(event)).toBe(true)
+    )
 
     expect(constants.AuthType).toExist()
     expect(constants.AuthType.token).toExist()
