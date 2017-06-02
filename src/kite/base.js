@@ -22,13 +22,6 @@ function __guard__(value, transform) {
     : undefined
 }
 
-function makeProperError({ type, message, code }) {
-  const err = new KiteError(message)
-  err.type = type
-  err.code = code
-  return err
-}
-
 class Kite extends Emitter {
   constructor(options) {
     super()
@@ -172,7 +165,7 @@ class Kite extends Emitter {
       withArgs: params,
       responseCallback(response) {
         const { error: rawErr, result } = response
-        const err = rawErr != null ? makeProperError(rawErr) : null
+        const err = rawErr != null ? KiteError.makeProperError(rawErr) : null
 
         return callback(err, result)
       },
