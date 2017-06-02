@@ -34,7 +34,7 @@ module.exports = function(options = {}) {
       this.backoffHandle = new Timeout(fn, timeout)
       return totalReconnectAttempts++
     } else {
-      return this.emit(Event.BackOffFailed)
+      return this.emit(Event.backOffFailed)
     }
   })
 }

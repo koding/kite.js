@@ -12,6 +12,7 @@ const Timeout = require('./timeout')
 const KiteError = require('./error')
 
 const {
+  Event,
   TimerHandles,
   State: { NOTREADY, READY, CLOSED, CONNECTING },
 } = require('../constants')
@@ -51,9 +52,9 @@ class Kite extends Emitter {
 
     this.proto = dnode(wrap.call(this, this.options.api))
 
-    this.proto.on('request', req => {
+    this.proto.on(Event.request, req => {
       this.ready(() => this.ws.send(JSON.stringify(req)))
-      this.emit('debug', 'Sending: ', JSON.stringify(req))
+      this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
     if (this.options.autoConnect) {
@@ -71,7 +72,7 @@ class Kite extends Emitter {
       throw new Error('Invalid auth type!')
     }
     this.options.auth.key = token
-    return this.emit('tokenSet', token)
+    return this.emit(Event.tokenSet, token)
   }
 
   connect() {
@@ -90,12 +91,12 @@ class Kite extends Emitter {
     this.ws = Konstructor === WebSocket
       ? new Konstructor(url)
       : new Konstructor(url, null, options)
-    this.ws.addEventListener('open', this.bound('onOpen'))
-    this.ws.addEventListener('close', this.bound('onClose'))
-    this.ws.addEventListener('message', this.bound('onMessage'))
-    this.ws.addEventListener('error', this.bound('onError'))
-    this.ws.addEventListener('info', info => this.emit('info', info))
-    this.emit('info', `Trying to connect to ${url}`)
+    this.ws.addEventListener(Event.open, this.bound('onOpen'))
+    this.ws.addEventListener(Event.close, this.bound('onClose'))
+    this.ws.addEventListener(Event.message, this.bound('onMessage'))
+    this.ws.addEventListener(Event.error, this.bound('onError'))
+    this.ws.addEventListener(Event.info, info => this.emit(Event.info, info))
+    this.emit(Event.info, `Trying to connect to ${url}`)
   }
 
   disconnect(reconnect = false) {
@@ -109,14 +110,14 @@ class Kite extends Emitter {
     if (this.ws != null) {
       this.ws.close()
     }
-    this.emit('notice', `Disconnecting from ${this.options.url}`)
+    this.emit(Event.notice, `Disconnecting from ${this.options.url}`)
   }
 
   onOpen() {
     this.readyState = READY
     // FIXME: the following is ridiculous.
-    this.emit('open')
-    this.emit('notice', `Connected to Kite: ${this.options.url}`)
+    this.emit(Event.open)
+    this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
@@ -124,7 +125,7 @@ class Kite extends Emitter {
 
   onClose(event) {
     this.readyState = CLOSED
-    this.emit('close', event)
+    this.emit(Event.close, event)
 
     let dcInfo = `${this.options.url}: disconnected`
     // enable below to autoReconnect when the socket has been closed
@@ -133,7 +134,7 @@ class Kite extends Emitter {
       dcInfo += ', trying to reconnect...'
     }
 
-    this.emit('info', dcInfo)
+    this.emit(Event.info, dcInfo)
   }
 
   onMessage({ data }) {
@@ -142,7 +143,7 @@ class Kite extends Emitter {
 
   onError(err) {
     console.log(err)
-    this.emit('error', 'Websocket error!')
+    this.emit(Event.error, 'Websocket error!')
   }
 
   getKiteInfo(params) {
@@ -183,7 +184,7 @@ class Kite extends Emitter {
     ])
     scrubbed.method = method
 
-    this.proto.emit('request', scrubbed)
+    this.proto.emit(Event.request, scrubbed)
   }
 
   expireTokenOnExpiry() {
@@ -213,9 +214,9 @@ class Kite extends Emitter {
 
   expireToken(callback) {
     if (callback != null) {
-      this.once('tokenSet', newToken => callback(null, newToken))
+      this.once(Event.tokenSet, newToken => callback(null, newToken))
     }
-    this.emit('tokenExpired')
+    this.emit(Event.tokenExpired)
     if (this.expiryHandle) {
       this.expiryHandle.clear()
       this.expiryHandle = null
@@ -226,7 +227,7 @@ class Kite extends Emitter {
     if (this.readyState === READY) {
       process.nextTick(callback)
     } else {
-      this.once('open', callback)
+      this.once(Event.open, callback)
     }
   }
 
