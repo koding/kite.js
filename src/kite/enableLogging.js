@@ -1,6 +1,6 @@
-const [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG] = Array.from(
-  Array(6).keys()
-)
+const {
+  DebugLevel: { CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG },
+} = require('../constants')
 
 const error = (...args) => console.error(...args)
 const warn = (...args) => console.warn(...args)

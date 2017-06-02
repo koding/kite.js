@@ -16,3 +16,8 @@ export const WhiteList = ['kite.heartbeat', 'kite.ping']
 
 const [NOTREADY, READY, CLOSED, CONNECTING] = Array.from([0, 1, 3, 5])
 export const State = { NOTREADY, READY, CLOSED, CONNECTING }
+
+const [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG] = Array.from(
+  Array(6).keys()
+)
+export const DebugLevel = { CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG }

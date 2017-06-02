@@ -19,4 +19,7 @@ describe('constants', () =>
     expect(constants.State.READY).toBe(1)
     expect(constants.State.CLOSED).toBe(3)
     expect(constants.State.CONNECTING).toBe(5)
+
+    expect(constants.DebugLevel.CRITICAL).toBe(0)
+    expect(constants.DebugLevel.DEBUG).toBe(5)
   }))
