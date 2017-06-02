@@ -41,38 +41,22 @@ class Kontrol extends Emitter {
 
   authenticate(options = this.options) {
     this.options = options
-    let {
-      url,
-      auth,
-      username,
-      environment,
-      version,
-      region,
-      hostname,
-      name,
-      logLevel,
-      transportClass,
-      transportOptions,
-      prefix,
-    } = this.options
 
-    if (name == null) {
-      name = 'kontrol'
-    }
+    let name = this.options.name ? this.options.name : 'kontrol'
 
     this.kite = new this.constructor.Kite({
-      url,
-      auth,
-      username,
-      environment,
-      version,
-      region,
-      hostname,
-      name,
-      logLevel,
-      transportClass,
-      transportOptions,
-      prefix,
+      url: this.options.url,
+      auth: this.options.auth,
+      username: this.options.username,
+      environment: this.options.environment,
+      version: this.options.version,
+      region: this.options.region,
+      hostname: this.options.hostname,
+      name: name,
+      logLevel: this.options.logLevel,
+      transportClass: this.options.transportClass,
+      transportOptions: this.options.transportOptions,
+      prefix: this.options.prefix,
     })
 
     this.kite.on('error', this.emit.bind(this, 'error')) // forward kite error events
