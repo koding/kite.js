@@ -9,6 +9,7 @@ describe('constants', () =>
       'backOffFailed',
       'tokenExpired',
       'tokenSet',
+      'register',
       'request',
       'message',
       'critical',

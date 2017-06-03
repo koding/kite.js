@@ -11,6 +11,7 @@ export const KnownEvents = [
   'tokenExpired',
   'tokenSet',
 
+  'register',
   'message',
   'request',
 
@@ -58,4 +59,9 @@ export const Defaults = {
     region: 'browser-region',
     hostname: 'browser-hostname',
   },
+}
+
+export const KontrolActions = {
+  REGISTER: 'register',
+  DEREGISTER: 'deregister',
 }

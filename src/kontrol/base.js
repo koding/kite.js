@@ -3,6 +3,8 @@ const Kite = require('../kite/base')
 const KiteError = require('../kite/error')
 const getPath = require('./getpath')
 
+const { Event, Defaults, KontrolActions } = require('../constants')
+
 class Kontrol extends Emitter {
   constructor(options) {
     super()
@@ -41,8 +43,8 @@ class Kontrol extends Emitter {
       prefix: this.options.prefix,
     })
 
-    this.kite.on('error', this.emit.bind(this, 'error')) // forward kite error events
-    this.kite.on('open', this.emit.bind(this, 'open'))
+    this.kite.on(Event.error, this.emit.bind(this, 'error')) // forward kite error events
+    this.kite.on(Event.open, this.emit.bind(this, 'open'))
   }
 
   createKite(options) {
@@ -82,7 +84,7 @@ class Kontrol extends Emitter {
       },
       transportClass: this.options.transportClass,
       transportOptions,
-    }).on('tokenExpired', () => {
+    }).on(Event.tokenExpired, () => {
       return this.renewToken(kite, kiteDescriptor)
     })
 
@@ -150,7 +152,7 @@ class Kontrol extends Emitter {
       callback(null, { changes, watcherID })
 
       for (let kite of this.createKites(kiteDescriptors)) {
-        changes.emit('register', kite)
+        changes.emit(Event.register, kite)
       }
     })
   }
@@ -164,7 +166,7 @@ class Kontrol extends Emitter {
       const { err, result } = response
 
       if (err != null) {
-        changes.emit('error', err)
+        changes.emit(Event.error, err)
         return
       }
 
@@ -196,11 +198,8 @@ class Kontrol extends Emitter {
   }
 }
 
-Kontrol.version = '1.0.0'
+Kontrol.version = Defaults.KiteInfo.version
 Kontrol.Kite = Kite
-Kontrol.actions = {
-  REGISTER: 'register',
-  DEREGISTER: 'deregister',
-}
+Kontrol.actions = KontrolActions
 
 export default Kontrol
