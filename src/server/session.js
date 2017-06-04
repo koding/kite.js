@@ -17,7 +17,9 @@ module.exports = class Session extends Emitter {
   }
 
   getId() {
-    return `${this.connection._socket.remoteAddress}:${this.connection._socket.remotePort}`
+    const { remoteAddress, remotePort } = this.connection._socket
+
+    return `${remoteAddress}:${remotePort}`
   }
 
   send(message) {
