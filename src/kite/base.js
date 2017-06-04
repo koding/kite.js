@@ -12,6 +12,9 @@ const Timeout = require('./timeout')
 const KiteError = require('./error')
 
 const {
+  Event,
+  AuthType,
+  Defaults,
   TimerHandles,
   State: { NOTREADY, READY, CLOSED, CONNECTING },
 } = require('../constants')
@@ -51,9 +54,9 @@ class Kite extends Emitter {
 
     this.proto = dnode(wrap.call(this, this.options.api))
 
-    this.proto.on('request', req => {
+    this.proto.on(Event.request, req => {
       this.ready(() => this.ws.send(JSON.stringify(req)))
-      this.emit('debug', 'Sending: ', JSON.stringify(req))
+      this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
     if (this.options.autoConnect) {
@@ -67,11 +70,11 @@ class Kite extends Emitter {
 
   setToken(token) {
     // FIXME: this setter is not symettrical with the getter
-    if (this.options.auth && this.options.auth === 'token') {
+    if (this.options.auth && this.options.auth === AuthType.token) {
       throw new Error('Invalid auth type!')
     }
     this.options.auth.key = token
-    return this.emit('tokenSet', token)
+    return this.emit(Event.tokenSet, token)
   }
 
   connect() {
@@ -90,12 +93,12 @@ class Kite extends Emitter {
     this.ws = Konstructor === WebSocket
       ? new Konstructor(url)
       : new Konstructor(url, null, options)
-    this.ws.addEventListener('open', this.bound('onOpen'))
-    this.ws.addEventListener('close', this.bound('onClose'))
-    this.ws.addEventListener('message', this.bound('onMessage'))
-    this.ws.addEventListener('error', this.bound('onError'))
-    this.ws.addEventListener('info', info => this.emit('info', info))
-    this.emit('info', `Trying to connect to ${url}`)
+    this.ws.addEventListener(Event.open, this.bound('onOpen'))
+    this.ws.addEventListener(Event.close, this.bound('onClose'))
+    this.ws.addEventListener(Event.message, this.bound('onMessage'))
+    this.ws.addEventListener(Event.error, this.bound('onError'))
+    this.ws.addEventListener(Event.info, info => this.emit(Event.info, info))
+    this.emit(Event.info, `Trying to connect to ${url}`)
   }
 
   disconnect(reconnect = false) {
@@ -109,14 +112,14 @@ class Kite extends Emitter {
     if (this.ws != null) {
       this.ws.close()
     }
-    this.emit('notice', `Disconnecting from ${this.options.url}`)
+    this.emit(Event.notice, `Disconnecting from ${this.options.url}`)
   }
 
   onOpen() {
     this.readyState = READY
     // FIXME: the following is ridiculous.
-    this.emit('open')
-    this.emit('notice', `Connected to Kite: ${this.options.url}`)
+    this.emit(Event.open)
+    this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
@@ -124,7 +127,7 @@ class Kite extends Emitter {
 
   onClose(event) {
     this.readyState = CLOSED
-    this.emit('close', event)
+    this.emit(Event.close, event)
 
     let dcInfo = `${this.options.url}: disconnected`
     // enable below to autoReconnect when the socket has been closed
@@ -133,7 +136,7 @@ class Kite extends Emitter {
       dcInfo += ', trying to reconnect...'
     }
 
-    this.emit('info', dcInfo)
+    this.emit(Event.info, dcInfo)
   }
 
   onMessage({ data }) {
@@ -142,18 +145,18 @@ class Kite extends Emitter {
 
   onError(err) {
     console.log(err)
-    this.emit('error', 'Websocket error!')
+    this.emit(Event.error, 'Websocket error!')
   }
 
   getKiteInfo(params) {
     let left
     return {
-      username: `${this.options.username != null ? this.options.username : 'anonymous'}`,
-      environment: `${this.options.environment != null ? this.options.environment : 'browser-environment'}`,
-      name: `${(left = __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) != null ? __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) : this.options.name) != null ? left : 'browser-kite'}`,
-      version: `${this.options.version != null ? this.options.version : '1.0.0'}`,
-      region: `${this.options.region != null ? this.options.region : 'browser-region'}`,
-      hostname: `${this.options.hostname != null ? this.options.hostname : 'browser-hostname'}`,
+      username: `${this.options.username != null ? this.options.username : Defaults.KiteInfo.username}`,
+      environment: `${this.options.environment != null ? this.options.environment : Defaults.KiteInfo.environment}`,
+      name: `${(left = __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) != null ? __guard__(params != null ? params[0] : undefined, ({ kiteName }) => kiteName) : this.options.name) != null ? left : Defaults.KiteInfo.name}`,
+      version: `${this.options.version != null ? this.options.version : Defaults.KiteInfo.version}`,
+      region: `${this.options.region != null ? this.options.region : Defaults.KiteInfo.region}`,
+      hostname: `${this.options.hostname != null ? this.options.hostname : Defaults.KiteInfo.hostname}`,
       id: this.id,
     }
   }
@@ -183,12 +186,12 @@ class Kite extends Emitter {
     ])
     scrubbed.method = method
 
-    this.proto.emit('request', scrubbed)
+    this.proto.emit(Event.request, scrubbed)
   }
 
   expireTokenOnExpiry() {
     const { auth = {} } = this.options
-    if (auth.type !== 'token') return
+    if (auth.type !== AuthType.token) return
 
     const { auth: { key: token } } = this.options
 
@@ -213,9 +216,9 @@ class Kite extends Emitter {
 
   expireToken(callback) {
     if (callback != null) {
-      this.once('tokenSet', newToken => callback(null, newToken))
+      this.once(Event.tokenSet, newToken => callback(null, newToken))
     }
-    this.emit('tokenExpired')
+    this.emit(Event.tokenExpired)
     if (this.expiryHandle) {
       this.expiryHandle.clear()
       this.expiryHandle = null
@@ -226,7 +229,7 @@ class Kite extends Emitter {
     if (this.readyState === READY) {
       process.nextTick(callback)
     } else {
-      this.once('open', callback)
+      this.once(Event.open, callback)
     }
   }
 
@@ -245,7 +248,7 @@ class Kite extends Emitter {
   }
 }
 
-Kite.version = '1.0.0'
+Kite.version = Defaults.KiteInfo.version
 Kite.Error = KiteError
 Kite.transportClass = WebSocket
 Kite.prototype.initBackoff = backoff

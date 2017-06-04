@@ -1,6 +1,7 @@
 const parse = require('try-json-parse')
 const handleAuth = require('./auth')
 const KiteError = require('./error')
+const { Event } = require('../constants')
 
 const mungeCallbacks = (callbacks, n) => {
   // FIXME: this is an ugly hack; there must be a better way to implement it:
@@ -21,12 +22,12 @@ const mungeCallbacks = (callbacks, n) => {
 module.exports = function(proto, message) {
   let responseCallback
   let withArgs
-  this.emit('debug', `Receiving: ${message}`)
+  this.emit(Event.debug, `Receiving: ${message}`)
 
   const req = parse(message)
 
   if (req == null) {
-    this.emit('warning', new KiteError(`Invalid payload! (${message})`))
+    this.emit(Event.warning, new KiteError(`Invalid payload! (${message})`))
     return
   }
 
@@ -40,17 +41,17 @@ module.exports = function(proto, message) {
   }
 
   if (withArgs == null && responseCallback == null) {
-    this.emit('debug', 'Handling a normal dnode message')
+    this.emit(Event.debug, 'Handling a normal dnode message')
     return proto.handle(req)
   }
 
-  this.emit('debug', 'Authenticating request')
+  this.emit(Event.debug, 'Authenticating request')
 
   return handleAuth
     .call(this, method, auth, this.key)
     .then(
       function(token) {
-        this.emit('debug', 'Authentication passed')
+        this.emit(Event.debug, 'Authentication passed')
 
         if (withArgs == null) {
           withArgs = []
@@ -79,7 +80,7 @@ module.exports = function(proto, message) {
     )
     .catch(
       function(err) {
-        this.emit('debug', 'Authentication failed')
+        this.emit(Event.debug, 'Authentication failed')
 
         mungeCallbacks(callbacks, 1)
 
