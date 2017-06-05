@@ -1,6 +1,6 @@
-const expect = require('expect')
-const Kite = require('./base')
-const { Defaults: { KiteInfo } } = require('../constants')
+import * as expect from 'expect'
+import Kite from './base'
+import { Defaults } from '../constants'
 
 describe('Kite', () => {
   describe('::getKiteInfo', () =>
@@ -13,6 +13,6 @@ describe('Kite', () => {
 
       let kiteInfo = kite.getKiteInfo()
       delete kiteInfo.id // new id generated each time
-      expect(kiteInfo).toEqual(KiteInfo)
+      expect(kiteInfo).toEqual(Defaults.KiteInfo)
     }))
 })

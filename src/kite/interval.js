@@ -1,6 +1,6 @@
-const Delayed = require('./delayed')
+import Delayed from './delayed'
 
-module.exports = class Interval extends Delayed {
+export default class Interval extends Delayed {
   begin() {
     return (this.handle = setInterval(
       this.fn,

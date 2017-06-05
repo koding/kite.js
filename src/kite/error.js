@@ -1,4 +1,4 @@
-module.exports = class KiteError extends Error {
+export default class KiteError extends Error {
   constructor(message) {
     super()
 

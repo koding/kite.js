@@ -1,4 +1,4 @@
-module.exports = () => {
+export default () => {
   const now = new Date()
   return new Date(
     now.getUTCFullYear(),

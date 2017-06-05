@@ -1,5 +1,5 @@
-const expect = require('expect')
-const KiteError = require('./error')
+import * as expect from 'expect'
+import KiteError from './error'
 
 describe('KiteError', () =>
   it('should provide a generic Error object', () => {

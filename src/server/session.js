@@ -1,6 +1,6 @@
-const Emitter = require('../kite/emitter')
+import Emitter from '../kite/emitter'
 
-module.exports = class Session extends Emitter {
+export default class Session extends Emitter {
   constructor(connection) {
     super()
 
