@@ -118,11 +118,11 @@ class Kite extends Emitter {
   onOpen() {
     this.readyState = READY
     // FIXME: the following is ridiculous.
-    this.emit(Event.open)
     this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
+    this.emit(Event.open)
   }
 
   onClose(event) {
