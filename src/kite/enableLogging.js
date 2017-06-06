@@ -9,7 +9,7 @@ const info = (...args) => console.info(...args)
 
 export default (name = 'kite', emitter, logLevel = INFO) => {
   const createLogger = (category, fn) => (...messages) =>
-    fn(`[${name}] ${category}\t${messages.join(' ')}`)
+    fn(`[${name}] ${category}\t`, ...messages)
 
   if (CRITICAL <= logLevel) {
     emitter.on(Event.critical, createLogger('CRITICAL', error))

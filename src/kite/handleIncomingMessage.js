@@ -79,7 +79,7 @@ export default function(proto, message) {
     )
     .catch(
       function(err) {
-        this.emit(Event.debug, 'Authentication failed')
+        this.emit(Event.debug, 'Authentication failed', err)
 
         mungeCallbacks(callbacks, 1)
 

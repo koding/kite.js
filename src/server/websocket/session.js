@@ -7,7 +7,6 @@ export default class Session extends Emitter {
     this.connection = connection
 
     this.connection.on('message', message => {
-      console.log('message', message)
       return this.emit('message', message)
     })
 
