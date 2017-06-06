@@ -53,8 +53,11 @@
     "bluebird": "^3.5.0",
     "dnode-protocol": "^0.2.2",
     "jwt-simple": "^0.5.1",
-    "uuid": "^3.0.1",
+    "sockjs": "^0.3.18",
+    "sockjs-client": "^1.1.4",
+    "stream-to-array": "^2.3.0",
     "try-json-parse": "^0.1.1",
+    "uuid": "^3.0.1",
     "ws": "^3.0.0"
   },
   "license": "MIT",
