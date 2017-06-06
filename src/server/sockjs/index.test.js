@@ -1,6 +1,7 @@
 const Kite = require('../../kite')
 const Server = require('./')
 const SockJS = require('sockjs-client')
+const logLevel = 0
 
 describe('SockJS Server with WebSocket', () => {
   it('should be able to accept kite connections', done => {
@@ -9,9 +10,10 @@ describe('SockJS Server with WebSocket', () => {
       autoReconnect: false,
       autoConnect: false,
       transportClass: SockJS,
+      logLevel,
     })
 
-    const server = new Server({ port: 7778 })
+    const server = new Server({ port: 7778, logLevel })
     server.on('connection', connection => {
       server.close()
       done()
@@ -31,9 +33,10 @@ describe('SockJS Server with XHR', () => {
       transportOptions: {
         transports: ['xhr-polling'],
       },
+      logLevel,
     })
 
-    const server = new Server({ port: 7779 })
+    const server = new Server({ port: 7779, logLevel })
     server.on('connection', connection => {
       server.close()
       done()

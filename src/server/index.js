@@ -100,10 +100,11 @@ class KiteServer extends Emitter {
     }
     this.port = port
     const prefix = this.getPrefix()
+    const { name, logLevel } = this.options
     const Server = this.getServerClass()
-    this.server = new Server({ port, prefix })
+    this.server = new Server({ port, prefix, name, logLevel })
     this.server.on('connection', this.bound('onConnection'))
-    return this.emit('info', `Listening: ${this.server.getAddress()}`)
+    this.emit('info', `Listening: ${this.server.getAddress()}`)
   }
 
   close() {
