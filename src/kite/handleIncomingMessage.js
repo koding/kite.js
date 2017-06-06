@@ -47,8 +47,7 @@ export default function(proto, message) {
 
   this.emit(Event.debug, 'Authenticating request')
 
-  return handleAuth
-    .call(this, method, auth, this.key)
+  return handleAuth(this, method, auth, this.key)
     .then(
       function(token) {
         this.emit(Event.debug, 'Authentication passed')
