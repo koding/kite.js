@@ -1,7 +1,7 @@
-const parse = require('try-json-parse')
-const handleAuth = require('./auth')
-const KiteError = require('./error')
-const { Event } = require('../constants')
+import parse from 'try-json-parse'
+import handleAuth from './auth'
+import KiteError from './error'
+import { Event } from '../constants'
 
 const mungeCallbacks = (callbacks, n) => {
   // FIXME: this is an ugly hack; there must be a better way to implement it:
@@ -19,7 +19,7 @@ const mungeCallbacks = (callbacks, n) => {
   return callbacks
 }
 
-module.exports = function(proto, message) {
+export default function(proto, message) {
   let responseCallback
   let withArgs
   this.emit(Event.debug, `Receiving: ${message}`)

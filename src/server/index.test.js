@@ -1,6 +1,6 @@
-const expect = require('expect')
-const Kite = require('../kite')
-const Server = require('./')
+import * as expect from 'expect'
+import Kite from '../kite'
+import Server from './'
 
 describe('Server', () => {
   it('should be able to accept kite connections', done => {

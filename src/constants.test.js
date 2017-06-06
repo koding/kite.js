@@ -1,5 +1,5 @@
-const expect = require('expect')
-const constants = require('./constants')
+import * as expect from 'expect'
+import * as constants from './constants'
 
 describe('constants', () =>
   it('should expose required constants', () => {

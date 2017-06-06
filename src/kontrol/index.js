@@ -1,7 +1,7 @@
 let Kontrol
-const BaseKontrol = require('./base')
-const Kite = require('../kite')
-const Promise = require('bluebird')
+import BaseKontrol from './base'
+import Kite from '../kite'
+import * as Promise from 'bluebird'
 
 const methods = [
   'fetchKites',
@@ -11,7 +11,7 @@ const methods = [
   'register',
 ]
 
-module.exports = Kontrol = (() => {
+export default (Kontrol = (() => {
   Kontrol = class Kontrol extends BaseKontrol {
     static initClass() {
       this.Kite = Kite
@@ -25,4 +25,4 @@ module.exports = Kontrol = (() => {
   }
   Kontrol.initClass()
   return Kontrol
-})()
+})())

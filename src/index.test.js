@@ -1,5 +1,5 @@
-const expect = require('expect')
-const kite = require('../src')
+import * as expect from 'expect'
+import kite from '../src'
 
 describe('kite.js', () =>
   it('should provide Kontrol and Kite', () => {
