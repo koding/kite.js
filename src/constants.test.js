@@ -41,4 +41,6 @@ describe('constants', () =>
 
     expect(constants.DebugLevel.CRITICAL).toBe(0)
     expect(constants.DebugLevel.DEBUG).toBe(5)
+
+    expect(constants.Version).toBe(require('../package.json').version)
   }))

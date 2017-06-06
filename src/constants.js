@@ -4,7 +4,7 @@ function asObjectOf(list) {
     return events
   }, {})
 }
-
+export const Version = require('../package.json').version
 export const KnownEvents = [
   'backOffFailed',
 
@@ -55,7 +55,7 @@ export const Defaults = {
     username: 'anonymous',
     environment: 'browser-environment',
     name: 'browser-kite',
-    version: '1.0.0',
+    version: Version,
     region: 'browser-region',
     hostname: 'browser-hostname',
   },

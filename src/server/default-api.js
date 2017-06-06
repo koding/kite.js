@@ -1,4 +1,4 @@
-module.exports = () => ({
+export default {
   'kite.ping'(callback) {
     return callback(null, 'pong')
   },
@@ -11,4 +11,4 @@ module.exports = () => ({
   'kite.echo'(err, callback) {
     return callback(err)
   },
-})
+}
