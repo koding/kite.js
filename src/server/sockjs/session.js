@@ -1,13 +1,9 @@
-let Session
-const util = require('util')
+const Emitter = require('../../kite/emitter')
 
-const EventEmitter = require('../../event-emitter.coffee')
-
-module.exports = Session = class Session extends EventEmitter {
+export default class Session extends Emitter {
   constructor(connection) {
-    if (!(this instanceof Session)) {
-      return new Session(connection)
-    }
+    super()
+
     this.connection = connection
 
     this.connection.on('data', message => {
