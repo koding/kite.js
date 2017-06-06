@@ -11,17 +11,21 @@ class Server extends Emitter {
     this.sockjs = SockJS.createServer()
     this.server = http.createServer()
     this.options = options ? options : {}
+    this.options.hostname = this.options.hostname || '0.0.0.0'
+    if (!this.options.port) throw new Error('port is required!')
+
 
     this.sockjs.on('connection', connection => {
       return this.emit('connection', new Session(connection))
     })
 
     this.sockjs.installHandlers(this.server, { prefix: options.prefix || '' })
-    this.server.listen(options.port, options.hostname || '0.0.0.0')
+
+    this.server.listen(options.port, options.hostname)
   }
 
   getAddress() {
-    return this.server._connectionKey
+    return `${this.options.hostname}:${this.options.port}`
   }
 
   close() {
