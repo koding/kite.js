@@ -185,17 +185,6 @@ class KiteServer extends Emitter {
     return joinPath(HOME, '.kite/kite.key')
   }
 
-  onConnection(ws) {
-    const proto = dnodeProtocol(this.api)
-    proto.on('request', this.handleRequest.bind(this, ws))
-    const id = ws.getId()
-    ws.on('message', this.handleMessage.bind(this, proto))
-    ws.on('close', () => {
-      return this.emit('info', `Client has disconnected: ${id}`)
-    })
-    return this.emit('info', `New connection from: ${id}`)
-  }
-
   handleRequest(ws, response) {
     const { arguments: args, method, callbacks, links } = response
     const [err, result] = Array.from(args)
@@ -208,6 +197,19 @@ class KiteServer extends Emitter {
     })
     this.emit('debug', `Sending: ${messageStr}`)
     return ws.send(messageStr)
+  }
+
+  onConnection(ws) {
+    const proto = dnodeProtocol(this.api)
+    proto.on('request', this.lazyBound('handleRequest', ws))
+
+    const id = ws.getId()
+    ws.on('message', this.lazyBound('handleMessage', proto))
+    ws.on('close', () => {
+      return this.emit('info', `Client has disconnected: ${id}`)
+    })
+
+    this.emit('info', `New connection from: ${id}`)
   }
 }
 

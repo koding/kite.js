@@ -11,4 +11,12 @@ export default class Emitter extends EventEmitter {
       define(this, boundMethod, { value: this[method].bind(this) })
     return this[boundMethod]
   }
+
+  lazyBound(method, ...args) {
+    if (typeof this[method] == 'function')
+      return this[method].bind(this, ...args)
+
+    console.log(typeof this[method])
+    throw new Error(`lazyBound: unknown method! ${method}`)
+  }
 }
