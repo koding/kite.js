@@ -46,7 +46,7 @@ class KiteServer extends Emitter {
     let func
     let left
     if (this.api == null) {
-      this.api = require('./default-api.coffee')()
+      this.api = require('./default-api')
     }
 
     if (typeof fn === 'function') {
@@ -67,20 +67,18 @@ class KiteServer extends Emitter {
   }
 
   methods(methods) {
-    return (() => {
-      const result = []
-      for (let methodName in methods) {
-        const fn = methods[methodName]
-        result.push(this.method(methodName, fn))
-      }
-      return result
-    })()
+    const result = []
+    for (let methodName in methods) {
+      const fn = methods[methodName]
+      result.push(this.method(methodName, fn))
+    }
+    return result
   }
 
   getServerClass() {
     return this.options.serverClass != null
       ? this.options.serverClass
-      : require('./websocket/server')
+      : require('./websocket')
   }
 
   getPrefix() {
@@ -88,7 +86,7 @@ class KiteServer extends Emitter {
     if (prefix == null) {
       prefix = ''
     }
-    if (prefix.charAt(0) !== '/') {
+    if (prefix.length && prefix.charAt(0) !== '/') {
       prefix = `/${prefix}`
     }
     return prefix
@@ -214,7 +212,7 @@ class KiteServer extends Emitter {
   }
 }
 
-KiteServer.normalizeKiteKey = Promise.method(
+KiteServer.prototype.normalizeKiteKey = Promise.method(
   (src = this.defaultKiteKey(), enc = 'utf-8') => {
     switch (false) {
       case typeof src !== 'string':
@@ -229,7 +227,7 @@ KiteServer.normalizeKiteKey = Promise.method(
   }
 )
 
-KiteServer.handleMessage = require('../kite/handleIncomingMessage')
+KiteServer.prototype.handleMessage = require('../kite/handleIncomingMessage')
 KiteServer.version = Defaults.KiteInfo.version
 
 export default KiteServer
