@@ -19,7 +19,7 @@ const mungeCallbacks = (callbacks, n) => {
   return callbacks
 }
 
-module.exports = function(proto, message) {
+export default function(proto, message) {
   let responseCallback
   let withArgs
   this.emit(Event.debug, `Receiving: ${message}`)

@@ -9,7 +9,7 @@ const {
   Event,
 } = require('../constants')
 
-module.exports = function(options = {}) {
+export default function(options = {}) {
   const { backoff = {} } = options
   let totalReconnectAttempts = 0
   const initalDelayMs = backoff.initialDelayMs != null

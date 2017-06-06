@@ -1,5 +1,4 @@
-module.exports =
-  Object.defineProperty ||
+export default Object.defineProperty ||
   ((ctx, name, { value }) => {
     // TODO: what should this error message be?
     if (value == null) {
