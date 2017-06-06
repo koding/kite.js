@@ -17,7 +17,8 @@ export default class Session extends Emitter {
   }
 
   getId() {
-    return `${this.connection._socket.remoteAddress}:${this.connection._socket.remotePort}`
+    return `${this.connection._socket.remoteAddress}:${this.connection._socket
+      .remotePort}`
   }
 
   send(message) {
