@@ -1,5 +1,5 @@
 const { Server: WebSocketServer } = require('ws')
-const Emitter = require('../kite/emitter')
+const Emitter = require('../../kite/emitter')
 const Session = require('./session')
 
 class Server extends Emitter {
@@ -24,4 +24,4 @@ class Server extends Emitter {
 Server.scheme = 'ws'
 Server.secureScheme = 'wws'
 
-module.exports = Server
+export default Server

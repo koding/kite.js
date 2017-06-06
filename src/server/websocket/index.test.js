@@ -1,5 +1,4 @@
-const expect = require('expect')
-const Kite = require('../kite')
+const Kite = require('../../kite')
 const Server = require('./')
 
 describe('Server', () => {
