@@ -9,4 +9,4 @@ if (typeof WebSocket !== 'undefined') {
   ws = window.WebSocket || window.MozWebSocket
 }
 
-module.exports = ws
+export default ws

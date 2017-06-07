@@ -2,13 +2,13 @@ const Promise = require('bluebird')
 const handleToken = require('./token')
 const { AuthType, WhiteList } = require('../constants')
 
-export default Promise.method((method, auth, kiteKey) => {
+export default Promise.method((kite, method, auth, kiteKey) => {
   if (auth == null) {
     if (WhiteList.includes(method)) {
       return
     }
 
-    if (this.api && this.api[method] && this.api[method].mustAuth) {
+    if (kite.api && kite.api[method] && !kite.api[method].mustAuth) {
       return
     }
 

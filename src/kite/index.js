@@ -2,15 +2,15 @@ const BaseKite = require('./base')
 const Promise = require('bluebird')
 
 class Kite extends BaseKite {
-  tell(method, params, callback) {
+  tell(method, ...params) {
     return new Promise((resolve, reject) =>
-      super.tell(method, params, (err, result) => {
+      super.tell(method, ...params, (err, result) => {
         if (err) {
           return reject(err)
         }
         return resolve(result)
       })
-    ).nodeify(callback)
+    )
   }
 
   ready(callback) {

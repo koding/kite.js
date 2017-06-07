@@ -19,7 +19,7 @@ const mungeCallbacks = (callbacks, n) => {
   return callbacks
 }
 
-module.exports = function(proto, message) {
+export default function(proto, message) {
   let responseCallback
   let withArgs
   this.emit(Event.debug, `Receiving: ${message}`)
@@ -47,8 +47,7 @@ module.exports = function(proto, message) {
 
   this.emit(Event.debug, 'Authenticating request')
 
-  return handleAuth
-    .call(this, method, auth, this.key)
+  return handleAuth(this, method, auth, this.key)
     .then(
       function(token) {
         this.emit(Event.debug, 'Authentication passed')
@@ -80,7 +79,7 @@ module.exports = function(proto, message) {
     )
     .catch(
       function(err) {
-        this.emit(Event.debug, 'Authentication failed')
+        this.emit(Event.debug, 'Authentication failed', err)
 
         mungeCallbacks(callbacks, 1)
 

@@ -1,7 +1,7 @@
 const { EventEmitter } = require('events')
 const define = require('./define')
 
-module.exports = class Emitter extends EventEmitter {
+export default class Emitter extends EventEmitter {
   bound(method) {
     if (this[method] == null) {
       throw new Error(`Could not bind method: ${method}`)
@@ -10,5 +10,13 @@ module.exports = class Emitter extends EventEmitter {
     boundMethod in this ||
       define(this, boundMethod, { value: this[method].bind(this) })
     return this[boundMethod]
+  }
+
+  lazyBound(method, ...args) {
+    if (typeof this[method] == 'function')
+      return this[method].bind(this, ...args)
+
+    console.log(typeof this[method])
+    throw new Error(`lazyBound: unknown method! ${method}`)
   }
 }
