@@ -1,6 +1,6 @@
-const Kite = require('../../kite')
-const Server = require('./')
-const SockJS = require('sockjs-client')
+import Kite from '../../kite'
+import Server from './'
+import SockJS from 'sockjs-client'
 const logLevel = 0
 
 describe('SockJS Server with WebSocket', () => {

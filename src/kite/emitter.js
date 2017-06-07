@@ -1,5 +1,5 @@
-const { EventEmitter } = require('events')
-const define = require('./define')
+import { EventEmitter } from 'events'
+import define from './define'
 
 export default class Emitter extends EventEmitter {
   bound(method) {

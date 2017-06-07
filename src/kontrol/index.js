@@ -1,5 +1,5 @@
-const BaseKontrol = require('./base')
-const Promise = require('bluebird')
+import BaseKontrol from './base'
+import Promise from 'bluebird'
 
 const methods = [
   'fetchKites',

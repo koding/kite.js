@@ -1,5 +1,5 @@
-const BaseKite = require('./base')
-const Promise = require('bluebird')
+import BaseKite from './base'
+import Promise from 'bluebird'
 
 class Kite extends BaseKite {
   tell(method, ...params) {

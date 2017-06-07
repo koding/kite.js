@@ -1,19 +1,16 @@
-const Promise = require('bluebird')
-const Emitter = require('../kite/emitter')
-const dnodeProtocol = require('dnode-protocol')
+import Promise from 'bluebird'
+import Emitter from '../kite/emitter'
+import dnodeProtocol from 'dnode-protocol'
 
 const toArray = Promise.promisify(require('stream-to-array'))
 const fs = Promise.promisifyAll(require('fs'))
-const { join: joinPath } = require('path')
-
-const KiteError = require('../kite/error')
-const Kontrol = require('../kontrol')
-
-const enableLogging = require('../kite/enableLogging')
-const { v4: createId } = require('uuid')
-
-const { getKontrolClaims } = require('../kite/claims')
-const { Defaults } = require('../constants')
+import { join as joinPath } from 'path'
+import KiteError from '../kite/error'
+import Kontrol from '../kontrol'
+import enableLogging from '../kite/enableLogging'
+import { v4 as createId } from 'uuid'
+import { getKontrolClaims } from '../kite/claims'
+import { Defaults } from '../constants'
 
 class KiteServer extends Emitter {
   constructor(options) {

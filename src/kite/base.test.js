@@ -1,6 +1,6 @@
-const expect = require('expect')
-const Kite = require('./base')
-const { Defaults } = require('../constants')
+import expect from 'expect'
+import Kite from './base'
+import { Defaults } from '../constants'
 
 describe('Kite', () => {
   describe('getKiteInfo', () =>

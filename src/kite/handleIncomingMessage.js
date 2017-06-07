@@ -1,7 +1,7 @@
-const parse = require('try-json-parse')
-const handleAuth = require('./auth')
-const KiteError = require('./error')
-const { Event } = require('../constants')
+import parse from 'try-json-parse'
+import handleAuth from './auth'
+import KiteError from './error'
+import { Event } from '../constants'
 
 const mungeCallbacks = (callbacks, n) => {
   // FIXME: this is an ugly hack; there must be a better way to implement it:
