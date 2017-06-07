@@ -17,21 +17,6 @@
     "space-before-function-paren": [
       "error",
       "never"
-    ],
-    "key-spacing": [
-      "error",
-      {
-        "multiLine": {
-          "beforeColon": false,
-          "afterColon": true
-        },
-        "align": {
-          "beforeColon": false,
-          "afterColon": true,
-          "on": "colon",
-          "mode": "strict"
-        }
-      }
     ]
   }
 }
