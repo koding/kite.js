@@ -4,7 +4,7 @@ function asObjectOf(list) {
     return events
   }, {})
 }
-export const Version = require('../package.json').version
+export const Version = '1.0.1'
 export const KnownEvents = [
   'backOffFailed',
 
