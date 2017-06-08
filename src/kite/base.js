@@ -13,18 +13,30 @@ import KiteError from './error'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
 class Kite extends Emitter {
+  static version = Defaults.KiteInfo.version
+  static Error = KiteError
+  static transportClass = WebSocket
+
+  static defaultOptions = {
+    autoConnect: true,
+    autoReconnect: true,
+    prefix: '',
+    transportClass: Kite.transportClass,
+    transportOptions: {},
+  }
+
   constructor(options = {}) {
+    options = typeof options === 'string' ? { url: options } : options
     super()
 
     this.id = uuid.v4()
-    this.options = typeof options === 'string' ? { url: options } : options
-    if (this.options.autoConnect == null) {
-      this.options.autoConnect = true
-    }
-    if (this.options.autoReconnect == null) {
-      this.options.autoReconnect = true
-    }
-    if (this.options.prefix) {
+    this.options = this.options = Object.assign(
+      {},
+      Kite.defaultOptions,
+      options
+    )
+
+    if (this.options.url && this.options.prefix) {
       this.options.url += this.options.prefix
     }
 
@@ -69,17 +81,12 @@ class Kite extends Emitter {
       return
     }
     this.readyState = State.CONNECTING
-    const { url, transportClass, transportOptions } = this.options
-    const Konstructor = transportClass != null
-      ? transportClass
-      : this.constructor.transportClass
-    const options = transportOptions != null
-      ? transportOptions
-      : this.constructor.transportOptions
+    const { url, transportClass: Konstructor, transportOptions } = this.options
+
     // websocket will whine if extra arguments are passed
     this.ws = Konstructor === WebSocket
       ? new Konstructor(url)
-      : new Konstructor(url, null, options)
+      : new Konstructor(url, null, transportOptions)
     this.ws.addEventListener(Event.open, this.bound('onOpen'))
     this.ws.addEventListener(Event.close, this.bound('onClose'))
     this.ws.addEventListener(Event.message, this.bound('onMessage'))
@@ -240,9 +247,6 @@ class Kite extends Emitter {
   }
 }
 
-Kite.version = Defaults.KiteInfo.version
-Kite.Error = KiteError
-Kite.transportClass = WebSocket
 Kite.prototype.initBackoff = backoff
 
 export default Kite
