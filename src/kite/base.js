@@ -19,7 +19,7 @@ function __guard__(value, transform) {
 }
 
 class Kite extends Emitter {
-  constructor(options) {
+  constructor(options = {}) {
     super()
 
     this.id = uuid.v4()
