@@ -10,6 +10,7 @@ import handleIncomingMessage from './handleIncomingMessage'
 import enableLogging from './enableLogging'
 import Timeout from './timeout'
 import KiteError from './error'
+import MessageScrubber from './messagescrubber'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
 class Kite extends Emitter {
@@ -52,6 +53,7 @@ class Kite extends Emitter {
     }
 
     this.proto = dnode(wrap.call(this, this.options.api))
+    this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
       this.ready(() => this.ws.send(JSON.stringify(req)))
@@ -164,31 +166,8 @@ class Kite extends Emitter {
     }
   }
 
-  wrapMessage(method, params, callback) {
-    return {
-      kite: this.getKiteInfo(params),
-      authentication: this.options.auth,
-      withArgs: params,
-      responseCallback(response) {
-        const { error: rawErr, result } = response
-        const err = rawErr != null ? KiteError.makeProperError(rawErr) : null
-
-        return callback(err, result)
-      },
-    }
-  }
-
   tell(method, params, callback) {
-    // by default, remove this callback after it is called once.
-    if (callback.times == null) {
-      callback.times = 1
-    }
-
-    const scrubbed = this.proto.scrubber.scrub([
-      this.wrapMessage(method, params, callback),
-    ])
-    scrubbed.method = method
-
+    const scrubbed = this.messageScrubber.scrub(method, params, callback)
     this.proto.emit(Event.request, scrubbed)
   }
 
