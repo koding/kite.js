@@ -48,10 +48,6 @@ class Kite extends Emitter {
 
     this.readyState = State.NOTREADY
 
-    if (this.options.autoReconnect) {
-      this.initBackoff()
-    }
-
     this.proto = dnode(wrap.call(this, this.options.api))
     this.messageScrubber = new MessageScrubber({ kite: this })
 
@@ -59,6 +55,10 @@ class Kite extends Emitter {
       this.ready(() => this.ws.send(JSON.stringify(req)))
       this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
+
+    if (this.options.autoReconnect) {
+      this.initBackoff()
+    }
 
     if (this.options.autoConnect) {
       this.connect()
@@ -71,10 +71,13 @@ class Kite extends Emitter {
 
   setToken(token) {
     // FIXME: this setter is not symettrical with the getter
-    if (this.options.auth && this.options.auth === AuthType.token) {
+    const { auth } = this.options
+
+    if (!auth || auth === AuthType.token) {
       throw new Error('Invalid auth type!')
     }
-    this.options.auth.key = token
+
+    auth.key = token
     return this.emit(Event.tokenSet, token)
   }
 
