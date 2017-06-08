@@ -1,5 +1,5 @@
-const Kite = require('../../kite')
-const Server = require('./')
+import Kite from '../../kite'
+import Server from './'
 
 const logLevel = 0
 

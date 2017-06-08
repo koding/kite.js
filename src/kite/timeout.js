@@ -1,4 +1,4 @@
-const Delayed = require('./delayed')
+import Delayed from './delayed'
 
 export default class Timeout extends Delayed {
   begin() {

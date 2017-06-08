@@ -1,9 +1,8 @@
-const SockJS = require('sockjs')
-const http = require('http')
-
-const enableLogging = require('../../kite/enableLogging')
-const Emitter = require('../../kite/emitter')
-const Session = require('./session')
+import SockJS from 'sockjs'
+import http from 'http'
+import enableLogging from '../../kite/enableLogging'
+import Emitter from '../../kite/emitter'
+import Session from './session'
 
 class Server extends Emitter {
   constructor(options) {

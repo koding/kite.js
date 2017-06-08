@@ -1,4 +1,4 @@
-const Interval = require('./interval')
+import Interval from './interval'
 
 export default function(userlandApi = {}) {
   const api = ['error', 'info', 'log', 'warn'].reduce((api, method) => {

@@ -1,5 +1,6 @@
-const expect = require('expect')
-const constants = require('./constants')
+import expect from 'expect'
+import pkg from '../package.json'
+import * as constants from './constants'
 
 describe('constants', () =>
   it('should expose required constants', () => {
@@ -42,5 +43,5 @@ describe('constants', () =>
     expect(constants.DebugLevel.CRITICAL).toBe(0)
     expect(constants.DebugLevel.DEBUG).toBe(5)
 
-    expect(constants.Version).toBe(require('../package.json').version)
+    expect(constants.Version).toBe(pkg.version)
   }))

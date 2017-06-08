@@ -1,6 +1,6 @@
-const { Server: WebSocketServer } = require('ws')
-const Emitter = require('../../kite/emitter')
-const Session = require('./session')
+import { Server as WebSocketServer } from 'ws'
+import Emitter from '../../kite/emitter'
+import Session from './session'
 
 class Server extends Emitter {
   constructor(options) {

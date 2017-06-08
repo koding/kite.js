@@ -1,9 +1,8 @@
-const Emitter = require('events').EventEmitter
-const Kite = require('../kite/base')
-const KiteError = require('../kite/error')
-const getPath = require('./getpath')
-
-const { Event, Defaults, KontrolActions } = require('../constants')
+import { EventEmitter as Emitter } from 'events'
+import Kite from '../kite/base'
+import KiteError from '../kite/error'
+import getPath from './getpath'
+import { Event, Defaults, KontrolActions } from '../constants'
 
 class Kontrol extends Emitter {
   constructor(options) {

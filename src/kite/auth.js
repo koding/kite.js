@@ -1,6 +1,6 @@
-const Promise = require('bluebird')
-const handleToken = require('./token')
-const { AuthType, WhiteList } = require('../constants')
+import Promise from 'bluebird'
+import handleToken from './token'
+import { AuthType, WhiteList } from '../constants'
 
 export default Promise.method((kite, method, auth, kiteKey) => {
   if (auth == null) {

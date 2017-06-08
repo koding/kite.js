@@ -1,28 +1,34 @@
-const Promise = require('bluebird')
-const Emitter = require('../kite/emitter')
-const dnodeProtocol = require('dnode-protocol')
+import Promise from 'bluebird'
+import Emitter from '../kite/emitter'
+import dnodeProtocol from 'dnode-protocol'
 
-const toArray = Promise.promisify(require('stream-to-array'))
-const fs = Promise.promisifyAll(require('fs'))
-const { join: joinPath } = require('path')
+import streamToArray from 'stream-to-array'
+import fs from 'fs'
+import { hostname } from 'os'
+import { join as joinPath } from 'path'
 
-const KiteError = require('../kite/error')
-const Kontrol = require('../kontrol')
+import KiteError from '../kite/error'
+import Kontrol from '../kontrol'
+import enableLogging from '../kite/enableLogging'
+import handleIncomingMessage from '../kite/handleIncomingMessage'
+import { v4 as createId } from 'uuid'
+import { getKontrolClaims } from '../kite/claims'
+import { Defaults } from '../constants'
 
-const enableLogging = require('../kite/enableLogging')
-const { v4: createId } = require('uuid')
+import DefaultApi from './default-api'
+import WebSocketServer from './websocket'
 
-const { getKontrolClaims } = require('../kite/claims')
-const { Defaults } = require('../constants')
+const toArray = Promise.promisify(streamToArray)
+const { readFileAsync } = Promise.promisifyAll(fs)
 
 class KiteServer extends Emitter {
-  constructor(options) {
+  constructor(options = {}) {
     super()
 
-    this.options = options ? options : {}
+    this.options = options
 
     if (this.options.hostname == null) {
-      this.options.hostname = require('os').hostname()
+      this.options.hostname = hostname()
     }
 
     enableLogging(options.name, this, options.logLevel)
@@ -46,7 +52,7 @@ class KiteServer extends Emitter {
     let func
     let left
     if (this.api == null) {
-      this.api = require('./default-api')
+      this.api = DefaultApi
     }
 
     if (typeof fn === 'function') {
@@ -78,7 +84,7 @@ class KiteServer extends Emitter {
   getServerClass() {
     return this.options.serverClass != null
       ? this.options.serverClass
-      : require('./websocket')
+      : WebSocketServer
   }
 
   getPrefix() {
@@ -216,9 +222,15 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
   (src = this.defaultKiteKey(), enc = 'utf-8') => {
     switch (false) {
       case typeof src !== 'string':
-        return fs
-          .readFileAsync(src, enc)
-          .catch(KiteError.codeIs('ENOENT'), err => src)
+        return readFileAsync(src, enc).catch(
+          KiteError.codeIs('ENOENT'),
+          err => {
+            if (err) {
+              console.error(err)
+            }
+            return src
+          }
+        )
       case typeof src.pipe !== 'function':
         return toArray(src).then(arr => arr.join('\n'))
       default:
@@ -227,7 +239,7 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
   }
 )
 
-KiteServer.prototype.handleMessage = require('../kite/handleIncomingMessage')
+KiteServer.prototype.handleMessage = handleIncomingMessage
 KiteServer.version = Defaults.KiteInfo.version
 
 export default KiteServer

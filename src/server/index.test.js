@@ -1,8 +1,8 @@
-const expect = require('expect')
-const Kite = require('../kite')
-const KiteServer = require('./')
-const SockJS = require('sockjs-client')
-const SockJsServer = require('./sockjs')
+import expect from 'expect'
+import Kite from '../kite'
+import KiteServer from './'
+import SockJS from 'sockjs-client'
+import SockJsServer from './sockjs'
 
 const logLevel = 0
 

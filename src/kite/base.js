@@ -1,23 +1,16 @@
-const dnode = require('dnode-protocol')
-const WebSocket = require('ws')
-const atob = require('atob')
-const uuid = require('uuid')
-const Emitter = require('./emitter')
-const now = require('./now')
-const backoff = require('./backoff')
-const wrap = require('./wrap')
-const handleIncomingMessage = require('./handleIncomingMessage')
-const enableLogging = require('./enableLogging')
-const Timeout = require('./timeout')
-const KiteError = require('./error')
-
-const {
-  Event,
-  AuthType,
-  Defaults,
-  TimerHandles,
-  State: { NOTREADY, READY, CLOSED, CONNECTING },
-} = require('../constants')
+import dnode from 'dnode-protocol'
+import WebSocket from 'ws'
+import atob from 'atob'
+import uuid from 'uuid'
+import Emitter from './emitter'
+import now from './now'
+import backoff from './backoff'
+import wrap from './wrap'
+import handleIncomingMessage from './handleIncomingMessage'
+import enableLogging from './enableLogging'
+import Timeout from './timeout'
+import KiteError from './error'
+import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null
@@ -46,7 +39,7 @@ class Kite extends Emitter {
     // refresh expired tokens
     this.expireTokenOnExpiry()
 
-    this.readyState = NOTREADY
+    this.readyState = State.NOTREADY
 
     if (this.options.autoReconnect) {
       this.initBackoff()
@@ -78,10 +71,10 @@ class Kite extends Emitter {
   }
 
   connect() {
-    if ([CONNECTING, READY].includes(this.readyState)) {
+    if ([State.CONNECTING, State.READY].includes(this.readyState)) {
       return
     }
-    this.readyState = CONNECTING
+    this.readyState = State.CONNECTING
     const { url, transportClass, transportOptions } = this.options
     const Konstructor = transportClass != null
       ? transportClass
@@ -116,7 +109,7 @@ class Kite extends Emitter {
   }
 
   onOpen() {
-    this.readyState = READY
+    this.readyState = State.READY
     // FIXME: the following is ridiculous.
     this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
     if (typeof this.clearBackoffTimeout === 'function') {
@@ -126,7 +119,7 @@ class Kite extends Emitter {
   }
 
   onClose(event) {
-    this.readyState = CLOSED
+    this.readyState = State.CLOSED
     this.emit(Event.close, event)
 
     let dcInfo = `${this.options.url}: disconnected`
@@ -246,7 +239,7 @@ class Kite extends Emitter {
   }
 
   ready(callback) {
-    if (this.readyState === READY) {
+    if (this.readyState === State.READY) {
       process.nextTick(callback)
     } else {
       this.once(Event.open, callback)
