@@ -76,8 +76,12 @@ class Kite extends Emitter {
     return this.emit(Event.tokenSet, token)
   }
 
+  canConnect() {
+    return ![State.CONNECTING, State.READY].includes(this.readyState)
+  }
+
   connect() {
-    if ([State.CONNECTING, State.READY].includes(this.readyState)) {
+    if (!this.canConnect()) {
       return
     }
     this.readyState = State.CONNECTING
