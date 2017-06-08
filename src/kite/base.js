@@ -12,12 +12,6 @@ import Timeout from './timeout'
 import KiteError from './error'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
-
 class Kite extends Emitter {
   constructor(options = {}) {
     super()
@@ -142,35 +136,20 @@ class Kite extends Emitter {
   }
 
   getKiteInfo(params) {
-    let left
+    const { username, environment, version, region, hostname } = this.options
+
+    const name = Array.isArray(params) && params[0]
+      ? params[0].kiteName
+      : undefined
+
     return {
-      username: `${this.options.username != null
-        ? this.options.username
-        : Defaults.KiteInfo.username}`,
-      environment: `${this.options.environment != null
-        ? this.options.environment
-        : Defaults.KiteInfo.environment}`,
-      name: `${(left = __guard__(
-        params != null ? params[0] : undefined,
-        ({ kiteName }) => kiteName
-      ) != null
-        ? __guard__(
-            params != null ? params[0] : undefined,
-            ({ kiteName }) => kiteName
-          )
-        : this.options.name) != null
-        ? left
-        : Defaults.KiteInfo.name}`,
-      version: `${this.options.version != null
-        ? this.options.version
-        : Defaults.KiteInfo.version}`,
-      region: `${this.options.region != null
-        ? this.options.region
-        : Defaults.KiteInfo.region}`,
-      hostname: `${this.options.hostname != null
-        ? this.options.hostname
-        : Defaults.KiteInfo.hostname}`,
       id: this.id,
+      username: username || Defaults.KiteInfo.username,
+      environment: environment || Defaults.KiteInfo.environment,
+      name: name || Defaults.KiteInfo.name,
+      version: version || Defaults.KiteInfo.version,
+      region: region || Defaults.KiteInfo.region,
+      hostname: hostname || Defaults.KiteInfo.hostname,
     }
   }
 
