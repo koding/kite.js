@@ -73,8 +73,12 @@ class Kite extends Emitter {
     // FIXME: this setter is not symettrical with the getter
     const { auth } = this.options
 
-    if (!auth || auth === AuthType.token) {
+    if (auth && auth === AuthType.token) {
       throw new Error('Invalid auth type!')
+    }
+
+    if (!auth) {
+      throw new Error('Auth option must be set before setting a token')
     }
 
     auth.key = token

@@ -59,7 +59,7 @@ describe('Kite', () => {
     it('fails if kite is initialized without any auth options', () => {
       const kite = makeKite()
 
-      expect(() => kite.setToken('foo')).toThrow(/Invalid auth type/)
+      expect(() => kite.setToken('foo')).toThrow(/Auth option must be set/)
     })
 
     it('works well if kite is initialized with correct auth options', () => {
