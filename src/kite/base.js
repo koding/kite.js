@@ -31,7 +31,7 @@ class Kite extends Emitter {
     super()
 
     this.id = uuid.v4()
-    this.options = this.options = Object.assign(
+    this.options = Object.assign(
       {},
       Kite.defaultOptions,
       options
