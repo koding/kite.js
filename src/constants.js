@@ -21,6 +21,7 @@ export const KnownEvents = [
   'warn',
   'info',
   'open',
+  'close',
   'debug',
 ]
 
