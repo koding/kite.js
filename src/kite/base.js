@@ -1,16 +1,15 @@
-import dnode from 'dnode-protocol'
 import WebSocket from 'ws'
 import atob from 'atob'
 import uuid from 'uuid'
 import Emitter from './emitter'
 import now from './now'
 import backoff from './backoff'
-import wrap from './wrap'
 import handleIncomingMessage from './handleIncomingMessage'
 import enableLogging from './enableLogging'
 import Timeout from './timeout'
 import KiteError from './error'
 import MessageScrubber from './messagescrubber'
+import createProto from './createProto'
 import KiteInfo from './KiteInfo'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
@@ -32,11 +31,7 @@ class Kite extends Emitter {
     super()
 
     this.id = uuid.v4()
-    this.options = Object.assign(
-      {},
-      Kite.defaultOptions,
-      options
-    )
+    this.options = Object.assign({}, Kite.defaultOptions, options)
 
     if (this.options.url && this.options.prefix) {
       this.options.url += this.options.prefix
@@ -49,7 +44,11 @@ class Kite extends Emitter {
 
     this.readyState = State.NOTREADY
 
-    this.proto = dnode(wrap.call(this, this.options.api))
+    this.proto = createProto({
+      kite: this,
+      api: this.options.api,
+    })
+
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
