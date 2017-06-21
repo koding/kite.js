@@ -77,14 +77,16 @@ describe('Kite', () => {
 
   describe('getKiteInfo', () =>
     it('should return default kite info if no option provided', () => {
-      let kite = new Kite({
+      const kite = new Kite({
         url: 'ws://localhost',
         autoConnect: false,
       })
       expect(kite).toExist()
 
-      let kiteInfo = kite.getKiteInfo()
-      delete kiteInfo.id // new id generated each time
-      expect(kiteInfo).toEqual(Defaults.KiteInfo)
+      const kiteInfo = kite.getKiteInfo()
+      expect(kiteInfo['environment']).toBe('browser-environment')
+      expect(kiteInfo['name']).toBe('browser-kite')
+      expect(kiteInfo['region']).toBe('browser-region')
+      expect(kiteInfo['username']).toBe('anonymous')
     }))
 })

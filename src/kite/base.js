@@ -11,6 +11,7 @@ import enableLogging from './enableLogging'
 import Timeout from './timeout'
 import KiteError from './error'
 import MessageScrubber from './messagescrubber'
+import KiteInfo from './KiteInfo'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
 class Kite extends Emitter {
@@ -162,15 +163,15 @@ class Kite extends Emitter {
       ? params[0].kiteName
       : undefined
 
-    return {
+    return new KiteInfo({
       id: this.id,
-      username: username || Defaults.KiteInfo.username,
-      environment: environment || Defaults.KiteInfo.environment,
-      name: name || Defaults.KiteInfo.name,
-      version: version || Defaults.KiteInfo.version,
-      region: region || Defaults.KiteInfo.region,
-      hostname: hostname || Defaults.KiteInfo.hostname,
-    }
+      username,
+      environment,
+      name,
+      version,
+      region,
+      hostname,
+    })
   }
 
   tell(method, params, callback) {
