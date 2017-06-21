@@ -21,7 +21,14 @@ describe('Kite', () => {
     it('requires a valid url', () => {
       expect(() => new Kite({})).toThrow(/"url" must be a string/)
       expect(() => new Kite({ url: 'foo' })).toThrow(/invalid url/)
-      expect(() => new Kite({ url: 'http://localhost' })).toNotThrow()
+      expect(
+        () =>
+          new Kite({
+            url: 'http://localhost',
+            autoConnect: false,
+            autoReconnect: false,
+          })
+      ).toNotThrow()
     })
 
     it('accepts a prefix', () => {
