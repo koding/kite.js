@@ -20,7 +20,7 @@ class Server extends Emitter {
 
     const sockjsOptions = {
       log: (level, message) => {
-        const fn = this.logger[level]
+        const fn = this.logger[level].bind(this.logger)
         if (fn) {
           fn(message)
         }
