@@ -9,7 +9,7 @@ import { join as joinPath } from 'path'
 
 import KiteError from '../kite/error'
 import Kontrol from '../kontrol'
-import enableLogging from '../kite/enableLogging'
+import Logger from '../kite/Logger'
 import handleIncomingMessage from '../kite/handleIncomingMessage'
 import { v4 as createId } from 'uuid'
 import { getKontrolClaims } from '../kite/claims'
@@ -31,7 +31,10 @@ class KiteServer extends Emitter {
       this.options.hostname = hostname()
     }
 
-    enableLogging(options.name, this, options.logLevel)
+    this.logger = new Logger({
+      name: options.name || 'kite',
+      level: options.logLevel,
+    })
 
     this.id = createId()
     this.server = null
@@ -108,7 +111,7 @@ class KiteServer extends Emitter {
     const Server = this.getServerClass()
     this.server = new Server({ port, prefix, name, logLevel })
     this.server.on('connection', this.bound('onConnection'))
-    this.emit('info', `Listening: ${this.server.getAddress()}`)
+    this.logger.info(`Listening: ${this.server.getAddress()}`)
   }
 
   close() {
@@ -168,16 +171,17 @@ class KiteServer extends Emitter {
         transportClass,
       })
         .on('open', () => {
-          return this.emit('info', 'Connected to Kontrol')
+          this.logger.info('Connected to Kontrol')
         })
         .on('error', err => {
-          return this.emit('error', err)
+          this.emit('error', err)
+          this.logger.error(err)
         })
 
       const kiteURL = `${scheme}://${host}:${this.port}/${this.options.name}`
 
       return this.kontrol.register({ url: kiteURL }).then(() => {
-        return this.emit('info', `Registered to Kontrol with URL: ${kiteURL}`)
+        this.logger.info(`Registered to Kontrol with URL: ${kiteURL}`)
       })
     })
   }
@@ -200,7 +204,7 @@ class KiteServer extends Emitter {
       links,
       callbacks,
     })
-    this.emit('debug', `Sending: ${messageStr}`)
+    this.logger.debug(`Sending: ${messageStr}`)
     return ws.send(messageStr)
   }
 
@@ -211,10 +215,10 @@ class KiteServer extends Emitter {
     const id = ws.getId()
     ws.on('message', this.lazyBound('handleMessage', proto))
     ws.on('close', () => {
-      return this.emit('info', `Client has disconnected: ${id}`)
+      this.logger.info(`Client has disconnected: ${id}`)
     })
 
-    this.emit('info', `New connection from: ${id}`)
+    this.logger.info(`New connection from: ${id}`)
   }
 }
 
@@ -224,12 +228,7 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
       case typeof src !== 'string':
         return readFileAsync(src, enc).catch(
           KiteError.codeIs('ENOENT'),
-          err => {
-            if (err) {
-              console.error(err)
-            }
-            return src
-          }
+          err => (err ? console.error(err) : src)
         )
       case typeof src.pipe !== 'function':
         return toArray(src).then(arr => arr.join('\n'))
