@@ -110,13 +110,17 @@ class Kite extends Emitter {
     this.emit(Event.info, `Trying to connect to ${url}`)
   }
 
-  disconnect(reconnect = false) {
+  cleanTimerHandles() {
     for (let handle of TimerHandles) {
       if (this[handle] != null) {
         this[handle].clear()
         this[handle] = null
       }
     }
+  }
+
+  disconnect(reconnect = false) {
+    this.cleanTimerHandles()
     this.options.autoReconnect = !!reconnect
     if (this.transport != null) {
       this.transport.close()
