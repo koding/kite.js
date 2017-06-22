@@ -7,7 +7,10 @@ import Session from './session'
 class Server extends Emitter {
   constructor(options = {}) {
     super()
+
+    this.options = options
     this.options.hostname = this.options.hostname || '0.0.0.0'
+
     if (!this.options.port) throw new Error('port is required!')
 
     this.logger = new Logger({
