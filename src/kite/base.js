@@ -11,6 +11,7 @@ import KiteError from './error'
 import MessageScrubber from './messagescrubber'
 import createProto from './createProto'
 import KiteInfo from './KiteInfo'
+import Logger from './Logger'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
 class Kite extends Emitter {
@@ -37,7 +38,10 @@ class Kite extends Emitter {
       this.options.url += this.options.prefix
     }
 
-    enableLogging(this.options.name, this, this.options.logLevel)
+    this.logger = new Logger({
+      name: this.options.name || 'kite',
+      level: this.options.logLevel,
+    })
 
     // refresh expired tokens
     this.expireTokenOnExpiry()
@@ -52,8 +56,9 @@ class Kite extends Emitter {
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
-      this.ready(() => this.transport.send(JSON.stringify(req)))
-      this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
+      req = JSON.stringify(req)
+      this.ready(() => this.transport.send(req))
+      this.logger.debug('Sending: ', req)
     })
 
     if (this.options.autoReconnect) {
@@ -104,10 +109,8 @@ class Kite extends Emitter {
     this.transport.addEventListener(Event.close, this.bound('onClose'))
     this.transport.addEventListener(Event.message, this.bound('onMessage'))
     this.transport.addEventListener(Event.error, this.bound('onError'))
-    this.transport.addEventListener(Event.info, info =>
-      this.emit(Event.info, info)
-    )
-    this.emit(Event.info, `Trying to connect to ${url}`)
+    this.transport.addEventListener(Event.info, info => this.logger.info(info))
+    this.logger.info(`Trying to connect to ${url}`)
   }
 
   cleanTimerHandles() {
@@ -121,17 +124,21 @@ class Kite extends Emitter {
 
   disconnect(reconnect = false) {
     this.cleanTimerHandles()
+
+    // set reconnect to autoReconnect so that onClose handler can behave.
+    // FIXME
     this.options.autoReconnect = !!reconnect
     if (this.transport != null) {
       this.transport.close()
     }
-    this.emit(Event.notice, `Disconnecting from ${this.options.url}`)
+
+    this.logger.notice(`Disconnecting from ${this.options.url}`)
   }
 
   onOpen() {
     this.readyState = State.READY
     // FIXME: the following is ridiculous.
-    this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
+    this.logger.notice(`Connected to Kite: ${this.options.url}`)
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
@@ -148,8 +155,7 @@ class Kite extends Emitter {
       process.nextTick(() => this.setBackoffTimeout(this.bound('connect')))
       dcInfo += ', trying to reconnect...'
     }
-
-    this.emit(Event.info, dcInfo)
+    this.logger.info(dcInfo)
   }
 
   onMessage({ data }) {
@@ -159,6 +165,7 @@ class Kite extends Emitter {
   onError(err) {
     console.log(err)
     this.emit(Event.error, 'Websocket error!')
+    this.logger.error('WebSocket error!')
   }
 
   getKiteInfo(params) {
