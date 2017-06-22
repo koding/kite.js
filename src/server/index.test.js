@@ -83,7 +83,7 @@ describe('kite operations', () => {
   describe('kite.disconnect()', () => {
     it('should set readyState to closed', done => {
       withServer((kite, server) => {
-        kite.ws.addEventListener(Event.close, () => {
+        kite.transport.addEventListener(Event.close, () => {
           process.nextTick(() => {
             expect(kite.readyState).toBe(State.CLOSED)
             server.close()

@@ -52,7 +52,7 @@ class Kite extends Emitter {
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
-      this.ready(() => this.ws.send(JSON.stringify(req)))
+      this.ready(() => this.transport.send(JSON.stringify(req)))
       this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
@@ -97,14 +97,16 @@ class Kite extends Emitter {
     const { url, transportClass: Konstructor, transportOptions } = this.options
 
     // websocket will whine if extra arguments are passed
-    this.ws = Konstructor === WebSocket
+    this.transport = Konstructor === WebSocket
       ? new Konstructor(url)
       : new Konstructor(url, null, transportOptions)
-    this.ws.addEventListener(Event.open, this.bound('onOpen'))
-    this.ws.addEventListener(Event.close, this.bound('onClose'))
-    this.ws.addEventListener(Event.message, this.bound('onMessage'))
-    this.ws.addEventListener(Event.error, this.bound('onError'))
-    this.ws.addEventListener(Event.info, info => this.emit(Event.info, info))
+    this.transport.addEventListener(Event.open, this.bound('onOpen'))
+    this.transport.addEventListener(Event.close, this.bound('onClose'))
+    this.transport.addEventListener(Event.message, this.bound('onMessage'))
+    this.transport.addEventListener(Event.error, this.bound('onError'))
+    this.transport.addEventListener(Event.info, info =>
+      this.emit(Event.info, info)
+    )
     this.emit(Event.info, `Trying to connect to ${url}`)
   }
 
@@ -116,8 +118,8 @@ class Kite extends Emitter {
       }
     }
     this.options.autoReconnect = !!reconnect
-    if (this.ws != null) {
-      this.ws.close()
+    if (this.transport != null) {
+      this.transport.close()
     }
     this.emit(Event.notice, `Disconnecting from ${this.options.url}`)
   }
