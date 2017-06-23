@@ -1,16 +1,17 @@
-import dnode from 'dnode-protocol'
 import WebSocket from 'ws'
 import atob from 'atob'
 import uuid from 'uuid'
 import Emitter from './emitter'
 import now from './now'
 import backoff from './backoff'
-import wrap from './wrap'
 import handleIncomingMessage from './handleIncomingMessage'
 import enableLogging from './enableLogging'
 import Timeout from './timeout'
 import KiteError from './error'
 import MessageScrubber from './messagescrubber'
+import createProto from './createProto'
+import KiteInfo from './KiteInfo'
+import Logger from './Logger'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
 class Kite extends Emitter {
@@ -31,29 +32,33 @@ class Kite extends Emitter {
     super()
 
     this.id = uuid.v4()
-    this.options = Object.assign(
-      {},
-      Kite.defaultOptions,
-      options
-    )
+    this.options = Object.assign({}, Kite.defaultOptions, options)
 
     if (this.options.url && this.options.prefix) {
       this.options.url += this.options.prefix
     }
 
-    enableLogging(this.options.name, this, this.options.logLevel)
+    this.logger = new Logger({
+      name: this.options.name || 'kite',
+      level: this.options.logLevel,
+    })
 
     // refresh expired tokens
     this.expireTokenOnExpiry()
 
     this.readyState = State.NOTREADY
 
-    this.proto = dnode(wrap.call(this, this.options.api))
+    this.proto = createProto({
+      kite: this,
+      api: this.options.api,
+    })
+
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
-      this.ready(() => this.ws.send(JSON.stringify(req)))
-      this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
+      req = JSON.stringify(req)
+      this.ready(() => this.transport.send(req))
+      this.logger.debug('Sending: ', req)
     })
 
     if (this.options.autoReconnect) {
@@ -97,35 +102,43 @@ class Kite extends Emitter {
     const { url, transportClass: Konstructor, transportOptions } = this.options
 
     // websocket will whine if extra arguments are passed
-    this.ws = Konstructor === WebSocket
+    this.transport = Konstructor === WebSocket
       ? new Konstructor(url)
       : new Konstructor(url, null, transportOptions)
-    this.ws.addEventListener(Event.open, this.bound('onOpen'))
-    this.ws.addEventListener(Event.close, this.bound('onClose'))
-    this.ws.addEventListener(Event.message, this.bound('onMessage'))
-    this.ws.addEventListener(Event.error, this.bound('onError'))
-    this.ws.addEventListener(Event.info, info => this.emit(Event.info, info))
-    this.emit(Event.info, `Trying to connect to ${url}`)
+    this.transport.addEventListener(Event.open, this.bound('onOpen'))
+    this.transport.addEventListener(Event.close, this.bound('onClose'))
+    this.transport.addEventListener(Event.message, this.bound('onMessage'))
+    this.transport.addEventListener(Event.error, this.bound('onError'))
+    this.transport.addEventListener(Event.info, info => this.logger.info(info))
+    this.logger.info(`Trying to connect to ${url}`)
   }
 
-  disconnect(reconnect = false) {
+  cleanTimerHandles() {
     for (let handle of TimerHandles) {
       if (this[handle] != null) {
         this[handle].clear()
         this[handle] = null
       }
     }
+  }
+
+  disconnect(reconnect = false) {
+    this.cleanTimerHandles()
+
+    // set reconnect to autoReconnect so that onClose handler can behave.
+    // FIXME
     this.options.autoReconnect = !!reconnect
-    if (this.ws != null) {
-      this.ws.close()
+    if (this.transport != null) {
+      this.transport.close()
     }
-    this.emit(Event.notice, `Disconnecting from ${this.options.url}`)
+
+    this.logger.notice(`Disconnecting from ${this.options.url}`)
   }
 
   onOpen() {
     this.readyState = State.READY
     // FIXME: the following is ridiculous.
-    this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
+    this.logger.notice(`Connected to Kite: ${this.options.url}`)
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
@@ -142,8 +155,7 @@ class Kite extends Emitter {
       process.nextTick(() => this.setBackoffTimeout(this.bound('connect')))
       dcInfo += ', trying to reconnect...'
     }
-
-    this.emit(Event.info, dcInfo)
+    this.logger.info(dcInfo)
   }
 
   onMessage({ data }) {
@@ -153,6 +165,7 @@ class Kite extends Emitter {
   onError(err) {
     console.log(err)
     this.emit(Event.error, 'Websocket error!')
+    this.logger.error('WebSocket error!')
   }
 
   getKiteInfo(params) {
@@ -162,15 +175,15 @@ class Kite extends Emitter {
       ? params[0].kiteName
       : undefined
 
-    return {
+    return new KiteInfo({
       id: this.id,
-      username: username || Defaults.KiteInfo.username,
-      environment: environment || Defaults.KiteInfo.environment,
-      name: name || Defaults.KiteInfo.name,
-      version: version || Defaults.KiteInfo.version,
-      region: region || Defaults.KiteInfo.region,
-      hostname: hostname || Defaults.KiteInfo.hostname,
-    }
+      username,
+      environment,
+      name,
+      version,
+      region,
+      hostname,
+    })
   }
 
   tell(method, params, callback) {

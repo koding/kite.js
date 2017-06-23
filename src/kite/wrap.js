@@ -1,6 +1,6 @@
 import Interval from './interval'
 
-export default function(userlandApi = {}) {
+export default function wrap(userlandApi = {}) {
   const api = ['error', 'info', 'log', 'warn'].reduce((api, method) => {
     api[method] = console[method].bind(console)
     return api

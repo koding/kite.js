@@ -9,7 +9,7 @@ import { join as joinPath } from 'path'
 
 import KiteError from '../kite/error'
 import Kontrol from '../kontrol'
-import enableLogging from '../kite/enableLogging'
+import Logger from '../kite/Logger'
 import handleIncomingMessage from '../kite/handleIncomingMessage'
 import { v4 as createId } from 'uuid'
 import { getKontrolClaims } from '../kite/claims'
@@ -21,26 +21,28 @@ import WebSocketServer from './websocket'
 const toArray = Promise.promisify(streamToArray)
 const { readFileAsync } = Promise.promisifyAll(fs)
 
+const isFunction = thing => typeof thing === 'function'
+const withDefault = (thing, def) => (thing != null ? thing : def)
+
 class KiteServer extends Emitter {
   constructor(options = {}) {
+    options.hostname = options.hostname == null ? hostname() : options.hostname
+    options.api = options.api || DefaultApi
+
     super()
 
     this.options = options
 
-    if (this.options.hostname == null) {
-      this.options.hostname = hostname()
-    }
-
-    enableLogging(options.name, this, options.logLevel)
-
     this.id = createId()
     this.server = null
 
-    if (options.api != null) {
-      this.methods(options.api)
-    }
+    this.logger = new Logger({
+      name: options.name || 'kite',
+      level: options.logLevel,
+    })
 
-    this.currentToken = null
+    this.api = {}
+    this.methods(options.api)
   }
 
   getToken() {
@@ -48,28 +50,25 @@ class KiteServer extends Emitter {
   }
 
   method(methodName, fn) {
-    let auth
-    let func
-    let left
-    if (this.api == null) {
-      this.api = DefaultApi
-    }
+    let auth, func
 
-    if (typeof fn === 'function') {
+    if (isFunction(fn)) {
       func = fn
-    } else if (typeof fn.func === 'function') {
-      ;({ func, auth } = fn)
+    } else if (isFunction(fn.func)) {
+      func = fn.func
+      auth = fn.auth
     } else {
       throw new Error(
         `Argument must be a function or an object with a func property`
       )
     }
 
-    func.mustAuth = (left = auth != null ? auth : this.options.auth) != null
-      ? left
-      : true
+    auth = withDefault(auth, this.options.auth)
+    func.mustAuth = withDefault(auth, true)
 
-    return (this.api[methodName] = func)
+    this.api[methodName] = func
+
+    return func
   }
 
   methods(methods) {
@@ -108,7 +107,7 @@ class KiteServer extends Emitter {
     const Server = this.getServerClass()
     this.server = new Server({ port, prefix, name, logLevel })
     this.server.on('connection', this.bound('onConnection'))
-    this.emit('info', `Listening: ${this.server.getAddress()}`)
+    this.logger.info(`Listening: ${this.server.getAddress()}`)
   }
 
   close() {
@@ -156,10 +155,10 @@ class KiteServer extends Emitter {
       const { kontrolURL, sub: keyUsername } = getKontrolClaims(this.key)
 
       this.kontrol = new Kontrol({
-        url: userKontrolURL != null ? userKontrolURL : kontrolURL,
+        url: withDefault(userKontrolURL, kontrolURL),
         auth: { type: 'kiteKey', key },
         name,
-        username: username != null ? username : keyUsername,
+        username: withDefault(username, keyUsername),
         environment,
         version,
         region,
@@ -168,16 +167,17 @@ class KiteServer extends Emitter {
         transportClass,
       })
         .on('open', () => {
-          return this.emit('info', 'Connected to Kontrol')
+          this.logger.info('Connected to Kontrol')
         })
         .on('error', err => {
-          return this.emit('error', err)
+          this.emit('error', err)
+          this.logger.error(err)
         })
 
       const kiteURL = `${scheme}://${host}:${this.port}/${this.options.name}`
 
       return this.kontrol.register({ url: kiteURL }).then(() => {
-        return this.emit('info', `Registered to Kontrol with URL: ${kiteURL}`)
+        this.logger.info(`Registered to Kontrol with URL: ${kiteURL}`)
       })
     })
   }
@@ -200,7 +200,7 @@ class KiteServer extends Emitter {
       links,
       callbacks,
     })
-    this.emit('debug', `Sending: ${messageStr}`)
+    this.logger.debug(`Sending: ${messageStr}`)
     return ws.send(messageStr)
   }
 
@@ -211,10 +211,10 @@ class KiteServer extends Emitter {
     const id = ws.getId()
     ws.on('message', this.lazyBound('handleMessage', proto))
     ws.on('close', () => {
-      return this.emit('info', `Client has disconnected: ${id}`)
+      this.logger.info(`Client has disconnected: ${id}`)
     })
 
-    this.emit('info', `New connection from: ${id}`)
+    this.logger.info(`New connection from: ${id}`)
   }
 }
 
@@ -224,12 +224,7 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
       case typeof src !== 'string':
         return readFileAsync(src, enc).catch(
           KiteError.codeIs('ENOENT'),
-          err => {
-            if (err) {
-              console.error(err)
-            }
-            return src
-          }
+          err => (err ? console.error(err) : src)
         )
       case typeof src.pipe !== 'function':
         return toArray(src).then(arr => arr.join('\n'))

@@ -1,22 +1,29 @@
 import SockJS from 'sockjs'
 import http from 'http'
-import enableLogging from '../../kite/enableLogging'
+import Logger from '../../kite/Logger'
 import Emitter from '../../kite/emitter'
 import Session from './session'
 
 class Server extends Emitter {
-  constructor(options) {
+  constructor(options = {}) {
     super()
 
-    this.options = options ? options : {}
+    this.options = options
     this.options.hostname = this.options.hostname || '0.0.0.0'
+
     if (!this.options.port) throw new Error('port is required!')
 
-    enableLogging(options.name, this, options.logLevel)
+    this.logger = new Logger({
+      name: options.name,
+      level: options.logLevel,
+    })
 
     const sockjsOptions = {
       log: (level, message) => {
-        this.emit(level, message)
+        const fn = this.logger[level].bind(this.logger)
+        if (fn) {
+          fn(message)
+        }
       },
     }
 
@@ -24,13 +31,13 @@ class Server extends Emitter {
     this.server = http.createServer()
 
     this.sockjs.on('connection', connection => {
-      this.emit('debug', 'a new connection', connection)
+      this.logger.debug('a new connection', connection)
       this.emit('connection', new Session(connection))
     })
 
     this.sockjs.installHandlers(this.server, { prefix: options.prefix || '' })
 
-    this.emit('debug', 'starting to listen on server', options)
+    this.logger.debug('starting to listen on server', options)
     this.server.listen(options.port, options.hostname)
   }
 
