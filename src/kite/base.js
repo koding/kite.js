@@ -31,11 +31,7 @@ class Kite extends Emitter {
     super()
 
     this.id = uuid.v4()
-    this.options = Object.assign(
-      {},
-      Kite.defaultOptions,
-      options
-    )
+    this.options = Object.assign({}, Kite.defaultOptions, options)
 
     if (this.options.url && this.options.prefix) {
       this.options.url += this.options.prefix
