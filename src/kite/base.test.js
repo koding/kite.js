@@ -9,6 +9,7 @@ const makeKite = (options = {}) => {
       url: 'ws://localhost',
       autoConnect: false,
       autoReconnect: false,
+      logLevel: 0,
     },
     options
   )
@@ -21,7 +22,9 @@ describe('Kite', () => {
     it('requires a valid url', () => {
       expect(() => new Kite({})).toThrow(/"url" must be a string/)
       expect(() => new Kite({ url: 'foo' })).toThrow(/invalid url/)
-      expect(() => new Kite({ url: 'http://localhost' })).toNotThrow()
+      expect(
+        () => new Kite({ autoConnect: false, url: 'http://localhost' })
+      ).toNotThrow()
     })
 
     it('accepts a prefix', () => {
