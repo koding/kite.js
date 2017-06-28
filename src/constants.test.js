@@ -19,6 +19,7 @@ describe('constants', () =>
       'warn',
       'info',
       'open',
+      'close',
       'debug',
     ]
 
