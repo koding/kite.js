@@ -147,7 +147,6 @@ class Kite extends Emitter {
   }
 
   onError(err) {
-    console.log(err)
     this.emit(Event.error, 'Websocket error!')
   }
 
