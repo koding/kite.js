@@ -156,7 +156,7 @@ class Kite extends Emitter {
 
     const name = Array.isArray(params) && params[0]
       ? params[0].kiteName
-      : undefined
+      : this.options.name
 
     return {
       id: this.id,
