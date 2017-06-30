@@ -32,49 +32,45 @@ export default function handleIncomingMessage(proto, message) {
   this.emit(Event.debug, 'Authenticating request')
 
   return handleAuth(this, method, auth, this.key)
-    .then(
-      function(token) {
-        this.emit(Event.debug, 'Authentication passed')
+    .then(token => {
+      this.emit(Event.debug, 'Authentication passed')
 
-        if (withArgs == null) {
-          withArgs = []
-        }
+      if (withArgs == null) {
+        withArgs = []
+      }
 
-        if (!Array.isArray(withArgs)) {
-          withArgs = [withArgs]
-        }
+      if (!Array.isArray(withArgs)) {
+        withArgs = [withArgs]
+      }
 
-        mungeCallbacks(callbacks, withArgs.length)
+      mungeCallbacks(callbacks, withArgs.length)
 
-        // set this as the current token for the duration of the synchronous
-        // method call.
-        // NOTE: this mechanism may be changed at some point in the future.
-        this.currentToken = token
+      // set this as the current token for the duration of the synchronous
+      // method call.
+      // NOTE: this mechanism may be changed at some point in the future.
+      this.currentToken = token
 
-        proto.handle({
-          method,
-          arguments: [...Array.from(withArgs), responseCallback],
-          links,
-          callbacks,
-        })
+      proto.handle({
+        method,
+        arguments: [...Array.from(withArgs), responseCallback],
+        links,
+        callbacks,
+      })
 
-        return (this.currentToken = null)
-      }.bind(this)
-    )
-    .catch(
-      function(err) {
-        this.emit(Event.debug, 'Authentication failed', err)
+      return (this.currentToken = null)
+    })
+    .catch(err => {
+      this.emit(Event.debug, 'Authentication failed', err)
 
-        mungeCallbacks(callbacks, 1)
+      mungeCallbacks(callbacks, 1)
 
-        return proto.handle({
-          method: 'kite.echo',
-          arguments: [err, responseCallback],
-          links,
-          callbacks,
-        })
-      }.bind(this)
-    )
+      return proto.handle({
+        method: 'kite.echo',
+        arguments: [err, responseCallback],
+        links,
+        callbacks,
+      })
+    })
 }
 
 const isKiteReq = req =>
