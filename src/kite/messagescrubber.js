@@ -24,6 +24,11 @@ export default class MessageScrubber {
   }
 
   scrub(method, params, callback) {
+    if (!callback && params) {
+      callback = params
+      params = null
+    }
+
     // by default, remove this callback after it is called once.
     if (callback.times == null) {
       callback.times = 1
