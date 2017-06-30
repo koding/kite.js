@@ -4,8 +4,6 @@ import KiteError from './error'
 import { Event } from '../constants'
 
 export default function handleIncomingMessage(proto, message) {
-  let responseCallback
-  let withArgs
   this.emit(Event.debug, `Receiving: ${message}`)
 
   const req = parse(message)
@@ -15,19 +13,17 @@ export default function handleIncomingMessage(proto, message) {
     return
   }
 
-  let { arguments: args, links, callbacks, method, authentication: auth } = req
-
-  if (args.length > 0) {
-    const [firstArg] = Array.from(args)
-    withArgs = firstArg.withArgs
-    responseCallback = firstArg.responseCallback
-    auth = firstArg.authentication
-  }
-
-  if (withArgs == null && responseCallback == null) {
+  if (!isKiteReq(req)) {
     this.emit(Event.debug, 'Handling a normal dnode message')
     return proto.handle(req)
   }
+
+  const { links, method, callbacks } = req
+  const {
+    withArgs = [],
+    authentication: auth,
+    responseCallback,
+  } = parseKiteReq(req)
 
   this.emit(Event.debug, 'Authenticating request')
 
@@ -35,40 +31,31 @@ export default function handleIncomingMessage(proto, message) {
     .then(token => {
       this.emit(Event.debug, 'Authentication passed')
 
-      if (withArgs == null) {
-        withArgs = []
-      }
-
-      if (!Array.isArray(withArgs)) {
-        withArgs = [withArgs]
-      }
-
-      mungeCallbacks(callbacks, withArgs.length)
-
       // set this as the current token for the duration of the synchronous
       // method call.
       // NOTE: this mechanism may be changed at some point in the future.
       this.currentToken = token
 
-      proto.handle({
-        method,
-        arguments: [...Array.from(withArgs), responseCallback],
-        links,
-        callbacks,
-      })
+      proto.handle(
+        toProtoReq({
+          method,
+          withArgs,
+          responseCallback,
+          links,
+          callbacks,
+        })
+      )
 
-      return (this.currentToken = null)
+      this.currentToken = null
     })
     .catch(err => {
       this.emit(Event.debug, 'Authentication failed', err)
-
-      mungeCallbacks(callbacks, 1)
 
       return proto.handle({
         method: 'kite.echo',
         arguments: [err, responseCallback],
         links,
-        callbacks,
+        callbacks: mungeCallbacks(callbacks, 1),
       })
     })
 }
