@@ -11,7 +11,7 @@ export default class MessageScrubber {
 
   wrapMessage(params, callback) {
     return {
-      kite: this.kite.getKiteInfo(params),
+      kite: this.kite.getKiteInfo(),
       authentication: this.kite.options.auth,
       withArgs: params,
       responseCallback(response) {

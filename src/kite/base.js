@@ -150,12 +150,15 @@ class Kite extends Emitter {
     this.emit(Event.error, 'Websocket error!')
   }
 
-  getKiteInfo(params) {
-    const { username, environment, version, region, hostname } = this.options
-
-    const name = Array.isArray(params) && params[0]
-      ? params[0].kiteName
-      : this.options.name
+  getKiteInfo() {
+    const {
+      name,
+      username,
+      environment,
+      version,
+      region,
+      hostname,
+    } = this.options
 
     return {
       id: this.id,
