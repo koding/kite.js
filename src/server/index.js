@@ -22,6 +22,8 @@ import SockJsServer from './sockjs'
 const toArray = Promise.promisify(streamToArray)
 const { readFileAsync } = Promise.promisifyAll(fs)
 
+const isFunction = thing => typeof thing === 'function'
+
 class KiteServer extends Emitter {
   constructor(options = {}) {
     super()
@@ -37,9 +39,7 @@ class KiteServer extends Emitter {
     this.id = createId()
     this.server = null
 
-    if (options.api != null) {
-      this.methods(options.api)
-    }
+    this.api = Object.assign({}, DefaultApi, this.methods(options.api))
 
     this.currentToken = null
   }
@@ -49,37 +49,32 @@ class KiteServer extends Emitter {
   }
 
   method(methodName, fn) {
-    let auth
-    let func
-    let left
-    if (this.api == null) {
-      this.api = DefaultApi
-    }
+    let auth, func
 
-    if (typeof fn === 'function') {
+    if (isFunction(fn)) {
       func = fn
-    } else if (typeof fn.func === 'function') {
-      ;({ func, auth } = fn)
+      auth = undefined
+    } else if (isFunction(fn.func)) {
+      func = fn.func
+      auth = fn.auth
     } else {
       throw new Error(
         `Argument must be a function or an object with a func property`
       )
     }
 
-    func.mustAuth = (left = auth != null ? auth : this.options.auth) != null
-      ? left
-      : true
+    auth = auth != null ? auth : this.options.auth
+    func.mustAuth = auth != null ? auth : true
 
-    return (this.api[methodName] = func)
+    return {
+      [methodName]: func,
+    }
   }
 
   methods(methods) {
-    const result = []
-    for (let methodName in methods) {
-      const fn = methods[methodName]
-      result.push(this.method(methodName, fn))
-    }
-    return result
+    return Object.keys(methods).reduce((acc, methodName) => {
+      return Object.assign(acc, this.method(methodName, methods[methodName]))
+    }, {})
   }
 
   getServerClass() {
