@@ -17,6 +17,7 @@ import { Defaults } from '../constants'
 
 import DefaultApi from './default-api'
 import WebSocketServer from './websocket'
+import SockJsServer from './sockjs'
 
 const toArray = Promise.promisify(streamToArray)
 const { readFileAsync } = Promise.promisifyAll(fs)
@@ -241,5 +242,9 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
 
 KiteServer.prototype.handleMessage = handleIncomingMessage
 KiteServer.version = Defaults.KiteInfo.version
+KiteServer.transport = {
+  WebSocket: WebSocketServer,
+  SockJs: SockJsServer,
+}
 
 export default KiteServer
