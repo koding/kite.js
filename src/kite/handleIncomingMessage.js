@@ -1,12 +1,11 @@
-import parse from 'try-json-parse'
 import handleAuth from './auth'
 import KiteError from './error'
 import { Event } from '../constants'
 
-export default function handleIncomingMessage(proto, message) {
+export default function handleIncomingMessage(proto, req) {
+  const message = JSON.stringify(req)
   this.emit(Event.debug, `Receiving: ${message}`)
 
-  const req = parse(message)
 
   if (req == null) {
     this.emit(Event.warning, new KiteError(`Invalid payload! (${message})`))

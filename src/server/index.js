@@ -1,3 +1,4 @@
+import parse from 'try-json-parse'
 import Promise from 'bluebird'
 import Emitter from '../kite/emitter'
 import dnodeProtocol from 'dnode-protocol'
@@ -205,7 +206,11 @@ class KiteServer extends Emitter {
     proto.on('request', this.lazyBound('handleRequest', ws))
 
     const id = ws.getId()
-    ws.on('message', this.lazyBound('handleMessage', proto))
+
+    ws.on('message', message => {
+      handleIncomingMessage.call(this, proto, parse(message))
+    })
+
     ws.on('close', () => {
       return this.emit('info', `Client has disconnected: ${id}`)
     })
@@ -235,7 +240,6 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
   }
 )
 
-KiteServer.prototype.handleMessage = handleIncomingMessage
 KiteServer.version = Defaults.KiteInfo.version
 KiteServer.transport = {
   WebSocket: WebSocketServer,

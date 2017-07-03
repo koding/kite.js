@@ -1,3 +1,4 @@
+import parse from 'try-json-parse'
 import dnode from 'dnode-protocol'
 import WebSocket from 'ws'
 import atob from 'atob'
@@ -143,7 +144,7 @@ class Kite extends Emitter {
   }
 
   onMessage({ data }) {
-    handleIncomingMessage.call(this, this.proto, data)
+    handleIncomingMessage.call(this, this.proto, parse(data))
   }
 
   onError(err) {
