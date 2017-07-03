@@ -8,7 +8,7 @@ export default Promise.method((kite, method, auth, kiteKey) => {
       return
     }
 
-    if (kite.api && kite.api[method] && !kite.api[method].mustAuth) {
+    if (!kite.api.shouldAuthenticate(method)) {
       return
     }
 

@@ -16,14 +16,13 @@ import { v4 as createId } from 'uuid'
 import { getKontrolClaims } from '../kite/claims'
 import { Defaults } from '../constants'
 
-import DefaultApi from './default-api'
 import WebSocketServer from './websocket'
 import SockJsServer from './sockjs'
 
+import KiteApi from '../KiteApi'
+
 const toArray = Promise.promisify(streamToArray)
 const { readFileAsync } = Promise.promisifyAll(fs)
-
-const isFunction = thing => typeof thing === 'function'
 
 class KiteServer extends Emitter {
   constructor(options = {}) {
@@ -40,42 +39,16 @@ class KiteServer extends Emitter {
     this.id = createId()
     this.server = null
 
-    this.api = Object.assign({}, DefaultApi, this.methods(options.api))
+    this.api = new KiteApi({
+      auth: this.options.auth,
+      methods: this.options.api,
+    })
 
     this.currentToken = null
   }
 
   getToken() {
     return this.currentToken
-  }
-
-  method(methodName, fn) {
-    let auth, func
-
-    if (isFunction(fn)) {
-      func = fn
-      auth = undefined
-    } else if (isFunction(fn.func)) {
-      func = fn.func
-      auth = fn.auth
-    } else {
-      throw new Error(
-        `Argument must be a function or an object with a func property`
-      )
-    }
-
-    auth = auth != null ? auth : this.options.auth
-    func.mustAuth = auth != null ? auth : true
-
-    return {
-      [methodName]: func,
-    }
-  }
-
-  methods(methods) {
-    return Object.keys(methods).reduce((acc, methodName) => {
-      return Object.assign(acc, this.method(methodName, methods[methodName]))
-    }, {})
   }
 
   getServerClass() {
@@ -202,7 +175,7 @@ class KiteServer extends Emitter {
   }
 
   onConnection(ws) {
-    const proto = dnodeProtocol(this.api)
+    const proto = dnodeProtocol(this.api.methods)
     proto.on('request', this.lazyBound('handleRequest', ws))
 
     const id = ws.getId()
