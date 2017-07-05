@@ -47,11 +47,13 @@ class Kite extends Emitter {
     this.readyState = State.NOTREADY
 
     this.api = new KiteApi({
-      auth: this.options.auth,
+      // to be backwards compatible we don't allow client apis to be
+      // authenticated.
+      auth: false,
       methods: wrap.call(this, this.options.api),
     })
 
-    this.proto = dnode(this, this.api.methods)
+    this.proto = dnode(this.api.methods)
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {

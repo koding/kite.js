@@ -69,7 +69,7 @@ const isKiteReq = req =>
 const parseKiteReq = req => req.arguments[0]
 
 const isResponseCallback = callback =>
-  callback[0] === '0' && callback[1] === 'responseCallback'
+  Array.isArray(callback) && callback.join('.') === '0.responseCallback'
 
 const mungeCallbacks = (callbacks, n) => {
   // FIXME: this is an ugly hack; there must be a better way to implement it:
