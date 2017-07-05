@@ -13,6 +13,8 @@ import KiteError from './error'
 import MessageScrubber from './messagescrubber'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
+import KiteApi from '../KiteApi'
+
 class Kite extends Emitter {
   static version = Defaults.KiteInfo.version
   static Error = KiteError
@@ -44,7 +46,12 @@ class Kite extends Emitter {
 
     this.readyState = State.NOTREADY
 
-    this.proto = dnode(wrap.call(this, this.options.api))
+    this.api = new KiteApi({
+      auth: this.options.auth,
+      methods: wrap.call(this, this.options.api),
+    })
+
+    this.proto = dnode(this, this.api.methods)
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
@@ -150,12 +157,15 @@ class Kite extends Emitter {
     this.emit(Event.error, 'Websocket error!')
   }
 
-  getKiteInfo(params) {
-    const { username, environment, version, region, hostname } = this.options
-
-    const name = Array.isArray(params) && params[0]
-      ? params[0].kiteName
-      : this.options.name
+  getKiteInfo() {
+    const {
+      name,
+      username,
+      environment,
+      version,
+      region,
+      hostname,
+    } = this.options
 
     return {
       id: this.id,

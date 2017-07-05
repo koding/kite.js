@@ -15,9 +15,10 @@ import { v4 as createId } from 'uuid'
 import { getKontrolClaims } from '../kite/claims'
 import { Defaults } from '../constants'
 
-import DefaultApi from './default-api'
 import WebSocketServer from './websocket'
 import SockJsServer from './sockjs'
+
+import KiteApi from '../KiteApi'
 
 const toArray = Promise.promisify(streamToArray)
 const { readFileAsync } = Promise.promisifyAll(fs)
@@ -37,49 +38,16 @@ class KiteServer extends Emitter {
     this.id = createId()
     this.server = null
 
-    if (options.api != null) {
-      this.methods(options.api)
-    }
+    this.api = new KiteApi({
+      auth: this.options.auth,
+      methods: this.options.api,
+    })
 
     this.currentToken = null
   }
 
   getToken() {
     return this.currentToken
-  }
-
-  method(methodName, fn) {
-    let auth
-    let func
-    let left
-    if (this.api == null) {
-      this.api = DefaultApi
-    }
-
-    if (typeof fn === 'function') {
-      func = fn
-    } else if (typeof fn.func === 'function') {
-      ;({ func, auth } = fn)
-    } else {
-      throw new Error(
-        `Argument must be a function or an object with a func property`
-      )
-    }
-
-    func.mustAuth = (left = auth != null ? auth : this.options.auth) != null
-      ? left
-      : true
-
-    return (this.api[methodName] = func)
-  }
-
-  methods(methods) {
-    const result = []
-    for (let methodName in methods) {
-      const fn = methods[methodName]
-      result.push(this.method(methodName, fn))
-    }
-    return result
   }
 
   getServerClass() {
@@ -206,11 +174,12 @@ class KiteServer extends Emitter {
   }
 
   onConnection(ws) {
-    const proto = dnodeProtocol(this.api)
+    const proto = dnodeProtocol(this.api.methods)
     proto.on('request', this.lazyBound('handleRequest', ws))
 
     const id = ws.getId()
     ws.on('message', this.lazyBound('handleMessage', proto))
+
     ws.on('close', () => {
       return this.emit('info', `Client has disconnected: ${id}`)
     })
@@ -241,6 +210,7 @@ KiteServer.prototype.normalizeKiteKey = Promise.method(
 )
 
 KiteServer.prototype.handleMessage = handleIncomingMessage
+
 KiteServer.version = Defaults.KiteInfo.version
 KiteServer.transport = {
   WebSocket: WebSocketServer,
