@@ -126,7 +126,6 @@ class Kite extends Emitter {
   }
 
   onOpen() {
-    console.log('on open client')
     this.readyState = State.READY
     // FIXME: the following is ridiculous.
     this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
