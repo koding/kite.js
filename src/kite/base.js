@@ -47,7 +47,9 @@ class Kite extends Emitter {
     this.readyState = State.NOTREADY
 
     this.api = new KiteApi({
-      auth: this.options.auth,
+      // to be backwards compatible we don't allow client apis to be
+      // authenticated.
+      auth: false,
       methods: wrap.call(this, this.options.api),
     })
 
