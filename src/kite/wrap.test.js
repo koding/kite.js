@@ -5,10 +5,6 @@ describe('kite/wrap', () => {
   it('should include default api methods', () => {
     const wrapped = wrap()
 
-    expect(wrapped.error).toBeA('function')
-    expect(wrapped.info).toBeA('function')
-    expect(wrapped.log).toBeA('function')
-    expect(wrapped.warn).toBeA('function')
     expect(wrapped['kite.heartbeat']).toBeA('function')
   })
 

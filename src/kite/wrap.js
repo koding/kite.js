@@ -1,12 +1,9 @@
 import Interval from './interval'
 
 export default function(userlandApi = {}) {
-  const api = ['error', 'info', 'log', 'warn'].reduce((api, method) => {
-    api[method] = console[method].bind(console)
-    return api
-  }, {})
   api['kite.heartbeat'] = (duration, ping, callback) => {
     this.heartbeatHandle = new Interval(ping, duration * 1000)
+  const api = new Object()
     return callback(null)
   }
   for (let method of Object.keys(userlandApi || {})) {
