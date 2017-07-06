@@ -140,13 +140,17 @@ class BaseKite extends Emitter {
     connection.addEventListener(Event.info, info => this.emit(Event.info, info))
   }
 
-  disconnect(reconnect = false) {
+  cleanTimerHandlers() {
     for (let handle of TimerHandles) {
       if (this[handle] != null) {
         this[handle].clear()
         this[handle] = null
       }
     }
+  }
+
+  disconnect(reconnect = false) {
+    this.cleanTimerHandlers()
     this.options.autoReconnect = !!reconnect
     if (this.ws != null) {
       this.ws.close()
