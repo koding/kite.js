@@ -1,5 +1,4 @@
 import dnode from 'dnode-protocol'
-import WebSocket from 'ws'
 import atob from 'atob'
 import uuid from 'uuid'
 import Emitter from './emitter'
@@ -13,18 +12,25 @@ import KiteError from './error'
 import MessageScrubber from './messagescrubber'
 import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
 
+import WebSocket from 'ws'
+import SockJS from 'sockjs-client'
+
 import KiteApi from '../KiteApi'
 
-class Kite extends Emitter {
+class BaseKite extends Emitter {
   static version = Defaults.KiteInfo.version
   static Error = KiteError
-  static transportClass = WebSocket
+  static transport = {
+    SockJS,
+    WebSocket,
+  }
+  static transportClass = BaseKite.transport.WebSocket
 
   static defaultOptions = {
     autoConnect: true,
     autoReconnect: true,
     prefix: '',
-    transportClass: Kite.transportClass,
+    transportClass: BaseKite.transportClass,
     transportOptions: {},
   }
 
@@ -33,7 +39,7 @@ class Kite extends Emitter {
     super()
 
     this.id = uuid.v4()
-    this.options = Object.assign({}, Kite.defaultOptions, options)
+    this.options = Object.assign({}, BaseKite.defaultOptions, options)
 
     if (this.options.url && this.options.prefix) {
       this.options.url += this.options.prefix
@@ -244,6 +250,6 @@ class Kite extends Emitter {
   }
 }
 
-Kite.prototype.initBackoff = backoff
+BaseKite.prototype.initBackoff = backoff
 
-export default Kite
+export default BaseKite
