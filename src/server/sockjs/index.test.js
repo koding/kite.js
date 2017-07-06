@@ -1,6 +1,5 @@
 import Kite from '../../kite'
 import Server from './'
-import SockJS from 'sockjs-client'
 const logLevel = 0
 
 describe('SockJS Server with WebSocket', () => {
@@ -9,7 +8,7 @@ describe('SockJS Server with WebSocket', () => {
       url: 'http://localhost:7778',
       autoReconnect: false,
       autoConnect: false,
-      transportClass: SockJS,
+      transportClass: Kite.transport.SockJS,
       logLevel,
     })
 
@@ -29,7 +28,7 @@ describe('SockJS Server with XHR', () => {
       url: 'http://localhost:7779',
       autoReconnect: false,
       autoConnect: false,
-      transportClass: SockJS,
+      transportClass: Kite.transport.SockJS,
       transportOptions: {
         transports: ['xhr-polling'],
       },

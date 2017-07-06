@@ -18,6 +18,12 @@ const makeKite = (options = {}) => {
 }
 
 describe('BaseKite', () => {
+  it('should expose SockJS and WebSocket as transport class', done => {
+    expect(BaseKite.transport.SockJS).toExist()
+    expect(BaseKite.transport.WebSocket).toExist()
+    done()
+  })
+
   describe('constructor', () => {
     it('requires a valid url', () => {
       expect(() => new BaseKite({})).toThrow(/"url" must be a string/)
