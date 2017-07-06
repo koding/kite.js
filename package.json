@@ -3,7 +3,8 @@
   "description": "kite client for browser",
   "main": "lib/index.js",
   "browser": {
-    "ws": "./lib/ws-browser.js"
+    "ws": "./lib/ws-browser.js",
+    "os": "./lib/os-browser.js"
   },
   "version": "1.0.6",
   "scripts": {
