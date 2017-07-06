@@ -165,11 +165,14 @@ class BaseKite extends Emitter {
 
   onOpen() {
     this.readyState = State.READY
-    // FIXME: the following is ridiculous.
+
     this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
+
+    // FIXME: the following is ridiculous.
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
+
     this.emit(Event.open)
   }
 
