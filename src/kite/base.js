@@ -182,7 +182,7 @@ class BaseKite extends Emitter {
 
     let dcInfo = `${this.options.url}: disconnected`
     // enable below to autoReconnect when the socket has been closed
-    if (this.options.autoReconnect) {
+    if (this.canReconnect()) {
       process.nextTick(() => this.setBackoffTimeout(this.bound('connect')))
       dcInfo += ', trying to reconnect...'
     }
