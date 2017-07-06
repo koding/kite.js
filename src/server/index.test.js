@@ -147,7 +147,7 @@ describe('KiteServer connection', () => {
       const math = new KiteServer({
         name: 'math',
         auth: false,
-        serverClass: KiteServer.transport.SockJs,
+        serverClass: KiteServer.transport.SockJS,
         logLevel,
         api: {
           square: function(x, callback) {
