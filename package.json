@@ -6,7 +6,7 @@
     "ws": "./lib/ws-browser.js",
     "os": "./lib/os-browser.js"
   },
-  "version": "1.0.6",
+  "version": "1.0.7",
   "scripts": {
     "clean": "rm -rf ./lib",
     "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.test.js'",
@@ -20,7 +20,7 @@
     "prebuild": "npm run clean",
     "build": "babel src --source-maps --out-dir lib",
     "build:watch": "babel src --watch --source-maps --out-dir lib",
-    "prepublish": "npm run format:all && npm run test && npm run build",
+    "prepublish": "npm run format:all && npm run test && npm run bundle",
     "format:single": "prettier --single-quote --trailing-comma es5 --no-semi --write",
     "format:all": "prettier --single-quote --trailing-comma es5 --no-semi --write 'src/**/*.js'",
     "format:check:single": "prettier --single-quote --trailing-comma es5 --no-semi --list-different",
