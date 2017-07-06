@@ -67,12 +67,27 @@ class BaseKite extends Emitter {
       this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
-    if (this.options.autoReconnect) {
-      this.initBackoff()
-    }
+    const { connection, autoConnect, autoReconnect } = this.options
 
-    if (this.options.autoConnect) {
-      this.connect()
+    // if we have a connection already dismiss the `autoConnect` and
+    // `autoReconnect` options.
+    if (connection) {
+      if (connection.readyState === connection.CLOSED) {
+        throw new Error(
+          'Given connection is closed, try with a live connection or pass a url option to let Kite create the connection'
+        )
+      }
+
+      this.addConnectionHandlers(connection)
+      this.ws = connection
+
+      // if the connection is already open trigger `onOpen`.
+      if (connection.readyState === connection.OPEN) {
+        this.onOpen()
+      }
+    } else {
+      autoReconnect && this.initBackoff()
+      autoConnect && this.connect()
     }
   }
 
@@ -100,6 +115,11 @@ class BaseKite extends Emitter {
     return ![State.CONNECTING, State.READY].includes(this.readyState)
   }
 
+  canReconnect() {
+    // we don't want to reconnect if a connection is passed already.
+    return !this.options.connection && this.options.autoReconnect
+  }
+
   connect() {
     if (!this.canConnect()) {
       return
@@ -111,21 +131,31 @@ class BaseKite extends Emitter {
     this.ws = Konstructor === WebSocket
       ? new Konstructor(url)
       : new Konstructor(url, null, transportOptions)
-    this.ws.addEventListener(Event.open, this.bound('onOpen'))
-    this.ws.addEventListener(Event.close, this.bound('onClose'))
-    this.ws.addEventListener(Event.message, this.bound('onMessage'))
-    this.ws.addEventListener(Event.error, this.bound('onError'))
-    this.ws.addEventListener(Event.info, info => this.emit(Event.info, info))
+
+    this.addConnectionHandlers(this.ws)
+
     this.emit(Event.info, `Trying to connect to ${url}`)
   }
 
-  disconnect(reconnect = false) {
+  addConnectionHandlers(connection) {
+    connection.addEventListener(Event.open, this.bound('onOpen'))
+    connection.addEventListener(Event.close, this.bound('onClose'))
+    connection.addEventListener(Event.message, this.bound('onMessage'))
+    connection.addEventListener(Event.error, this.bound('onError'))
+    connection.addEventListener(Event.info, info => this.emit(Event.info, info))
+  }
+
+  cleanTimerHandlers() {
     for (let handle of TimerHandles) {
       if (this[handle] != null) {
         this[handle].clear()
         this[handle] = null
       }
     }
+  }
+
+  disconnect(reconnect = false) {
+    this.cleanTimerHandlers()
     this.options.autoReconnect = !!reconnect
     if (this.ws != null) {
       this.ws.close()
@@ -135,11 +165,14 @@ class BaseKite extends Emitter {
 
   onOpen() {
     this.readyState = State.READY
-    // FIXME: the following is ridiculous.
+
     this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
+
+    // FIXME: the following is ridiculous.
     if (typeof this.clearBackoffTimeout === 'function') {
       this.clearBackoffTimeout()
     }
+
     this.emit(Event.open)
   }
 
@@ -149,7 +182,7 @@ class BaseKite extends Emitter {
 
     let dcInfo = `${this.options.url}: disconnected`
     // enable below to autoReconnect when the socket has been closed
-    if (this.options.autoReconnect) {
+    if (this.canReconnect()) {
       process.nextTick(() => this.setBackoffTimeout(this.bound('connect')))
       dcInfo += ', trying to reconnect...'
     }
