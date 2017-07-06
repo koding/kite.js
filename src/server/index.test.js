@@ -1,6 +1,8 @@
 import expect from 'expect'
 import Kite from '../kite'
 import KiteServer from './'
+import SockJS from 'sockjs-client'
+import WebSocket from 'ws'
 
 const logLevel = 0
 
@@ -78,5 +80,98 @@ describe('KiteServer with WebSocket', () => {
 
     math.listen(7780)
     kite.connect()
+  })
+})
+
+describe('KiteServer connection', () => {
+  describe('with existing connection', () => {
+    it('should throw if the given connection is closed', done => {
+      const math = new KiteServer({
+        name: 'math',
+        auth: false,
+        logLevel,
+        api: {
+          square: function(x, callback) {
+            callback(null, x * x)
+          },
+        },
+      })
+
+      math.listen(7780)
+
+      const connection = new WebSocket('ws://localhost:7780')
+
+      connection.on('open', () => {
+        connection.on('close', () => {
+          math.close()
+          expect(() => {
+            new Kite({ connection: connection, logLevel })
+          }).toThrow(/Given connection is closed/)
+          done()
+        })
+        connection.close()
+      })
+    })
+
+    it('should work with a WebSocket connection', done => {
+      const math = new KiteServer({
+        name: 'math',
+        auth: false,
+        logLevel,
+        api: {
+          square: function(x, callback) {
+            callback(null, x * x)
+          },
+        },
+      })
+
+      math.listen(7780)
+
+      const connection = new WebSocket('ws://localhost:7780')
+
+      const kite = new Kite({
+        connection,
+        logLevel,
+      })
+
+      kite.on('open', () => {
+        kite.tell('square', 5).then(res => expect(res).toBe(25)).finally(() => {
+          kite.disconnect()
+          math.close()
+          done()
+        })
+      })
+    })
+
+    it('should work with a SockJS connection', done => {
+      const math = new KiteServer({
+        name: 'math',
+        auth: false,
+        serverClass: KiteServer.transport.SockJs,
+        logLevel,
+        api: {
+          square: function(x, callback) {
+            callback(null, x * x)
+          },
+        },
+      })
+
+      math.listen(7780)
+
+      const connection = new SockJS('http://0.0.0.0:7780')
+
+      const kite = new Kite({
+        connection,
+        logLevel,
+      })
+
+      kite.on('open', () => {
+        kite.tell('square', 5).then(res => expect(res).toBe(25)).finally(() => {
+          kite.disconnect()
+          math.close()
+          done()
+        })
+      })
+    })
   })
 })

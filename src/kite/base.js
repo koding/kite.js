@@ -67,12 +67,27 @@ class BaseKite extends Emitter {
       this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
-    if (this.options.autoReconnect) {
-      this.initBackoff()
-    }
+    const { connection, autoConnect, autoReconnect } = this.options
 
-    if (this.options.autoConnect) {
-      this.connect()
+    // if we have a connection already dismiss the `autoConnect` and
+    // `autoReconnect` options.
+    if (connection) {
+      if (connection.readyState === connection.CLOSED) {
+        throw new Error(
+          'Given connection is closed, try with a live connection or pass a url option to let Kite create the connection'
+        )
+      }
+
+      this.addConnectionHandlers(connection)
+      this.ws = connection
+
+      // if the connection is already open trigger `onOpen`.
+      if (connection.readyState === connection.OPEN) {
+        this.onOpen()
+      }
+    } else {
+      autoReconnect && this.initBackoff()
+      autoConnect && this.connect()
     }
   }
 
