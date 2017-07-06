@@ -111,12 +111,18 @@ class BaseKite extends Emitter {
     this.ws = Konstructor === WebSocket
       ? new Konstructor(url)
       : new Konstructor(url, null, transportOptions)
-    this.ws.addEventListener(Event.open, this.bound('onOpen'))
-    this.ws.addEventListener(Event.close, this.bound('onClose'))
-    this.ws.addEventListener(Event.message, this.bound('onMessage'))
-    this.ws.addEventListener(Event.error, this.bound('onError'))
-    this.ws.addEventListener(Event.info, info => this.emit(Event.info, info))
+
+    this.addConnectionHandlers(this.ws)
+
     this.emit(Event.info, `Trying to connect to ${url}`)
+  }
+
+  addConnectionHandlers(connection) {
+    connection.addEventListener(Event.open, this.bound('onOpen'))
+    connection.addEventListener(Event.close, this.bound('onClose'))
+    connection.addEventListener(Event.message, this.bound('onMessage'))
+    connection.addEventListener(Event.error, this.bound('onError'))
+    connection.addEventListener(Event.info, info => this.emit(Event.info, info))
   }
 
   disconnect(reconnect = false) {
