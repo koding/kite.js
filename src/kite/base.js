@@ -115,6 +115,11 @@ class BaseKite extends Emitter {
     return ![State.CONNECTING, State.READY].includes(this.readyState)
   }
 
+  canReconnect() {
+    // we don't want to reconnect if a connection is passed already.
+    return !this.options.connection && this.options.autoReconnect
+  }
+
   connect() {
     if (!this.canConnect()) {
       return
