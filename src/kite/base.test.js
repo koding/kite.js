@@ -1,5 +1,5 @@
 import expect from 'expect'
-import Kite from './base'
+import BaseKite from './base'
 import { Defaults, State, AuthType } from '../constants'
 
 const makeKite = (options = {}) => {
@@ -14,16 +14,22 @@ const makeKite = (options = {}) => {
     options
   )
 
-  return new Kite(options)
+  return new BaseKite(options)
 }
 
-describe('Kite', () => {
+describe('BaseKite', () => {
+  it('should expose SockJS and WebSocket as transport class', done => {
+    expect(BaseKite.transport.SockJS).toExist()
+    expect(BaseKite.transport.WebSocket).toExist()
+    done()
+  })
+
   describe('constructor', () => {
     it('requires a valid url', () => {
-      expect(() => new Kite({})).toThrow(/"url" must be a string/)
-      expect(() => new Kite({ url: 'foo' })).toThrow(/invalid url/)
+      expect(() => new BaseKite({})).toThrow(/"url" must be a string/)
+      expect(() => new BaseKite({ url: 'foo' })).toThrow(/invalid url/)
       expect(
-        () => new Kite({ autoConnect: false, url: 'http://localhost' })
+        () => new BaseKite({ autoConnect: false, url: 'http://localhost' })
       ).toNotThrow()
     })
 
@@ -80,7 +86,7 @@ describe('Kite', () => {
 
   describe('getKiteInfo', () =>
     it('should return default kite info if no option provided', () => {
-      let kite = new Kite({
+      let kite = new BaseKite({
         url: 'ws://localhost',
         autoConnect: false,
       })

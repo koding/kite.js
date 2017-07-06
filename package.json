@@ -3,9 +3,10 @@
   "description": "kite client for browser",
   "main": "lib/index.js",
   "browser": {
-    "ws": "./lib/ws-browser.js"
+    "ws": "./lib/ws-browser.js",
+    "os": "./lib/os-browser.js"
   },
-  "version": "1.0.6",
+  "version": "1.0.7",
   "scripts": {
     "clean": "rm -rf ./lib",
     "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.test.js'",
@@ -13,12 +14,13 @@
     "test:single": "mocha --reporter spec --compilers js:babel-core/register",
     "test:single:watch": "mocha --watch --reporter spec --compilers js:babel-core/register",
     "prebundle": "npm run build",
-    "bundle": "browserify -t babelify -g uglifyify lib/bundle.js -o dist/bundle.js",
+    "bundle": "browserify -t babelify lib/bundle.js -o dist/bundle.js",
+    "postbundle": "uglifyjs -o dist/bundle.min.js -c -m -- dist/bundle.js",
     "lint": "eslint .",
     "prebuild": "npm run clean",
     "build": "babel src --source-maps --out-dir lib",
     "build:watch": "babel src --watch --source-maps --out-dir lib",
-    "prepublish": "npm run format:all && npm run test && npm run build",
+    "prepublish": "npm run format:all && npm run test && npm run bundle",
     "format:single": "prettier --single-quote --trailing-comma es5 --no-semi --write",
     "format:all": "prettier --single-quote --trailing-comma es5 --no-semi --write 'src/**/*.js'",
     "format:check:single": "prettier --single-quote --trailing-comma es5 --no-semi --list-different",
@@ -46,7 +48,7 @@
     "expect": "^1.20.2",
     "mocha": "^3.4.2",
     "prettier": "^1.3.1",
-    "uglifyify": "^3.0.4"
+    "uglify-es": "^3.0.23"
   },
   "directories": {
     "test": "test"

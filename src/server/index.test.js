@@ -1,13 +1,12 @@
 import expect from 'expect'
 import Kite from '../kite'
 import KiteServer from './'
-import SockJS from 'sockjs-client'
 
 const logLevel = 0
 
 describe('KiteServer', () => {
-  it('should expose SockJs and WebSocket as transport class', done => {
-    expect(KiteServer.transport.SockJs).toExist()
+  it('should expose SockJS and WebSocket as transport class', done => {
+    expect(KiteServer.transport.SockJS).toExist()
     expect(KiteServer.transport.WebSocket).toExist()
     done()
   })
@@ -19,14 +18,14 @@ describe('KiteServer with SockJS', () => {
       url: 'http://0.0.0.0:7780',
       autoReconnect: false,
       autoConnect: false,
-      transportClass: SockJS,
+      transportClass: Kite.transport.SockJS,
       logLevel,
     })
 
     const math = new KiteServer({
       name: 'math',
       auth: false,
-      serverClass: KiteServer.transport.SockJs,
+      serverClass: KiteServer.transport.SockJS,
       logLevel,
       api: {
         square: function(x, callback) {

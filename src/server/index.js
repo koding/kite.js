@@ -16,7 +16,7 @@ import { getKontrolClaims } from '../kite/claims'
 import { Defaults } from '../constants'
 
 import WebSocketServer from './websocket'
-import SockJsServer from './sockjs'
+import SockJSServer from './sockjs'
 
 import KiteApi from '../KiteApi'
 
@@ -214,7 +214,7 @@ KiteServer.prototype.handleMessage = handleIncomingMessage
 KiteServer.version = Defaults.KiteInfo.version
 KiteServer.transport = {
   WebSocket: WebSocketServer,
-  SockJs: SockJsServer,
+  SockJS: SockJSServer,
 }
 
 export default KiteServer

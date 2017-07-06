@@ -14,7 +14,7 @@ export default class MessageScrubber {
       kite: this.kite.getKiteInfo(),
       authentication: this.kite.options.auth,
       withArgs: params,
-      responseCallback(response) {
+      responseCallback(response = {}) {
         const { error: rawErr, result } = response
         const err = rawErr != null ? KiteError.makeProperError(rawErr) : null
 

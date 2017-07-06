@@ -1,6 +1,7 @@
-const kite = require('./index')
+const Kite = require('./kite')
+const Kontrol = require('./kontrol')
 
 if (typeof window !== 'undefined' && window !== null) {
-  window.Kite = window.Kite ? window.Kite : kite.Kite
-  window.Kontrol = window.Kontrol ? window.Kontrol : kite.Kontrol
+  window.Kite = window.Kite ? window.Kite : Kite
+  window.Kontrol = window.Kontrol ? window.Kontrol : Kontrol
 }
