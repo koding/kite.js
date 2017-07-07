@@ -18,10 +18,13 @@ const makeKite = (options = {}) => {
 }
 
 describe('BaseKite', () => {
-  it('should expose SockJS and WebSocket as transport class', done => {
+  it('should expose DebugLevels', () => {
+    expect(BaseKite.DebugLevel).toExist()
+  })
+
+  it('should expose SockJS and WebSocket as transport class', () => {
     expect(BaseKite.transport.SockJS).toExist()
     expect(BaseKite.transport.WebSocket).toExist()
-    done()
   })
 
   describe('constructor', () => {
