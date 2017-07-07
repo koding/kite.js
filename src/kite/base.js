@@ -93,10 +93,6 @@ class BaseKite extends Emitter {
       if (connection.readyState === connection.OPEN) {
         this.onOpen()
       }
-    } else if (session) {
-      this.options.url = session.getId()
-      this.ws = session
-      this.onOpen()
     } else {
       autoReconnect && this.initBackoff()
       autoConnect && this.connect()

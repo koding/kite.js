@@ -124,7 +124,7 @@ function asObjectOf(list) {
     return events;
   }, {});
 }
-var Version = exports.Version = '1.0.7';
+var Version = exports.Version = '1.0.8';
 var KnownEvents = exports.KnownEvents = ['backOffFailed', 'tokenExpired', 'tokenSet', 'register', 'message', 'request', 'critical', 'notice', 'error', 'warn', 'info', 'open', 'close', 'debug'];
 
 var Event = exports.Event = asObjectOf(KnownEvents);
@@ -430,12 +430,30 @@ var BaseKite = function (_Emitter) {
       _this.emit(_constants.Event.debug, 'Sending: ', JSON.stringify(req));
     });
 
-    if (_this.options.autoReconnect) {
-      _this.initBackoff();
-    }
+    var _this$options = _this.options,
+        connection = _this$options.connection,
+        session = _this$options.session,
+        autoConnect = _this$options.autoConnect,
+        autoReconnect = _this$options.autoReconnect;
 
-    if (_this.options.autoConnect) {
-      _this.connect();
+    // if we have a connection already dismiss the `autoConnect` and
+    // `autoReconnect` options.
+
+    if (connection) {
+      if (connection.readyState === connection.CLOSED) {
+        throw new Error('Given connection is closed, try with a live connection or pass a url option to let Kite create the connection');
+      }
+
+      _this.addConnectionHandlers(connection);
+      _this.ws = connection;
+
+      // if the connection is already open trigger `onOpen`.
+      if (connection.readyState === connection.OPEN) {
+        _this.onOpen();
+      }
+    } else {
+      autoReconnect && _this.initBackoff();
+      autoConnect && _this.connect();
     }
     return _this;
   }
@@ -468,10 +486,14 @@ var BaseKite = function (_Emitter) {
       return ![_constants.State.CONNECTING, _constants.State.READY].includes(this.readyState);
     }
   }, {
+    key: 'canReconnect',
+    value: function canReconnect() {
+      // we don't want to reconnect if a connection is passed already.
+      return !this.options.connection && this.options.autoReconnect;
+    }
+  }, {
     key: 'connect',
     value: function connect() {
-      var _this2 = this;
-
       if (!this.canConnect()) {
         return;
       }
@@ -484,19 +506,27 @@ var BaseKite = function (_Emitter) {
       // websocket will whine if extra arguments are passed
 
       this.ws = Konstructor === _ws2.default ? new Konstructor(url) : new Konstructor(url, null, transportOptions);
-      this.ws.addEventListener(_constants.Event.open, this.bound('onOpen'));
-      this.ws.addEventListener(_constants.Event.close, this.bound('onClose'));
-      this.ws.addEventListener(_constants.Event.message, this.bound('onMessage'));
-      this.ws.addEventListener(_constants.Event.error, this.bound('onError'));
-      this.ws.addEventListener(_constants.Event.info, function (info) {
-        return _this2.emit(_constants.Event.info, info);
-      });
+
+      this.addConnectionHandlers(this.ws);
+
       this.emit(_constants.Event.info, 'Trying to connect to ' + url);
     }
   }, {
-    key: 'disconnect',
-    value: function disconnect() {
-      var reconnect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    key: 'addConnectionHandlers',
+    value: function addConnectionHandlers(connection) {
+      var _this2 = this;
+
+      connection.addEventListener(_constants.Event.open, this.bound('onOpen'));
+      connection.addEventListener(_constants.Event.close, this.bound('onClose'));
+      connection.addEventListener(_constants.Event.message, this.bound('onMessage'));
+      connection.addEventListener(_constants.Event.error, this.bound('onError'));
+      connection.addEventListener(_constants.Event.info, function (info) {
+        return _this2.emit(_constants.Event.info, info);
+      });
+    }
+  }, {
+    key: 'cleanTimerHandlers',
+    value: function cleanTimerHandlers() {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -524,7 +554,13 @@ var BaseKite = function (_Emitter) {
           }
         }
       }
+    }
+  }, {
+    key: 'disconnect',
+    value: function disconnect() {
+      var reconnect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
+      this.cleanTimerHandlers();
       this.options.autoReconnect = !!reconnect;
       if (this.ws != null) {
         this.ws.close();
@@ -535,11 +571,14 @@ var BaseKite = function (_Emitter) {
     key: 'onOpen',
     value: function onOpen() {
       this.readyState = _constants.State.READY;
+
+      this.emit(_constants.Event.notice, 'Connected to Kite: ' + this.options.url
+
       // FIXME: the following is ridiculous.
-      this.emit(_constants.Event.notice, 'Connected to Kite: ' + this.options.url);
-      if (typeof this.clearBackoffTimeout === 'function') {
+      );if (typeof this.clearBackoffTimeout === 'function') {
         this.clearBackoffTimeout();
       }
+
       this.emit(_constants.Event.open);
     }
   }, {
@@ -552,7 +591,7 @@ var BaseKite = function (_Emitter) {
 
       var dcInfo = this.options.url + ': disconnected';
       // enable below to autoReconnect when the socket has been closed
-      if (this.options.autoReconnect) {
+      if (this.canReconnect()) {
         process.nextTick(function () {
           return _this3.setBackoffTimeout(_this3.bound('connect'));
         });
@@ -700,6 +739,7 @@ var BaseKite = function (_Emitter) {
 
 BaseKite.version = _constants.Defaults.KiteInfo.version;
 BaseKite.Error = _error2.default;
+BaseKite.DebugLevel = _constants.DebugLevel;
 BaseKite.transport = {
   SockJS: _sockjsClient2.default,
   WebSocket: _ws2.default
@@ -1159,6 +1199,7 @@ function handleIncomingMessage(proto, message) {
     }));
 
     _this.currentToken = null;
+    return null;
   }).catch(function (err) {
     _this.emit(_constants.Event.debug, 'Authentication failed', err);
 

@@ -188,11 +188,16 @@ class KiteServer extends Emitter {
       transportClass = Kite.transport.SockJS
     }
     ws.kite = new Kite({
+      url: id,
       name: `${this.options.name}-remote`,
       logLevel: this.options.logLevel,
-      session: ws,
+      autoConnect: false,
+      autoReconnect: false,
       transportClass,
     })
+
+    ws.kite.ws = ws
+    ws.kite.onOpen()
 
     ws.on('message', _message => {
       const message = parse(_message)

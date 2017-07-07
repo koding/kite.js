@@ -4,7 +4,7 @@ function asObjectOf(list) {
     return events
   }, {})
 }
-export const Version = '1.0.7'
+export const Version = '1.0.8'
 export const KnownEvents = [
   'backOffFailed',
 
