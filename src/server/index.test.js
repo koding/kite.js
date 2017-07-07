@@ -174,4 +174,76 @@ describe('KiteServer connection', () => {
       })
     })
   })
+
+  describe('with existing session', () => {
+    it('should work with an existing WebSocket session', done => {
+      const kite = new Kite({
+        url: 'ws://0.0.0.0:7780',
+        autoReconnect: false,
+        autoConnect: false,
+        logLevel,
+        api: {
+          square: function(x, callback) {
+            callback(null, x * x)
+          },
+        },
+      })
+
+      const math = new KiteServer({
+        name: 'math',
+        auth: false,
+        logLevel,
+      })
+
+      math.listen(7780)
+      math.server.on('connection', connection => {
+        connection.kite
+          .tell('square', 5)
+          .then(res => expect(res).toBe(25))
+          .finally(() => {
+            kite.disconnect()
+            math.close()
+            done()
+          })
+      })
+
+      kite.connect()
+    })
+
+    it('should work with an existing SockJS session', done => {
+      const kite = new Kite({
+        url: 'http://0.0.0.0:7780',
+        transportClass: Kite.transport.SockJS,
+        autoReconnect: false,
+        autoConnect: false,
+        logLevel,
+        api: {
+          square: function(x, callback) {
+            callback(null, x * x)
+          },
+        },
+      })
+
+      const math = new KiteServer({
+        serverClass: KiteServer.transport.SockJS,
+        name: 'math',
+        auth: false,
+        logLevel,
+      })
+
+      math.listen(7780)
+      math.server.on('connection', connection => {
+        connection.kite
+          .tell('square', 5)
+          .then(res => expect(res).toBe(25))
+          .finally(() => {
+            kite.disconnect()
+            math.close()
+            done()
+          })
+      })
+
+      kite.connect()
+    })
+  })
 })
