@@ -67,7 +67,7 @@ class BaseKite extends Emitter {
       this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
-    const { connection, autoConnect, autoReconnect } = this.options
+    const { connection, session, autoConnect, autoReconnect } = this.options
 
     // if we have a connection already dismiss the `autoConnect` and
     // `autoReconnect` options.
@@ -85,6 +85,10 @@ class BaseKite extends Emitter {
       if (connection.readyState === connection.OPEN) {
         this.onOpen()
       }
+    } else if (session) {
+      this.options.url = session.getId()
+      this.ws = session
+      this.onOpen()
     } else {
       autoReconnect && this.initBackoff()
       autoConnect && this.connect()
