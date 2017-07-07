@@ -47,6 +47,7 @@ export default function handleIncomingMessage(proto, message) {
       )
 
       this.currentToken = null
+      return null
     })
     .catch(err => {
       this.emit(Event.debug, 'Authentication failed', err)
