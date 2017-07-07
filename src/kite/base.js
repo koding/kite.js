@@ -10,7 +10,14 @@ import enableLogging from './enableLogging'
 import Timeout from './timeout'
 import KiteError from './error'
 import MessageScrubber from './messagescrubber'
-import { Event, AuthType, Defaults, TimerHandles, State } from '../constants'
+import {
+  Event,
+  AuthType,
+  Defaults,
+  DebugLevel,
+  TimerHandles,
+  State,
+} from '../constants'
 
 import WebSocket from 'ws'
 import SockJS from 'sockjs-client'
@@ -20,6 +27,7 @@ import KiteApi from '../KiteApi'
 class BaseKite extends Emitter {
   static version = Defaults.KiteInfo.version
   static Error = KiteError
+  static DebugLevel = DebugLevel
   static transport = {
     SockJS,
     WebSocket,
@@ -67,7 +75,7 @@ class BaseKite extends Emitter {
       this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
     })
 
-    const { connection, autoConnect, autoReconnect } = this.options
+    const { connection, session, autoConnect, autoReconnect } = this.options
 
     // if we have a connection already dismiss the `autoConnect` and
     // `autoReconnect` options.

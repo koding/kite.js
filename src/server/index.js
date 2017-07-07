@@ -3,12 +3,16 @@ import Emitter from '../kite/emitter'
 import dnodeProtocol from 'dnode-protocol'
 
 import streamToArray from 'stream-to-array'
+import parse from 'try-json-parse'
 import fs from 'fs'
+
 import { hostname } from 'os'
 import { join as joinPath } from 'path'
 
 import KiteError from '../kite/error'
 import Kontrol from '../kontrol'
+import Kite from '../kite'
+
 import enableLogging from '../kite/enableLogging'
 import handleIncomingMessage from '../kite/handleIncomingMessage'
 import { v4 as createId } from 'uuid'
@@ -178,7 +182,37 @@ class KiteServer extends Emitter {
     proto.on('request', this.lazyBound('handleRequest', ws))
 
     const id = ws.getId()
-    ws.on('message', this.lazyBound('handleMessage', proto))
+
+    let transportClass = Kite.transport.WebSocket
+    if (this.options.serverClass === SockJSServer) {
+      transportClass = Kite.transport.SockJS
+    }
+    ws.kite = new Kite({
+      url: id,
+      name: `${this.options.name}-remote`,
+      logLevel: this.options.logLevel,
+      autoConnect: false,
+      autoReconnect: false,
+      transportClass,
+    })
+
+    ws.kite.ws = ws
+    ws.kite.onOpen()
+
+    ws.on('message', _message => {
+      const message = parse(_message)
+      if (Object.keys(this.api.methods).indexOf(message.method) > -1) {
+        this.handleMessage.call(this, proto, _message)
+      } else {
+        if (message.arguments.length >= 2) {
+          message.arguments = [
+            { error: message.arguments[0], result: message.arguments[1] },
+          ]
+          _message = JSON.stringify(message)
+        }
+        ws.kite.onMessage({ data: _message })
+      }
+    })
 
     ws.on('close', () => {
       return this.emit('info', `Client has disconnected: ${id}`)
