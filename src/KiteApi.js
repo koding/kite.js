@@ -6,6 +6,12 @@ export default class KiteApi {
   constructor({ auth, methods }) {
     this.auth = auth
     this.methods = this.setMethods(Object.assign({}, DefaultApi, methods))
+    this.methodKeys = Object.keys(this.methods)
+  }
+
+  hasMethod(method) {
+    if (!method || method == '') return false
+    return this.methodKeys.includes(method)
   }
 
   setMethods(methods) {

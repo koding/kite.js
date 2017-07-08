@@ -1,6 +1,11 @@
 import KiteError from './error'
+import { Event } from '../constants'
 
 export default class MessageScrubber {
+  static defaultCallback = kite => () => {
+    kite.emit(Event.debug, 'Unhandled call dropping to the floor.')
+  }
+
   constructor({ kite } = {}) {
     if (!kite) {
       throw new Error(`invalid kite: ${typeof kite}`)
@@ -14,8 +19,8 @@ export default class MessageScrubber {
       kite: this.kite.getKiteInfo(),
       authentication: this.kite.options.auth,
       withArgs: params,
-      responseCallback(response = {}) {
-        const { error: rawErr, result } = response
+      responseCallback(response) {
+        const { error: rawErr, result } = response || {}
         const err = rawErr != null ? KiteError.makeProperError(rawErr) : null
 
         return callback(err, result)
@@ -24,10 +29,12 @@ export default class MessageScrubber {
   }
 
   scrub(method, params, callback) {
-    if (!callback && params) {
+    if (!callback && typeof params == 'function') {
       callback = params
-      params = null
+      params = []
     }
+
+    callback = callback || MessageScrubber.defaultCallback(this.kite)
 
     // by default, remove this callback after it is called once.
     if (callback.times == null) {

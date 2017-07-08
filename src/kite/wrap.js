@@ -17,6 +17,10 @@ export default function(userlandApi = {}) {
     return callback({ message: 'not supported' })
   }
 
+  api['kite.echo'] = (message, callback) => {
+    return callback(null, message)
+  }
+
   api['kite.log'] = (message, callback) => {
     this.emit('info', message)
     return callback(null)

@@ -6,7 +6,11 @@ import { Event } from '../constants'
 export default function handleIncomingMessage(proto, message) {
   this.emit(Event.debug, `Receiving: ${message}`)
 
-  const req = parse(message)
+  if (typeof message === 'string') {
+    message = parse(message)
+  }
+
+  const req = message
 
   if (req == null) {
     this.emit(Event.warning, new KiteError(`Invalid payload! (${message})`))
@@ -36,15 +40,20 @@ export default function handleIncomingMessage(proto, message) {
       // NOTE: this mechanism may be changed at some point in the future.
       this.currentToken = token
 
-      proto.handle(
-        toProtoReq({
-          method,
-          withArgs,
-          responseCallback,
-          links,
-          callbacks,
-        })
-      )
+      try {
+        proto.handle(
+          toProtoReq({
+            method,
+            withArgs,
+            responseCallback,
+            links,
+            callbacks,
+          })
+        )
+      } catch (err) {
+        this.emit(Event.debug, 'Error processing request', err)
+        proto.handle(getTraceReq({ err, responseCallback, links, callbacks }))
+      }
 
       this.currentToken = null
       return null
@@ -52,12 +61,9 @@ export default function handleIncomingMessage(proto, message) {
     .catch(err => {
       this.emit(Event.debug, 'Authentication failed', err)
 
-      return proto.handle({
-        method: 'kite.echo',
-        arguments: [err, responseCallback],
-        links,
-        callbacks: mungeCallbacks(callbacks, 1),
-      })
+      return proto.handle(
+        getTraceReq({ err, responseCallback, links, callbacks })
+      )
     })
 }
 
@@ -66,6 +72,15 @@ const isKiteReq = req =>
   req.arguments[0] &&
   req.arguments[0].responseCallback &&
   req.arguments[0].withArgs
+
+const getTraceReq = o => {
+  return {
+    method: 'kite.echo',
+    arguments: [o.err, o.responseCallback],
+    links: o.links,
+    callbacks: mungeCallbacks(o.callbacks, 1),
+  }
+}
 
 const parseKiteReq = req => req.arguments[0]
 

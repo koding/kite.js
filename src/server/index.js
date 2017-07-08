@@ -199,18 +199,16 @@ class KiteServer extends Emitter {
     ws.kite.ws = ws
     ws.kite.onOpen()
 
-    ws.on('message', _message => {
-      const message = parse(_message)
-      if (Object.keys(this.api.methods).indexOf(message.method) > -1) {
-        this.handleMessage.call(this, proto, _message)
+    ws.on('message', rawData => {
+      const message = parse(rawData)
+      if (this.api.hasMethod(message.method)) {
+        this.handleMessage.call(this, proto, message, ws.kite)
       } else {
-        if (message.arguments.length >= 2) {
-          message.arguments = [
-            { error: message.arguments[0], result: message.arguments[1] },
-          ]
-          _message = JSON.stringify(message)
+        if (message.arguments.length == 2) {
+          let [error, result] = message.arguments
+          message.arguments = [{ error, result }]
         }
-        ws.kite.onMessage({ data: _message })
+        this.handleMessage.call(ws.kite, ws.kite.proto, message)
       }
     })
 

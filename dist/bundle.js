@@ -54,9 +54,16 @@ var KiteApi = function () {
 
     this.auth = auth;
     this.methods = this.setMethods(_extends({}, _constants.DefaultApi, methods));
+    this.methodKeys = Object.keys(this.methods);
   }
 
   _createClass(KiteApi, [{
+    key: 'hasMethod',
+    value: function hasMethod(method) {
+      if (!method || method == '') return false;
+      return this.methodKeys.includes(method);
+    }
+  }, {
     key: 'setMethods',
     value: function setMethods(methods) {
       var _this = this;
@@ -124,7 +131,7 @@ function asObjectOf(list) {
     return events;
   }, {});
 }
-var Version = exports.Version = '1.0.8';
+var Version = exports.Version = '1.0.9';
 var KnownEvents = exports.KnownEvents = ['backOffFailed', 'tokenExpired', 'tokenSet', 'register', 'message', 'request', 'critical', 'notice', 'error', 'warn', 'info', 'open', 'close', 'debug'];
 
 var Event = exports.Event = asObjectOf(KnownEvents);
@@ -1158,7 +1165,11 @@ function handleIncomingMessage(proto, message) {
 
   this.emit(_constants.Event.debug, 'Receiving: ' + message);
 
-  var req = (0, _tryJsonParse2.default)(message);
+  if (typeof message === 'string') {
+    message = (0, _tryJsonParse2.default)(message);
+  }
+
+  var req = message;
 
   if (req == null) {
     this.emit(_constants.Event.warning, new _error2.default('Invalid payload! (' + message + ')'));
@@ -1190,30 +1201,39 @@ function handleIncomingMessage(proto, message) {
     // NOTE: this mechanism may be changed at some point in the future.
     );_this.currentToken = token;
 
-    proto.handle(toProtoReq({
-      method: method,
-      withArgs: withArgs,
-      responseCallback: responseCallback,
-      links: links,
-      callbacks: callbacks
-    }));
+    try {
+      proto.handle(toProtoReq({
+        method: method,
+        withArgs: withArgs,
+        responseCallback: responseCallback,
+        links: links,
+        callbacks: callbacks
+      }));
+    } catch (err) {
+      _this.emit(_constants.Event.debug, 'Error processing request', err);
+      proto.handle(getTraceReq({ err: err, responseCallback: responseCallback, links: links, callbacks: callbacks }));
+    }
 
     _this.currentToken = null;
     return null;
   }).catch(function (err) {
     _this.emit(_constants.Event.debug, 'Authentication failed', err);
 
-    return proto.handle({
-      method: 'kite.echo',
-      arguments: [err, responseCallback],
-      links: links,
-      callbacks: mungeCallbacks(callbacks, 1)
-    });
+    return proto.handle(getTraceReq({ err: err, responseCallback: responseCallback, links: links, callbacks: callbacks }));
   });
 }
 
 var isKiteReq = function isKiteReq(req) {
   return req.arguments.length && req.arguments[0] && req.arguments[0].responseCallback && req.arguments[0].withArgs;
+};
+
+var getTraceReq = function getTraceReq(o) {
+  return {
+    method: 'kite.echo',
+    arguments: [o.err, o.responseCallback],
+    links: o.links,
+    callbacks: mungeCallbacks(o.callbacks, 1)
+  };
 };
 
 var parseKiteReq = function parseKiteReq(req) {
@@ -1512,6 +1532,8 @@ var _error = require('./error');
 
 var _error2 = _interopRequireDefault(_error);
 
+var _constants = require('../constants');
+
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
 }
@@ -1543,10 +1565,10 @@ var MessageScrubber = function () {
         kite: this.kite.getKiteInfo(),
         authentication: this.kite.options.auth,
         withArgs: params,
-        responseCallback: function responseCallback() {
-          var response = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-          var rawErr = response.error,
-              result = response.result;
+        responseCallback: function responseCallback(response) {
+          var _ref2 = response || {},
+              rawErr = _ref2.error,
+              result = _ref2.result;
 
           var err = rawErr != null ? _error2.default.makeProperError(rawErr) : null;
 
@@ -1557,13 +1579,15 @@ var MessageScrubber = function () {
   }, {
     key: 'scrub',
     value: function scrub(method, params, callback) {
-      if (!callback && params) {
+      if (!callback && typeof params == 'function') {
         callback = params;
-        params = null;
+        params = [];
       }
 
+      callback = callback || MessageScrubber.defaultCallback(this.kite
+
       // by default, remove this callback after it is called once.
-      if (callback.times == null) {
+      );if (callback.times == null) {
         callback.times = 1;
       }
 
@@ -1578,11 +1602,17 @@ var MessageScrubber = function () {
   return MessageScrubber;
 }();
 
+MessageScrubber.defaultCallback = function (kite) {
+  return function () {
+    kite.emit(_constants.Event.debug, 'Unhandled call dropping to the floor.');
+  };
+};
+
 exports.default = MessageScrubber;
 module.exports = exports['default'];
 
 
-},{"./error":12}],17:[function(require,module,exports){
+},{"../constants":3,"./error":12}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1773,6 +1803,10 @@ exports.default = function () {
 
   api['kite.tunnel'] = function (callback) {
     return callback({ message: 'not supported' });
+  };
+
+  api['kite.echo'] = function (message, callback) {
+    return callback(null, message);
   };
 
   api['kite.log'] = function (message, callback) {

@@ -4,9 +4,10 @@
   "main": "lib/index.js",
   "browser": {
     "ws": "./lib/ws-browser.js",
-    "os": "./lib/os-browser.js"
+    "os": "./lib/os-browser.js",
+    "./lib/server": "./lib/server-browser.js"
   },
-  "version": "1.0.8",
+  "version": "1.0.9",
   "scripts": {
     "clean": "rm -rf ./lib",
     "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.test.js'",
