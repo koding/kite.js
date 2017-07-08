@@ -4,7 +4,8 @@
   "main": "lib/index.js",
   "browser": {
     "ws": "./lib/ws-browser.js",
-    "os": "./lib/os-browser.js"
+    "os": "./lib/os-browser.js",
+    "./lib/server": "./lib/server-browser.js"
   },
   "version": "1.0.8",
   "scripts": {
