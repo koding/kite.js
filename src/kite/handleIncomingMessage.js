@@ -6,7 +6,11 @@ import { Event } from '../constants'
 export default function handleIncomingMessage(proto, message) {
   this.emit(Event.debug, `Receiving: ${message}`)
 
-  const req = parse(message)
+  if (typeof message === 'string') {
+    message = parse(message)
+  }
+
+  const req = message
 
   if (req == null) {
     this.emit(Event.warning, new KiteError(`Invalid payload! (${message})`))
