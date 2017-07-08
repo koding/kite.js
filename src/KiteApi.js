@@ -9,6 +9,11 @@ export default class KiteApi {
     this.methodKeys = Object.keys(this.methods)
   }
 
+  hasMethod(method) {
+    if (!method || method == '') return false
+    return this.methodKeys.includes(method)
+  }
+
   setMethods(methods) {
     return Object.keys(methods).reduce((acc, methodName) => {
       return Object.assign(acc, this.setMethod(methodName, methods[methodName]))

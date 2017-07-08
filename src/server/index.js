@@ -201,7 +201,7 @@ class KiteServer extends Emitter {
 
     ws.on('message', rawData => {
       const message = parse(rawData)
-      if (this.api.methodKeys.includes(message.method)) {
+      if (this.api.hasMethod(message.method)) {
         this.handleMessage.call(this, proto, message, ws.kite)
       } else {
         if (message.arguments.length == 2) {

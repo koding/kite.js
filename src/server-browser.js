@@ -1,2 +1,1 @@
-const KiteServer = {}
-export default KiteServer
+export default class KiteServer {}

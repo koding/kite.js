@@ -58,6 +58,12 @@ var KiteApi = function () {
   }
 
   _createClass(KiteApi, [{
+    key: 'hasMethod',
+    value: function hasMethod(method) {
+      if (!method || method == '') return false;
+      return this.methodKeys.includes(method);
+    }
+  }, {
     key: 'setMethods',
     value: function setMethods(methods) {
       var _this = this;
