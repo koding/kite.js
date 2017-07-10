@@ -18,6 +18,12 @@ import SockJSServer from './sockjs'
 import KiteApi from '../KiteApi'
 
 class KiteServer extends Emitter {
+  static version = Defaults.KiteInfo.version
+  static transport = {
+    WebSocket: WebSocketServer,
+    SockJS: SockJSServer,
+  }
+
   constructor(options = {}) {
     super()
 
@@ -139,11 +145,5 @@ class KiteServer extends Emitter {
 }
 
 KiteServer.prototype.handleMessage = handleIncomingMessage
-
-KiteServer.version = Defaults.KiteInfo.version
-KiteServer.transport = {
-  WebSocket: WebSocketServer,
-  SockJS: SockJSServer,
-}
 
 export default KiteServer
