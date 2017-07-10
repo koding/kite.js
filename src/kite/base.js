@@ -6,7 +6,6 @@ import now from './now'
 import backoff from './backoff'
 import wrap from './wrap'
 import handleIncomingMessage from './handleIncomingMessage'
-import enableLogging from './enableLogging'
 import Timeout from './timeout'
 import KiteError from './error'
 import MessageScrubber from './messagescrubber'
@@ -23,6 +22,7 @@ import WebSocket from 'ws'
 import SockJS from 'sockjs-client'
 
 import KiteApi from '../KiteApi'
+import KiteLogger from '../KiteLogger'
 
 class BaseKite extends Emitter {
   static version = Defaults.KiteInfo.version
@@ -53,7 +53,10 @@ class BaseKite extends Emitter {
       this.options.url += this.options.prefix
     }
 
-    enableLogging(this.options.name, this, this.options.logLevel)
+    this.logger = new KiteLogger({
+      name: this.options.name || 'kite',
+      level: this.options.logLevel,
+    })
 
     // refresh expired tokens
     this.expireTokenOnExpiry()
@@ -71,11 +74,12 @@ class BaseKite extends Emitter {
     this.messageScrubber = new MessageScrubber({ kite: this })
 
     this.proto.on(Event.request, req => {
-      this.ready(() => this.ws.send(JSON.stringify(req)))
-      this.emit(Event.debug, 'Sending: ', JSON.stringify(req))
+      const message = JSON.stringify(req)
+      this.ready(() => this.ws.send(message))
+      this.logger.debug('Sending:', message)
     })
 
-    const { connection, session, autoConnect, autoReconnect } = this.options
+    const { connection, autoConnect, autoReconnect } = this.options
 
     // if we have a connection already dismiss the `autoConnect` and
     // `autoReconnect` options.
@@ -142,7 +146,7 @@ class BaseKite extends Emitter {
 
     this.addConnectionHandlers(this.ws)
 
-    this.emit(Event.info, `Trying to connect to ${url}`)
+    this.logger.info(`Trying to connect to ${url}`)
   }
 
   addConnectionHandlers(connection) {
@@ -150,7 +154,7 @@ class BaseKite extends Emitter {
     connection.addEventListener(Event.close, this.bound('onClose'))
     connection.addEventListener(Event.message, this.bound('onMessage'))
     connection.addEventListener(Event.error, this.bound('onError'))
-    connection.addEventListener(Event.info, info => this.emit(Event.info, info))
+    connection.addEventListener(Event.info, info => this.logger.info(info))
   }
 
   cleanTimerHandlers() {
@@ -168,7 +172,7 @@ class BaseKite extends Emitter {
     if (this.ws != null) {
       this.ws.close()
     }
-    this.emit(Event.notice, `Disconnecting from ${this.options.url}`)
+    this.logger.notice(`Disconnecting from ${this.options.url}`)
   }
 
   onOpen() {
@@ -195,7 +199,7 @@ class BaseKite extends Emitter {
       dcInfo += ', trying to reconnect...'
     }
 
-    this.emit(Event.info, dcInfo)
+    this.logger.info(dcInfo)
   }
 
   onMessage({ data }) {
@@ -204,6 +208,7 @@ class BaseKite extends Emitter {
 
   onError(err) {
     this.emit(Event.error, 'Websocket error!')
+    this.logger.error('WebSocket error!')
   }
 
   getKiteInfo() {
