@@ -7,7 +7,6 @@ import { hostname } from 'os'
 
 import Kite from '../kite'
 
-import enableLogging from '../kite/enableLogging'
 import handleIncomingMessage from '../kite/handleIncomingMessage'
 import { v4 as createId } from 'uuid'
 import { Defaults } from '../constants'
@@ -16,6 +15,7 @@ import WebSocketServer from './websocket'
 import SockJSServer from './sockjs'
 
 import KiteApi from '../KiteApi'
+import KiteLogger from '../KiteLogger'
 
 class KiteServer extends Emitter {
   static version = Defaults.KiteInfo.version
@@ -33,7 +33,10 @@ class KiteServer extends Emitter {
       this.options.hostname = hostname()
     }
 
-    enableLogging(options.name, this, options.logLevel)
+    this.logger = new KiteLogger({
+      name: options.name || 'kite',
+      level: options.logLevel,
+    })
 
     this.id = createId()
     this.server = null
@@ -77,7 +80,7 @@ class KiteServer extends Emitter {
     const Server = this.getServerClass()
     this.server = new Server({ port, prefix, name, logLevel })
     this.server.on('connection', this.bound('onConnection'))
-    this.emit('info', `Listening: ${this.server.getAddress()}`)
+    this.logger.info(`Listening: ${this.server.getAddress()}`)
   }
 
   close() {
@@ -97,7 +100,7 @@ class KiteServer extends Emitter {
       links,
       callbacks,
     })
-    this.emit('debug', `Sending: ${messageStr}`)
+    this.logger.debug(`Sending: ${messageStr}`)
     return ws.send(messageStr)
   }
 
@@ -137,10 +140,10 @@ class KiteServer extends Emitter {
     })
 
     ws.on('close', () => {
-      return this.emit('info', `Client has disconnected: ${id}`)
+      this.logger.info(`Client has disconnected: ${id}`)
     })
 
-    this.emit('info', `New connection from: ${id}`)
+    this.logger.info(`New connection from: ${id}`)
   }
 }
 
