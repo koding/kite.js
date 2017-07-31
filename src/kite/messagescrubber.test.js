@@ -41,8 +41,11 @@ describe('kite/messagescrubber', () => {
       expect(called).toBe(true)
 
       expect.spyOn(KiteError, 'makeProperError')
-      result[4]({ error: 'raw error' })
-      expect(KiteError.makeProperError).toHaveBeenCalledWith('raw error')
+
+      const err = { message: 'raw error' }
+
+      result[4](err)
+      expect(KiteError.makeProperError).toHaveBeenCalledWith(err)
     })
 
     it('wraps kite auth option as authentication param', () => {

@@ -18,11 +18,10 @@ export default class MessageScrubber {
     params = Array.isArray(params) ? params : [params]
     return [
       ...params,
-      function responseCallback(response) {
-        const { error: rawErr, result } = response || {}
+      function responseCallback(rawErr, response) {
         const err = rawErr != null ? KiteError.makeProperError(rawErr) : null
 
-        return callback(err, result)
+        return callback(err, response)
       },
       {
         kite: this.kite.getKiteInfo(),
