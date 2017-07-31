@@ -248,6 +248,50 @@ describe('KiteServer to Remote Kite connection', () => {
   })
 })
 
+describe('kite info on handlers', () => {
+  it('accepts the kite info as last argument in the handlers', done => {
+    const kite = new Kite({
+      name: 'math-client',
+      url: 'http://0.0.0.0:7780',
+      autoReconnect: false,
+      autoConnect: false,
+      logLevel,
+    })
+
+    // we are gonna assert if kite info is assigned to this variable inside
+    // `square` handler.
+    let info = null
+
+    const math = new KiteServer({
+      name: 'math',
+      auth: false,
+      logLevel,
+      api: {
+        square: function(x, callback, kiteInfo) {
+          info = kiteInfo
+          callback(null, x * x)
+        },
+      },
+    })
+
+    kite.on('open', () => {
+      kite
+        .tell('square', 5)
+        .then(() => {
+          expect(info).toEqual({ kite: kite.getKiteInfo() })
+        })
+        .finally(() => {
+          kite.disconnect()
+          math.close()
+          done()
+        })
+    })
+
+    math.listen(7780)
+    kite.connect()
+  })
+})
+
 describe('error handling', () => {
   it('should handle errors properly', done => {
     const errorServer = new KiteServer({
