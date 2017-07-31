@@ -15,21 +15,24 @@ export default class MessageScrubber {
   }
 
   wrapMessage(params, callback) {
-    return {
-      kite: this.kite.getKiteInfo(),
-      authentication: this.kite.options.auth,
-      withArgs: params,
-      responseCallback(response) {
+    params = Array.isArray(params) ? params : [params]
+    return [
+      ...params,
+      function responseCallback(response) {
         const { error: rawErr, result } = response || {}
         const err = rawErr != null ? KiteError.makeProperError(rawErr) : null
 
         return callback(err, result)
       },
-    }
+      {
+        kite: this.kite.getKiteInfo(),
+        authentication: this.kite.options.auth,
+      },
+    ]
   }
 
   scrub(method, params, callback) {
-    if (!callback && typeof params == 'function') {
+    if (!callback && typeof params === 'function') {
       callback = params
       params = []
     }
@@ -41,9 +44,9 @@ export default class MessageScrubber {
       callback.times = 1
     }
 
-    let scrubbed = this.kite.proto.scrubber.scrub([
-      this.wrapMessage(params, callback),
-    ])
+    const wrapped = this.wrapMessage(params, callback)
+
+    let scrubbed = this.kite.proto.scrubber.scrub(wrapped)
 
     scrubbed.method = method
 
