@@ -25,16 +25,23 @@ describe('kite/messagescrubber', () => {
 
       const result = scrubber.wrapMessage(params, callback)
 
-      expect(result.kite).toInclude(Defaults.KiteInfo)
-      expect(result.withArgs).toEqual(params)
+      // ...params, callback, kiteInfo
+      expect(result.length).toBe(6)
+
+      expect(result[0]).toEqual(1)
+      expect(result[1]).toEqual(2)
+      expect(result[2]).toEqual(3)
+      expect(result[3]).toEqual(4)
+
+      expect(result[5].kite).toInclude(Defaults.KiteInfo)
 
       // test the returned responseCallback works correctly
       expect(called).toBe(false)
-      result.responseCallback({})
+      result[4]({})
       expect(called).toBe(true)
 
       expect.spyOn(KiteError, 'makeProperError')
-      result.responseCallback({ error: 'raw error' })
+      result[4]({ error: 'raw error' })
       expect(KiteError.makeProperError).toHaveBeenCalledWith('raw error')
     })
 
@@ -44,7 +51,7 @@ describe('kite/messagescrubber', () => {
 
       const result = scrubber.wrapMessage([1, 2, 3], () => {})
 
-      expect(result.authentication).toEqual({ foo: 'bar' })
+      expect(result[4].authentication).toEqual({ foo: 'bar' })
     })
   })
 
