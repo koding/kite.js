@@ -247,3 +247,39 @@ describe('KiteServer to Remote Kite connection', () => {
     kite.connect()
   })
 })
+
+describe('error handling', () => {
+  it('should handle errors properly', done => {
+    const errorServer = new KiteServer({
+      name: 'error-server',
+      auth: false,
+      logLevel,
+      api: {
+        makeError: function(callback) {
+          callback(new Error('awesome error'))
+        },
+      },
+    })
+
+    const kite = new Kite({
+      url: 'http://0.0.0.0:7780',
+      autoReconnect: false,
+      autoConnect: false,
+      logLevel,
+    })
+
+    kite.on('open', () => {
+      kite
+        .tell('makeError')
+        .catch(err => expect(err.message).toBe('awesome error'))
+        .finally(() => {
+          kite.disconnect()
+          errorServer.close()
+          done()
+        })
+    })
+
+    errorServer.listen(7780)
+    kite.connect()
+  })
+})
