@@ -18,7 +18,7 @@ export default function handleIncomingMessage(proto, message) {
   }
 
   if (!isKiteReq(req)) {
-    this.emit(Event.debug, 'Handling a normal dnode message')
+    this.emit(Event.debug, 'Handling a normal dnode message', req)
     return proto.handle(req)
   }
 
