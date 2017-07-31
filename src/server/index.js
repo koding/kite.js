@@ -169,10 +169,9 @@ class KiteServer extends Emitter {
   handleRequest(ws, response) {
     const { arguments: args, method, callbacks, links } = response
     const [err, result] = Array.from(args)
-    const message = { error: err, result }
     const messageStr = JSON.stringify({
       method,
-      arguments: [message],
+      arguments: [err, result],
       links,
       callbacks,
     })
@@ -207,11 +206,9 @@ class KiteServer extends Emitter {
       if (this.api.hasMethod(message.method)) {
         this.handleMessage(proto, message, ws.kite)
       } else {
-        if (message.arguments.length === 2) {
-          let [error, result] = message.arguments
-          message.arguments = [{ error, result }]
+        if (isKiteResponse(message)) {
+          this.handleMessage.call(ws.kite, ws.kite.proto, message)
         }
-        this.handleMessage.call(ws.kite, ws.kite.proto, message)
       }
     })
 
@@ -251,5 +248,8 @@ KiteServer.transport = {
   WebSocket: WebSocketServer,
   SockJS: SockJSServer,
 }
+
+const isKiteResponse = message =>
+  message.arguments.length === 2 && typeof message.method === 'number'
 
 export default KiteServer
