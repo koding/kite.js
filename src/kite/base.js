@@ -207,8 +207,8 @@ class BaseKite extends Emitter {
   }
 
   onError(err) {
-    this.emit(Event.error, 'Websocket error!')
-    this.logger.error('WebSocket error!')
+    this.emit(Event.error, 'Websocket error!', err)
+    this.logger.error('WebSocket error!', err)
   }
 
   getKiteInfo() {
