@@ -1,21 +1,14 @@
-import Promise from 'bluebird'
 import Emitter from '../kite/emitter'
 import dnodeProtocol from 'dnode-protocol'
 
-import streamToArray from 'stream-to-array'
 import parse from 'try-json-parse'
-import fs from 'fs'
 
 import { hostname } from 'os'
-import { join as joinPath } from 'path'
 
-import KiteError from '../kite/error'
-import Kontrol from '../kontrol'
 import Kite from '../kite'
 
 import handleIncomingMessage from '../kite/handleIncomingMessage'
 import { v4 as createId } from 'uuid'
-import { getKontrolClaims } from '../kite/claims'
 import { Defaults } from '../constants'
 
 import WebSocketServer from './websocket'
@@ -24,10 +17,13 @@ import SockJSServer from './sockjs'
 import KiteApi from '../KiteApi'
 import KiteLogger from '../KiteLogger'
 
-const toArray = Promise.promisify(streamToArray)
-const { readFileAsync } = Promise.promisifyAll(fs)
-
 class KiteServer extends Emitter {
+  static version = Defaults.KiteInfo.version
+  static transport = {
+    WebSocket: WebSocketServer,
+    SockJS: SockJSServer,
+  }
+
   constructor(options = {}) {
     super()
 
@@ -92,78 +88,6 @@ class KiteServer extends Emitter {
       this.server.close()
     }
     this.server = null
-    if (this.kontrol != null) {
-      this.kontrol.disconnect()
-    }
-    return (this.kontrol = null)
-  }
-
-  register({ kontrolURL: u, host: h, kiteKey: k }) {
-    if (this.kontrol != null) {
-      throw new Error('Already registered!')
-    }
-    const url = Promise.cast(u)
-    const host = Promise.cast(h)
-    const kiteKey = this.normalizeKiteKey(k)
-    return Promise.join(url, host, kiteKey, (userKontrolURL, host, key) => {
-      const {
-        name,
-        username,
-        environment,
-        version,
-        region,
-        hostname,
-        logLevel,
-        transportClass,
-        secure,
-      } = this.options
-
-      const Server = this.getServerClass()
-
-      const scheme =
-        (secure === true ? Server.secureScheme : Server.scheme) || 'ws'
-
-      if (key == null) {
-        throw new Error('No kite key!')
-      }
-
-      this.key = key
-
-      const { kontrolURL, sub: keyUsername } = getKontrolClaims(this.key)
-
-      this.kontrol = new Kontrol({
-        url: userKontrolURL != null ? userKontrolURL : kontrolURL,
-        auth: { type: 'kiteKey', key },
-        name,
-        username: username != null ? username : keyUsername,
-        environment,
-        version,
-        region,
-        hostname,
-        logLevel,
-        transportClass,
-      })
-        .on('open', () => {
-          return this.emit('info', 'Connected to Kontrol')
-        })
-        .on('error', err => {
-          return this.emit('error', err)
-        })
-
-      const kiteURL = `${scheme}://${host}:${this.port}/${this.options.name}`
-
-      return this.kontrol.register({ url: kiteURL }).then(() => {
-        return this.emit('info', `Registered to Kontrol with URL: ${kiteURL}`)
-      })
-    })
-  }
-
-  defaultKiteKey() {
-    const { HOME } = process.env
-    if (HOME == null) {
-      throw new Error("Couldn't find kite.key")
-    }
-    return joinPath(HOME, '.kite/kite.key')
   }
 
   handleRequest(ws, response) {
@@ -205,9 +129,9 @@ class KiteServer extends Emitter {
     ws.on('message', rawData => {
       const message = parse(rawData)
       if (this.api.hasMethod(message.method)) {
-        this.handleMessage.call(this, proto, message, ws.kite)
+        this.handleMessage(proto, message, ws.kite)
       } else {
-        if (message.arguments.length == 2) {
+        if (message.arguments.length === 2) {
           let [error, result] = message.arguments
           message.arguments = [{ error, result }]
         }
@@ -223,33 +147,6 @@ class KiteServer extends Emitter {
   }
 }
 
-KiteServer.prototype.normalizeKiteKey = Promise.method(
-  (src = this.defaultKiteKey(), enc = 'utf-8') => {
-    switch (false) {
-      case typeof src !== 'string':
-        return readFileAsync(src, enc).catch(
-          KiteError.codeIs('ENOENT'),
-          err => {
-            if (err) {
-              console.error(err)
-            }
-            return src
-          }
-        )
-      case typeof src.pipe !== 'function':
-        return toArray(src).then(arr => arr.join('\n'))
-      default:
-        throw new Error(`Don't know how to normalize the kite key: ${src}`)
-    }
-  }
-)
-
 KiteServer.prototype.handleMessage = handleIncomingMessage
-
-KiteServer.version = Defaults.KiteInfo.version
-KiteServer.transport = {
-  WebSocket: WebSocketServer,
-  SockJS: SockJSServer,
-}
 
 export default KiteServer
