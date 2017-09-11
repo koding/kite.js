@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="max-width:650px" viewBox="-50 -10 650 301">
+  <path stroke="#999" stroke-width=".5" d="M75 5v285" class="actor-line"/>
+  <rect width="150" height="65" fill="#eaeaea" stroke="#666" rx="3" ry="3" class="actor"/>
+  <text x="75" y="32.5" dominant-baseline="central" alignment-baseline="central" class="actor" text-anchor="middle">
+    <tspan x="75" dy="0">KiteA</tspan>
+  </text>
+  <path stroke="#999" stroke-width=".5" d="M275 5v285" class="actor-line"/>
+  <rect width="150" height="65" x="200" fill="#eaeaea" stroke="#666" rx="3" ry="3" class="actor"/>
+  <text x="275" y="23" dominant-baseline="central" alignment-baseline="central" class="actor" text-anchor="middle">
+    <tspan x="275">KiteTransportConnectio</tspan><tspan x="275" dy="22">n</tspan>
+  </text>
+  <path stroke="#999" stroke-width=".5" d="M475 5v285" class="actor-line"/>
+  <rect width="150" height="65" x="400" fill="#eaeaea" stroke="#666" rx="3" ry="3" class="actor"/>
+  <text x="475" y="32.5" dominant-baseline="central" alignment-baseline="central" class="actor" text-anchor="middle">
+    <tspan x="475" dy="0">KiteB</tspan>
+  </text>
+  <defs>
+    <marker id="a" refX="5" refY="2" markerWidth="6" markerHeight="4" orient="auto">
+      <path d="M0 0v4l6-2z"/>
+    </marker>
+  </defs>
+  <text x="175" y="93" class="messageText" text-anchor="middle">
+    send(request: KiteRequest)
+  </text>
+  <path fill="none" stroke="#000" stroke-width="2" d="M75 100h200" class="messageLine0" marker-end="url(#a)"/>
+  <text x="375" y="128" class="messageText" text-anchor="middle">
+    handle(request: KiteRequest)
+  </text>
+  <path fill="none" stroke="#000" stroke-width="2" d="M275 135h200" class="messageLine0" marker-end="url(#a)"/>
+  <text x="375" y="163" class="messageText" text-anchor="middle">
+    send(response: KiteResponse)
+  </text>
+  <path fill="none" stroke="#000" stroke-width="2" d="M475 170H275" class="messageLine1" marker-end="url(#a)" stroke-dasharray="3 3"/>
+  <text x="175" y="198" class="messageText" text-anchor="middle">
+    handle(response: KiteResponse)
+  </text>
+  <path fill="none" stroke="#000" stroke-width="2" d="M275 205H75" class="messageLine1" marker-end="url(#a)" stroke-dasharray="3 3"/>
+  <rect width="150" height="65" y="225" fill="#eaeaea" stroke="#666" rx="3" ry="3" class="actor"/>
+  <text x="75" y="257.5" dominant-baseline="central" alignment-baseline="central" class="actor" text-anchor="middle">
+    <tspan x="75" dy="0">KiteA</tspan>
+  </text>
+  <rect width="150" height="65" x="200" y="225" fill="#eaeaea" stroke="#666" rx="3" ry="3" class="actor"/>
+  <text x="275" y="248" dominant-baseline="central" alignment-baseline="central" class="actor" text-anchor="middle">
+    <tspan x="275">KiteTransportConnectio</tspan><tspan x="275" dy="22">n</tspan>
+  </text>
+  <rect width="150" height="65" x="400" y="225" fill="#eaeaea" stroke="#666" rx="3" ry="3" class="actor"/>
+  <text x="475" y="257.5" dominant-baseline="central" alignment-baseline="central" class="actor" text-anchor="middle">
+    <tspan x="475" dy="0">KiteB</tspan>
+  </text>
+</svg>
