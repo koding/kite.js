@@ -10,7 +10,7 @@ export default class KiteApi {
   }
 
   hasMethod(method) {
-    if (!method || method == '') return false
+    if (!method || method === '') return false
     return this.methodKeys.includes(method)
   }
 
