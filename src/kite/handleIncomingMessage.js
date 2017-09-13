@@ -23,11 +23,7 @@ export default function handleIncomingMessage(proto, message) {
   }
 
   const { links, method, callbacks } = req
-  const {
-    withArgs = [],
-    authentication: auth,
-    responseCallback,
-  } = parseKiteReq(req)
+  const { authentication: auth, responseCallback } = parseKiteReq(req)
 
   this.emit(Event.debug, 'Authenticating request')
 
@@ -41,18 +37,18 @@ export default function handleIncomingMessage(proto, message) {
       this.currentToken = token
 
       try {
+        proto.handle(req)
+      } catch (err) {
+        this.emit(Event.debug, 'Error processing request', err)
         proto.handle(
-          toProtoReq({
-            method,
-            withArgs,
+          getTraceReq({
+            kite: this.getKiteInfo(),
+            err,
             responseCallback,
             links,
             callbacks,
           })
         )
-      } catch (err) {
-        this.emit(Event.debug, 'Error processing request', err)
-        proto.handle(getTraceReq({ err, responseCallback, links, callbacks }))
       }
 
       this.currentToken = null
@@ -61,8 +57,14 @@ export default function handleIncomingMessage(proto, message) {
     .catch(err => {
       this.emit(Event.debug, 'Authentication failed', err)
 
-      return proto.handle(
-        getTraceReq({ err, responseCallback, links, callbacks })
+      proto.handle(
+        getTraceReq({
+          kite: this.getKiteInfo(),
+          err,
+          responseCallback,
+          links,
+          callbacks,
+        })
       )
     })
 }
@@ -76,9 +78,15 @@ const isKiteReq = req =>
 const getTraceReq = o => {
   return {
     method: 'kite.echo',
-    arguments: [o.err, o.responseCallback],
+    arguments: [
+      {
+        withArgs: [{ error: o.err }],
+        responseCallback: o.responseCallback,
+        kite: o.kite,
+      },
+    ],
     links: o.links,
-    callbacks: mungeCallbacks(o.callbacks, 1),
+    callbacks: o.callbacks,
   }
 }
 

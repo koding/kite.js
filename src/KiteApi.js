@@ -39,7 +39,10 @@ export default class KiteApi {
     func.mustAuth = auth != null ? auth : true
 
     return {
-      [methodName]: func,
+      [methodName]: ({ withArgs, authentication, responseCallback, kite }) => {
+        const args = Array.isArray(withArgs) ? withArgs : [withArgs]
+        func(...args, responseCallback, { kite, authentication })
+      },
     }
   }
 
