@@ -71,7 +71,11 @@ class BaseKite extends Emitter {
     })
 
     this.proto = dnode(this.api.methods)
-    this.messageScrubber = new MessageScrubber({ kite: this })
+    this.messageScrubber = new MessageScrubber({
+      info: this.getKiteInfo(),
+      logger: this.logger,
+      proto: this.proto,
+    })
 
     this.proto.on(Event.request, req => {
       const message = JSON.stringify(req)
