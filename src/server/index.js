@@ -1,5 +1,4 @@
 import Emitter from '../kite/emitter'
-import dnodeProtocol from 'dnode-protocol'
 
 import parse from 'try-json-parse'
 
@@ -105,7 +104,7 @@ class KiteServer extends Emitter {
   }
 
   onConnection(ws) {
-    const proto = dnodeProtocol(this.api.methods)
+    const proto = this.api.makeProto()
     proto.on('request', this.lazyBound('handleRequest', ws))
 
     const id = ws.getId()
@@ -135,7 +134,7 @@ class KiteServer extends Emitter {
           let [error, result] = message.arguments
           message.arguments = [{ error, result }]
         }
-        this.handleMessage.call(ws.kite, ws.kite.proto, message)
+        this.handleMessage.call(ws.kite, ws.kite.api.proto, message)
       }
     })
 
