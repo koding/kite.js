@@ -1,12 +1,11 @@
 import dnode from 'dnode-protocol'
-import { DefaultApi } from './constants'
 
 const isFunction = thing => typeof thing === 'function'
 
 export default class KiteApi {
   constructor({ auth, methods }) {
     this.auth = auth
-    this.methods = this.setMethods(Object.assign({}, DefaultApi, methods))
+    this.methods = this.setMethods(methods)
     this.methodKeys = Object.keys(this.methods)
     this.proto = this.makeProto()
   }
@@ -20,7 +19,7 @@ export default class KiteApi {
     return this.methodKeys.includes(method)
   }
 
-  setMethods(methods) {
+  setMethods(methods = {}) {
     return Object.keys(methods).reduce((acc, methodName) => {
       return Object.assign(acc, this.setMethod(methodName, methods[methodName]))
     }, {})
