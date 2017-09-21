@@ -29,7 +29,7 @@ export default class MessageScrubber {
   }
 
   scrub(method, params, callback) {
-    if (!callback && typeof params == 'function') {
+    if (!callback && typeof params === 'function') {
       callback = params
       params = []
     }
