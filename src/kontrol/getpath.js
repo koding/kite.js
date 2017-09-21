@@ -1,4 +1,4 @@
-export function getPath(query) {
+export default function getPath(query) {
   const val = query.username
   const username = val != null ? val : ''
   const val1 = query.environment
