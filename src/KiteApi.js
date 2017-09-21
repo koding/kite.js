@@ -10,7 +10,7 @@ export default class KiteApi {
   }
 
   hasMethod(method) {
-    if (!method || method == '') return false
+    if (!method || method === '') return false
     return this.methodKeys.includes(method)
   }
 
@@ -39,7 +39,10 @@ export default class KiteApi {
     func.mustAuth = auth != null ? auth : true
 
     return {
-      [methodName]: func,
+      [methodName]: ({ withArgs, authentication, responseCallback, kite }) => {
+        const args = Array.isArray(withArgs) ? withArgs : [withArgs]
+        func(...args, responseCallback, { kite, authentication })
+      },
     }
   }
 

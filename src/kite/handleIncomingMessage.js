@@ -23,11 +23,7 @@ export default function handleIncomingMessage(proto, message) {
   }
 
   const { links, method, callbacks } = req
-  const {
-    withArgs = [],
-    authentication: auth,
-    responseCallback,
-  } = parseKiteReq(req)
+  const { authentication: auth, responseCallback } = parseKiteReq(req)
 
   this.emit(Event.debug, 'Authenticating request')
 
@@ -41,18 +37,18 @@ export default function handleIncomingMessage(proto, message) {
       this.currentToken = token
 
       try {
+        proto.handle(req)
+      } catch (err) {
+        this.emit(Event.debug, 'Error processing request', err)
         proto.handle(
-          toProtoReq({
-            method,
-            withArgs,
+          getTraceReq({
+            kite: this.getKiteInfo(),
+            err,
             responseCallback,
             links,
             callbacks,
           })
         )
-      } catch (err) {
-        this.emit(Event.debug, 'Error processing request', err)
-        proto.handle(getTraceReq({ err, responseCallback, links, callbacks }))
       }
 
       this.currentToken = null
@@ -61,8 +57,14 @@ export default function handleIncomingMessage(proto, message) {
     .catch(err => {
       this.emit(Event.debug, 'Authentication failed', err)
 
-      return proto.handle(
-        getTraceReq({ err, responseCallback, links, callbacks })
+      proto.handle(
+        getTraceReq({
+          kite: this.getKiteInfo(),
+          err,
+          responseCallback,
+          links,
+          callbacks,
+        })
       )
     })
 }
@@ -76,52 +78,16 @@ const isKiteReq = req =>
 const getTraceReq = o => {
   return {
     method: 'kite.echo',
-    arguments: [o.err, o.responseCallback],
+    arguments: [
+      {
+        withArgs: [{ error: o.err }],
+        responseCallback: o.responseCallback,
+        kite: o.kite,
+      },
+    ],
     links: o.links,
-    callbacks: mungeCallbacks(o.callbacks, 1),
+    callbacks: o.callbacks,
   }
 }
 
 const parseKiteReq = req => req.arguments[0]
-
-const isResponseCallback = callback =>
-  Array.isArray(callback) && callback.join('.') === '0.responseCallback'
-
-const mungeCallbacks = (callbacks, n) => {
-  // FIXME: this is an ugly hack; there must be a better way to implement it:
-
-  for (let key of Object.keys(callbacks || {})) {
-    const callback = callbacks[key]
-    if (isResponseCallback(callback)) {
-      callbacks[key] = [n]
-    }
-    if (callback[1] === 'withArgs') {
-      // since we're rewriting the protocol for the withArgs case,
-      // we need to remove everything up to withArgs
-      callbacks[key] = callback.slice(2)
-    }
-  }
-
-  return callbacks
-}
-
-const toProtoReq = ({
-  method,
-  withArgs,
-  responseCallback,
-  links,
-  callbacks,
-}) => {
-  if (!Array.isArray(withArgs)) {
-    withArgs = [withArgs]
-  }
-
-  mungeCallbacks(callbacks, withArgs.length)
-
-  return {
-    method,
-    arguments: [...Array.from(withArgs), responseCallback],
-    links,
-    callbacks,
-  }
-}
