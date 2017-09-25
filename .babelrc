@@ -1,6 +1,7 @@
 {
   "plugins": ["add-module-exports", "transform-class-properties"],
   "presets": [
+    "flow",
     [
       "env",
       {
