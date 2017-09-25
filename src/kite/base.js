@@ -1,4 +1,3 @@
-import dnode from 'dnode-protocol'
 import atob from 'atob'
 import uuid from 'uuid'
 import Emitter from './emitter'
@@ -70,10 +69,13 @@ class BaseKite extends Emitter {
       methods: wrap.call(this, this.options.api),
     })
 
-    this.proto = dnode(this.api.methods)
-    this.messageScrubber = new MessageScrubber({ kite: this })
+    this.messageScrubber = new MessageScrubber({
+      info: this.getKiteInfo(),
+      logger: this.logger,
+      proto: this.api.proto,
+    })
 
-    this.proto.on(Event.request, req => {
+    this.api.proto.on(Event.request, req => {
       const message = JSON.stringify(req)
       this.ready(() => this.ws.send(message))
       this.logger.debug('Sending:', message)
@@ -204,7 +206,7 @@ class BaseKite extends Emitter {
   }
 
   onMessage({ data }) {
-    handleIncomingMessage.call(this, this.proto, data)
+    handleIncomingMessage.call(this, this.api.proto, data)
   }
 
   onError(err) {
@@ -235,7 +237,7 @@ class BaseKite extends Emitter {
 
   tell(method, params, callback) {
     const scrubbed = this.messageScrubber.scrub(method, params, callback)
-    this.proto.emit(Event.request, scrubbed)
+    this.api.proto.emit(Event.request, scrubbed)
   }
 
   expireTokenOnExpiry() {

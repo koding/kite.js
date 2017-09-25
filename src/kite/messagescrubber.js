@@ -1,23 +1,25 @@
 import KiteError from './error'
-import { Event } from '../constants'
 
 export default class MessageScrubber {
-  static defaultCallback = kite => () => {
-    kite.emit(Event.debug, 'Unhandled call dropping to the floor.')
+  static defaultCallback = logger => () => {
+    logger.debug('Unhandled call dropping to the floor.')
   }
 
-  constructor({ kite } = {}) {
-    if (!kite) {
-      throw new Error(`invalid kite: ${typeof kite}`)
+  constructor({ info, auth, proto, logger } = {}) {
+    if (!info) {
+      throw new Error(`invalid kite info: ${typeof info}`)
     }
 
-    this.kite = kite
+    this.info = info
+    this.auth = auth
+    this.proto = proto
+    this.logger = logger
   }
 
   wrapMessage(params, callback) {
     return {
-      kite: this.kite.getKiteInfo(),
-      authentication: this.kite.options.auth,
+      kite: this.info,
+      authentication: this.auth,
       withArgs: params,
       responseCallback(response) {
         const { error: rawErr, result } = response || {}
@@ -34,14 +36,14 @@ export default class MessageScrubber {
       params = []
     }
 
-    callback = callback || MessageScrubber.defaultCallback(this.kite)
+    callback = callback || MessageScrubber.defaultCallback(this.logger)
 
     // by default, remove this callback after it is called once.
     if (callback.times == null) {
       callback.times = 1
     }
 
-    let scrubbed = this.kite.proto.scrubber.scrub([
+    let scrubbed = this.proto.scrubber.scrub([
       this.wrapMessage(params, callback),
     ])
 
