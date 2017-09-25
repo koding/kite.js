@@ -32,7 +32,7 @@ describe('KiteError.codeIsnt', () =>
 
 describe('KiteError.makeProperError', () =>
   it('should generate a proper error', () => {
-    let anError = new KiteError.makeProperError({
+    let anError = KiteError.makeProperError({
       type: 'AnErrorType',
       code: 200,
       message: 'an error',

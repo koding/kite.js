@@ -8,7 +8,7 @@ class Kontrol extends Emitter {
   constructor(options) {
     super()
 
-    this.options = options ? options : {}
+    this.options = options || {}
 
     if (this.options.autoConnect == null) {
       this.options.autoConnect = true

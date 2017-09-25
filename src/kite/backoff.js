@@ -4,18 +4,20 @@ import { Backoff, Event } from '../constants'
 export default function(options = {}) {
   const { backoff = {} } = options
   let totalReconnectAttempts = 0
-  const initalDelayMs = backoff.initialDelayMs != null
-    ? backoff.initialDelayMs
-    : Backoff.INITIAL_DELAY
-  const multiplyFactor = backoff.multiplyFactor != null
-    ? backoff.multiplyFactor
-    : Backoff.MULTIPLY_FACTOR
-  const maxDelayMs = backoff.maxDelayMs != null
-    ? backoff.maxDelayMs
-    : Backoff.MAX_DELAY
-  const maxReconnectAttempts = backoff.maxReconnectAttempts != null
-    ? backoff.maxReconnectAttempts
-    : Backoff.MAX_RECONNECT_ATTEMPTS
+  const initalDelayMs =
+    backoff.initialDelayMs != null
+      ? backoff.initialDelayMs
+      : Backoff.INITIAL_DELAY
+  const multiplyFactor =
+    backoff.multiplyFactor != null
+      ? backoff.multiplyFactor
+      : Backoff.MULTIPLY_FACTOR
+  const maxDelayMs =
+    backoff.maxDelayMs != null ? backoff.maxDelayMs : Backoff.MAX_DELAY
+  const maxReconnectAttempts =
+    backoff.maxReconnectAttempts != null
+      ? backoff.maxReconnectAttempts
+      : Backoff.MAX_RECONNECT_ATTEMPTS
 
   this.clearBackoffTimeout = () => (totalReconnectAttempts = 0)
 

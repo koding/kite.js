@@ -37,11 +37,14 @@ describe('KiteServer with SockJS', () => {
     })
 
     kite.on('open', () => {
-      kite.tell('square', 5).then(res => expect(res).toBe(25)).finally(() => {
-        kite.disconnect()
-        math.close()
-        done()
-      })
+      kite
+        .tell('square', 5)
+        .then(res => expect(res).toBe(25))
+        .finally(() => {
+          kite.disconnect()
+          math.close()
+          done()
+        })
     })
 
     math.listen(7780)
@@ -71,11 +74,14 @@ describe('KiteServer with WebSocket', () => {
     })
 
     kite.on('open', () => {
-      kite.tell('square', 5).then(res => expect(res).toBe(25)).finally(() => {
-        kite.disconnect()
-        math.close()
-        done()
-      })
+      kite
+        .tell('square', 5)
+        .then(res => expect(res).toBe(25))
+        .finally(() => {
+          kite.disconnect()
+          math.close()
+          done()
+        })
     })
 
     math.listen(7780)
@@ -105,7 +111,7 @@ describe('KiteServer connection', () => {
         connection.on('close', () => {
           math.close()
           expect(() => {
-            new Kite({ connection: connection, logLevel })
+            return new Kite({ connection: connection, logLevel })
           }).toThrow(/Given connection is closed/)
           done()
         })
@@ -135,11 +141,14 @@ describe('KiteServer connection', () => {
       })
 
       kite.on('open', () => {
-        kite.tell('square', 5).then(res => expect(res).toBe(25)).finally(() => {
-          kite.disconnect()
-          math.close()
-          done()
-        })
+        kite
+          .tell('square', 5)
+          .then(res => expect(res).toBe(25))
+          .finally(() => {
+            kite.disconnect()
+            math.close()
+            done()
+          })
       })
     })
 
@@ -166,11 +175,14 @@ describe('KiteServer connection', () => {
       })
 
       kite.on('open', () => {
-        kite.tell('square', 5).then(res => expect(res).toBe(25)).finally(() => {
-          kite.disconnect()
-          math.close()
-          done()
-        })
+        kite
+          .tell('square', 5)
+          .then(res => expect(res).toBe(25))
+          .finally(() => {
+            kite.disconnect()
+            math.close()
+            done()
+          })
       })
     })
   })

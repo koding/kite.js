@@ -2,7 +2,7 @@ import Interval from './interval'
 import os from 'os'
 
 export default function(userlandApi = {}) {
-  const api = new Object()
+  const api = {}
 
   api['kite.heartbeat'] = (duration, ping, callback) => {
     this.heartbeatHandle = new Interval(ping, duration * 1000)
@@ -14,7 +14,7 @@ export default function(userlandApi = {}) {
   }
 
   api['kite.tunnel'] = callback => {
-    return callback({ message: 'not supported' })
+    return callback(new Error({ message: 'not supported' }))
   }
 
   api['kite.echo'] = (message, callback) => {
@@ -33,7 +33,7 @@ export default function(userlandApi = {}) {
 
   api['kite.prompt'] = (message, callback) => {
     try {
-      callback(null, prompt(message))
+      callback(null, global.prompt(message))
     } catch (err) {
       const readline = require('readline')
       const rl = readline.createInterface({

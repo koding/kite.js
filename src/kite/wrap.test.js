@@ -42,7 +42,6 @@ describe('kite/wrap', () => {
       'kite.print': () => (flags['kite.print'] = true),
       'kite.prompt': () => (flags['kite.prompt'] = true),
       'kite.getPass': () => (flags['kite.getPass'] = true),
-      'kite.heartbeat': () => (flags['kite.heartbeat'] = true),
     })
 
     wrapped['kite.systemInfo']()
