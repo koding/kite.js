@@ -5,7 +5,7 @@ import Session from './session'
 class Server extends Emitter {
   constructor(options) {
     super()
-    this.options = options ? options : {}
+    this.options = options || {}
     this.options.hostname = this.options.hostname || '0.0.0.0'
     this.server = new WebSocketServer({
       port: options.port,

@@ -140,9 +140,10 @@ class BaseKite extends Emitter {
     const { url, transportClass: Konstructor, transportOptions } = this.options
 
     // websocket will whine if extra arguments are passed
-    this.ws = Konstructor === WebSocket
-      ? new Konstructor(url)
-      : new Konstructor(url, null, transportOptions)
+    this.ws =
+      Konstructor === WebSocket
+        ? new Konstructor(url)
+        : new Konstructor(url, null, transportOptions)
 
     this.addConnectionHandlers(this.ws)
 
@@ -207,8 +208,8 @@ class BaseKite extends Emitter {
   }
 
   onError(err) {
-    this.emit(Event.error, 'Websocket error!')
-    this.logger.error('WebSocket error!')
+    this.emit(Event.error, 'Websocket error!', err)
+    this.logger.error('WebSocket error!', err)
   }
 
   getKiteInfo() {

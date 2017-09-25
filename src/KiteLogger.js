@@ -23,7 +23,6 @@ export default class Logger {
 
   logMessage(category, loggerType, ...args) {
     if (DebugLevel[category] <= this.level) {
-      const fn = this.loggers
       this.loggers[loggerType](`[${this.name}]`, category, ...args)
     }
   }
