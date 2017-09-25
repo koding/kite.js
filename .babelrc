@@ -1,11 +1,27 @@
 {
+  "plugins": ["add-module-exports", "transform-class-properties"],
   "presets": [
-    "es2015"
+    [
+      "env",
+      {
+        "targets": {
+          "node": "6.10"
+        }
+      }
+    ]
   ],
-  "plugins": [
-    "add-module-exports",
-    "transform-object-assign",
-    "transform-async-to-generator",
-    "transform-class-properties"
-  ]
+  "env": {
+    "browser": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "browsers": "> 1%"
+            }
+          }
+        ]
+      ]
+    }
+  }
 }
