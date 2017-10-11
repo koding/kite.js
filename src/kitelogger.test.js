@@ -1,5 +1,5 @@
 import expect from 'expect'
-import Logger from './KiteLogger'
+import Logger from './kitelogger'
 import { DebugLevel } from './constants'
 
 describe('Logger', () => {

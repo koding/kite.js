@@ -14,8 +14,8 @@ import { Defaults } from '../constants'
 import WebSocketServer from './websocket'
 import SockJSServer from './sockjs'
 
-import KiteApi from '../KiteApi'
-import KiteLogger from '../KiteLogger'
+import KiteApi from '../kiteapi'
+import KiteLogger from '../kitelogger'
 
 class KiteServer extends Emitter {
   static version = Defaults.KiteInfo.version
@@ -41,12 +41,28 @@ class KiteServer extends Emitter {
     this.id = createId()
     this.server = null
 
-    this.api = new KiteApi({
-      auth: this.options.auth,
-      methods: this.options.api,
-    })
+    this.setApi(
+      new KiteApi({
+        auth: this.options.auth,
+        methods: this.options.api,
+      })
+    )
 
     this.currentToken = null
+  }
+
+  setApi(api) {
+    if (api instanceof KiteApi) {
+      this.api = api
+    } else {
+      throw new Error('A valid KiteApi instance is required!')
+    }
+
+    if (this.server != null) {
+      this.logger.info(`API change, restarting running server...`)
+      this.close()
+      this.listen(this.port)
+    }
   }
 
   getToken() {
