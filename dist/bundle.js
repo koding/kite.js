@@ -1,226 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _constants = require('./constants');
-
-var isFunction = function isFunction(thing) {
-  return typeof thing === 'function';
-};
-
-var KiteApi = function () {
-  function KiteApi(_ref) {
-    var auth = _ref.auth,
-        methods = _ref.methods;
-
-    _classCallCheck(this, KiteApi);
-
-    this.auth = auth;
-    this.methods = this.setMethods(Object.assign({}, _constants.DefaultApi, methods));
-    this.methodKeys = Object.keys(this.methods);
-  }
-
-  _createClass(KiteApi, [{
-    key: 'hasMethod',
-    value: function hasMethod(method) {
-      if (!method || method === '') return false;
-      return this.methodKeys.includes(method);
-    }
-  }, {
-    key: 'setMethods',
-    value: function setMethods(methods) {
-      var _this = this;
-
-      return Object.keys(methods).reduce(function (acc, methodName) {
-        return Object.assign(acc, _this.setMethod(methodName, methods[methodName]));
-      }, {});
-    }
-  }, {
-    key: 'setMethod',
-    value: function setMethod(methodName, fn) {
-      var auth = void 0,
-          func = void 0;
-
-      if (isFunction(fn)) {
-        func = fn;
-        auth = undefined;
-      } else if (isFunction(fn.func)) {
-        func = fn.func;
-        auth = fn.auth;
-      } else {
-        throw new Error('Argument must be a function or an object with a func property');
-      }
-
-      auth = auth != null ? auth : this.auth;
-      func.mustAuth = auth != null ? auth : true;
-
-      return _defineProperty({}, methodName, function (_ref2) {
-        var withArgs = _ref2.withArgs,
-            authentication = _ref2.authentication,
-            responseCallback = _ref2.responseCallback,
-            kite = _ref2.kite;
-
-        var args = Array.isArray(withArgs) ? withArgs : [withArgs];
-        func.apply(undefined, _toConsumableArray(args).concat([responseCallback, { kite: kite, authentication: authentication }]));
-      });
-    }
-  }, {
-    key: 'shouldAuthenticate',
-    value: function shouldAuthenticate(method) {
-      return this.methods[method] && this.methods[method].mustAuth;
-    }
-  }]);
-
-  return KiteApi;
-}();
-
-exports.default = KiteApi;
-module.exports = exports['default'];
-
-
-},{"./constants":4}],2:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _constants = require('./constants');
-
-var defaults = {
-  error: function error() {
-    var _console;
-
-    return (_console = console).error.apply(_console, arguments);
-  },
-  warn: function warn() {
-    var _console2;
-
-    return (_console2 = console).warn.apply(_console2, arguments);
-  },
-  info: function info() {
-    var _console3;
-
-    return (_console3 = console).info.apply(_console3, arguments);
-  }
-};
-
-var Logger = function () {
-  function Logger() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Logger);
-
-    var name = options.name,
-        _options$level = options.level,
-        level = _options$level === undefined ? _constants.DebugLevel.INFO : _options$level,
-        _options$error = options.error,
-        error = _options$error === undefined ? defaults.error : _options$error,
-        _options$warn = options.warn,
-        warn = _options$warn === undefined ? defaults.warn : _options$warn,
-        _options$info = options.info,
-        info = _options$info === undefined ? defaults.info : _options$info;
-
-
-    this.name = name;
-    this.level = level;
-    this.loggers = { error: error, warn: warn, info: info };
-  }
-
-  _createClass(Logger, [{
-    key: 'logMessage',
-    value: function logMessage(category, loggerType) {
-      if (_constants.DebugLevel[category] <= this.level) {
-        var _loggers;
-
-        for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-          args[_key - 2] = arguments[_key];
-        }
-
-        (_loggers = this.loggers)[loggerType].apply(_loggers, ['[' + this.name + ']', category].concat(args));
-      }
-    }
-  }, {
-    key: 'critical',
-    value: function critical() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      this.logMessage.apply(this, ['CRITICAL', 'error'].concat(args));
-    }
-  }, {
-    key: 'error',
-    value: function error() {
-      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
-      }
-
-      this.logMessage.apply(this, ['ERROR', 'error'].concat(args));
-    }
-  }, {
-    key: 'warning',
-    value: function warning() {
-      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        args[_key4] = arguments[_key4];
-      }
-
-      this.logMessage.apply(this, ['WARNING', 'warn'].concat(args));
-    }
-  }, {
-    key: 'notice',
-    value: function notice() {
-      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-        args[_key5] = arguments[_key5];
-      }
-
-      this.logMessage.apply(this, ['NOTICE', 'info'].concat(args));
-    }
-  }, {
-    key: 'info',
-    value: function info() {
-      for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-        args[_key6] = arguments[_key6];
-      }
-
-      this.logMessage.apply(this, ['INFO', 'info'].concat(args));
-    }
-  }, {
-    key: 'debug',
-    value: function debug() {
-      for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-        args[_key7] = arguments[_key7];
-      }
-
-      this.logMessage.apply(this, ['DEBUG', 'info'].concat(args));
-    }
-  }]);
-
-  return Logger;
-}();
-
-exports.default = Logger;
-module.exports = exports['default'];
-
-
-},{"./constants":4}],3:[function(require,module,exports){
-'use strict';
-
 var Kite = require('./kite');
 var Kontrol = require('./kontrol');
 
@@ -230,7 +10,7 @@ if (typeof window !== 'undefined' && window !== null) {
 }
 
 
-},{"./kite":14,"./kontrol":23}],4:[function(require,module,exports){
+},{"./kite":12,"./kontrol":23}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -242,7 +22,7 @@ function asObjectOf(list) {
     return events;
   }, {});
 }
-var Version = exports.Version = '1.0.9';
+var Version = exports.Version = '1.0.10';
 var KnownEvents = exports.KnownEvents = ['backOffFailed', 'tokenExpired', 'tokenSet', 'register', 'message', 'request', 'critical', 'notice', 'error', 'warn', 'info', 'open', 'close', 'debug'];
 
 var Event = exports.Event = asObjectOf(KnownEvents);
@@ -288,7 +68,7 @@ var KontrolActions = exports.KontrolActions = {
 };
 
 
-},{}],5:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -336,7 +116,7 @@ exports.default = _bluebird2.default.method(function (kite, method, auth, kiteKe
 module.exports = exports['default'];
 
 
-},{"../constants":4,"./token":19,"bluebird":42}],6:[function(require,module,exports){
+},{"../constants":2,"./token":17,"bluebird":42}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -392,7 +172,7 @@ function _interopRequireDefault(obj) {
 module.exports = exports['default'];
 
 
-},{"../constants":4,"./timeout":18}],7:[function(require,module,exports){
+},{"../constants":2,"./timeout":16}],5:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -462,13 +242,13 @@ var _sockjsClient = require('sockjs-client');
 
 var _sockjsClient2 = _interopRequireDefault(_sockjsClient);
 
-var _KiteApi = require('../KiteApi');
+var _kiteapi = require('../kiteapi');
 
-var _KiteApi2 = _interopRequireDefault(_KiteApi);
+var _kiteapi2 = _interopRequireDefault(_kiteapi);
 
-var _KiteLogger = require('../KiteLogger');
+var _kitelogger = require('../kitelogger');
 
-var _KiteLogger2 = _interopRequireDefault(_KiteLogger);
+var _kitelogger2 = _interopRequireDefault(_kitelogger);
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
@@ -493,7 +273,7 @@ var BaseKite = function (_emitter2$default) {
       _this.options.url += _this.options.prefix;
     }
 
-    _this.logger = new _KiteLogger2.default({
+    _this.logger = new _kitelogger2.default({
       name: _this.options.name || 'kite',
       level: _this.options.logLevel
     });
@@ -503,7 +283,7 @@ var BaseKite = function (_emitter2$default) {
 
     _this.readyState = _constants.State.NOTREADY;
 
-    _this.api = new _KiteApi2.default({
+    _this.api = new _kiteapi2.default({
       // to be backwards compatible we don't allow client apis to be
       // authenticated.
       auth: false,
@@ -853,7 +633,7 @@ module.exports = exports['default'];
 
 
 }).call(this,require('_process'))
-},{"../KiteApi":1,"../KiteLogger":2,"../constants":4,"./backoff":6,"./emitter":11,"./error":12,"./handleIncomingMessage":13,"./messagescrubber":16,"./now":17,"./timeout":18,"./wrap":20,"_process":158,"atob":40,"dnode-protocol":96,"sockjs-client":190,"uuid":250,"ws":25}],8:[function(require,module,exports){
+},{"../constants":2,"../kiteapi":19,"../kitelogger":20,"./backoff":4,"./emitter":9,"./error":10,"./handleIncomingMessage":11,"./messagescrubber":14,"./now":15,"./timeout":16,"./wrap":18,"_process":158,"atob":40,"dnode-protocol":96,"sockjs-client":190,"uuid":250,"ws":25}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -880,7 +660,7 @@ exports.default = function (kiteKey) {
 module.exports = exports['default'];
 
 
-},{"atob":40,"try-json-parse":246}],9:[function(require,module,exports){
+},{"atob":40,"try-json-parse":246}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -900,7 +680,7 @@ exports.default = Object.defineProperty || function (ctx, name, _ref) {
 module.exports = exports['default'];
 
 
-},{}],10:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -952,7 +732,7 @@ exports.default = Delayed;
 module.exports = exports['default'];
 
 
-},{}],11:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1020,7 +800,7 @@ exports.default = Emitter;
 module.exports = exports['default'];
 
 
-},{"./define":9,"events":117}],12:[function(require,module,exports){
+},{"./define":7,"events":117}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1088,7 +868,7 @@ exports.default = KiteError;
 module.exports = exports['default'];
 
 
-},{}],13:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1204,7 +984,7 @@ var parseKiteReq = function parseKiteReq(req) {
 module.exports = exports['default'];
 
 
-},{"../constants":4,"./auth":5,"./error":12,"try-json-parse":246}],14:[function(require,module,exports){
+},{"../constants":2,"./auth":3,"./error":10,"try-json-parse":246}],12:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1282,7 +1062,7 @@ exports.default = Kite;
 module.exports = exports['default'];
 
 
-},{"./base":7,"bluebird":42}],15:[function(require,module,exports){
+},{"./base":5,"bluebird":42}],13:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1335,7 +1115,7 @@ exports.default = Interval;
 module.exports = exports['default'];
 
 
-},{"./delayed":10}],16:[function(require,module,exports){
+},{"./delayed":8}],14:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -1427,7 +1207,7 @@ MessageScrubber.defaultCallback = function (kite) {
 module.exports = exports['default'];
 
 
-},{"../constants":4,"./error":12}],17:[function(require,module,exports){
+},{"../constants":2,"./error":10}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1442,7 +1222,7 @@ exports.default = function () {
 module.exports = exports["default"];
 
 
-},{}],18:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1495,7 +1275,7 @@ exports.default = Timeout;
 module.exports = exports['default'];
 
 
-},{"./delayed":10}],19:[function(require,module,exports){
+},{"./delayed":8}],17:[function(require,module,exports){
 'use strict';
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -1538,7 +1318,7 @@ exports.default = function (tokenString, kiteKey) {
 module.exports = exports['default'];
 
 
-},{"./claims":8,"atob":40,"jwt-simple":139,"try-json-parse":246}],20:[function(require,module,exports){
+},{"./claims":6,"atob":40,"jwt-simple":139,"try-json-parse":246}],18:[function(require,module,exports){
 (function (process,global){
 'use strict';
 
@@ -1661,7 +1441,227 @@ module.exports = exports['default'];
 
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./interval":15,"_process":158,"os":24,"readline":72}],21:[function(require,module,exports){
+},{"./interval":13,"_process":158,"os":24,"readline":72}],19:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _constants = require('./constants');
+
+var isFunction = function isFunction(thing) {
+  return typeof thing === 'function';
+};
+
+var KiteApi = function () {
+  function KiteApi(_ref) {
+    var auth = _ref.auth,
+        methods = _ref.methods;
+
+    _classCallCheck(this, KiteApi);
+
+    this.auth = auth;
+    this.methods = this.setMethods(Object.assign({}, _constants.DefaultApi, methods));
+    this.methodKeys = Object.keys(this.methods);
+  }
+
+  _createClass(KiteApi, [{
+    key: 'hasMethod',
+    value: function hasMethod(method) {
+      if (!method || method === '') return false;
+      return this.methodKeys.includes(method);
+    }
+  }, {
+    key: 'setMethods',
+    value: function setMethods(methods) {
+      var _this = this;
+
+      return Object.keys(methods).reduce(function (acc, methodName) {
+        return Object.assign(acc, _this.setMethod(methodName, methods[methodName]));
+      }, {});
+    }
+  }, {
+    key: 'setMethod',
+    value: function setMethod(methodName, fn) {
+      var auth = void 0,
+          func = void 0;
+
+      if (isFunction(fn)) {
+        func = fn;
+        auth = undefined;
+      } else if (isFunction(fn.func)) {
+        func = fn.func;
+        auth = fn.auth;
+      } else {
+        throw new Error('Argument must be a function or an object with a func property');
+      }
+
+      auth = auth != null ? auth : this.auth;
+      func.mustAuth = auth != null ? auth : true;
+
+      return _defineProperty({}, methodName, function (_ref2) {
+        var withArgs = _ref2.withArgs,
+            authentication = _ref2.authentication,
+            responseCallback = _ref2.responseCallback,
+            kite = _ref2.kite;
+
+        var args = Array.isArray(withArgs) ? withArgs : [withArgs];
+        func.apply(undefined, _toConsumableArray(args).concat([responseCallback, { kite: kite, authentication: authentication }]));
+      });
+    }
+  }, {
+    key: 'shouldAuthenticate',
+    value: function shouldAuthenticate(method) {
+      return this.methods[method] && this.methods[method].mustAuth;
+    }
+  }]);
+
+  return KiteApi;
+}();
+
+exports.default = KiteApi;
+module.exports = exports['default'];
+
+
+},{"./constants":2}],20:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _constants = require('./constants');
+
+var defaults = {
+  error: function error() {
+    var _console;
+
+    return (_console = console).error.apply(_console, arguments);
+  },
+  warn: function warn() {
+    var _console2;
+
+    return (_console2 = console).warn.apply(_console2, arguments);
+  },
+  info: function info() {
+    var _console3;
+
+    return (_console3 = console).info.apply(_console3, arguments);
+  }
+};
+
+var Logger = function () {
+  function Logger() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Logger);
+
+    var name = options.name,
+        _options$level = options.level,
+        level = _options$level === undefined ? _constants.DebugLevel.INFO : _options$level,
+        _options$error = options.error,
+        error = _options$error === undefined ? defaults.error : _options$error,
+        _options$warn = options.warn,
+        warn = _options$warn === undefined ? defaults.warn : _options$warn,
+        _options$info = options.info,
+        info = _options$info === undefined ? defaults.info : _options$info;
+
+
+    this.name = name;
+    this.level = level;
+    this.loggers = { error: error, warn: warn, info: info };
+  }
+
+  _createClass(Logger, [{
+    key: 'logMessage',
+    value: function logMessage(category, loggerType) {
+      if (_constants.DebugLevel[category] <= this.level) {
+        var _loggers;
+
+        for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+          args[_key - 2] = arguments[_key];
+        }
+
+        (_loggers = this.loggers)[loggerType].apply(_loggers, ['[' + this.name + ']', category].concat(args));
+      }
+    }
+  }, {
+    key: 'critical',
+    value: function critical() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      this.logMessage.apply(this, ['CRITICAL', 'error'].concat(args));
+    }
+  }, {
+    key: 'error',
+    value: function error() {
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      this.logMessage.apply(this, ['ERROR', 'error'].concat(args));
+    }
+  }, {
+    key: 'warning',
+    value: function warning() {
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      this.logMessage.apply(this, ['WARNING', 'warn'].concat(args));
+    }
+  }, {
+    key: 'notice',
+    value: function notice() {
+      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        args[_key5] = arguments[_key5];
+      }
+
+      this.logMessage.apply(this, ['NOTICE', 'info'].concat(args));
+    }
+  }, {
+    key: 'info',
+    value: function info() {
+      for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+        args[_key6] = arguments[_key6];
+      }
+
+      this.logMessage.apply(this, ['INFO', 'info'].concat(args));
+    }
+  }, {
+    key: 'debug',
+    value: function debug() {
+      for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+        args[_key7] = arguments[_key7];
+      }
+
+      this.logMessage.apply(this, ['DEBUG', 'info'].concat(args));
+    }
+  }]);
+
+  return Logger;
+}();
+
+exports.default = Logger;
+module.exports = exports['default'];
+
+
+},{"./constants":2}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1970,7 +1970,7 @@ exports.default = Kontrol;
 module.exports = exports['default'];
 
 
-},{"../constants":4,"../kite/base":7,"../kite/error":12,"./getpath":22,"events":117}],22:[function(require,module,exports){
+},{"../constants":2,"../kite/base":5,"../kite/error":10,"./getpath":22,"events":117}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2071,7 +2071,7 @@ exports.default = Kontrol;
 module.exports = exports['default'];
 
 
-},{"../kite":14,"./base":21,"bluebird":42}],24:[function(require,module,exports){
+},{"../kite":12,"./base":21,"bluebird":42}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -36597,4 +36597,4 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{"indexof":134}]},{},[3]);
+},{"indexof":134}]},{},[1]);
