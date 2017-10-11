@@ -3,7 +3,7 @@ import http from 'http'
 import Emitter from '../../kite/emitter'
 import Session from './session'
 
-import KiteLogger from '../../KiteLogger'
+import KiteLogger from '../../kitelogger'
 
 export default class Server extends Emitter {
   static scheme = 'http'

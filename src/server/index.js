@@ -14,8 +14,8 @@ import { Defaults } from '../constants'
 import WebSocketServer from './websocket'
 import SockJSServer from './sockjs'
 
-import KiteApi from '../KiteApi'
-import KiteLogger from '../KiteLogger'
+import KiteApi from '../kiteapi'
+import KiteLogger from '../kitelogger'
 
 class KiteServer extends Emitter {
   static version = Defaults.KiteInfo.version

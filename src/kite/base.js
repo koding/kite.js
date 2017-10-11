@@ -21,8 +21,8 @@ import {
 import WebSocket from 'ws'
 import SockJS from 'sockjs-client'
 
-import KiteApi from '../KiteApi'
-import KiteLogger from '../KiteLogger'
+import KiteApi from '../kiteapi'
+import KiteLogger from '../kitelogger'
 
 class BaseKite extends Emitter {
   static version = Defaults.KiteInfo.version
