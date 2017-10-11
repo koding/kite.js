@@ -1,6 +1,7 @@
 import expect from 'expect'
 import Kite from '../kite'
 import KiteServer from './'
+import KiteApi from '../kiteapi'
 import SockJS from 'sockjs-client'
 import WebSocket from 'ws'
 
@@ -46,6 +47,63 @@ describe('KiteServer with SockJS', () => {
           done()
         })
     })
+
+    math.listen(7780)
+    kite.connect()
+  })
+
+  it('should allow defining api after init', done => {
+    const kite = new Kite({
+      url: 'http://0.0.0.0:7780',
+      autoReconnect: true,
+      autoConnect: false,
+      transportClass: Kite.transport.SockJS,
+      logLevel,
+    })
+
+    const math = new KiteServer({
+      name: 'math',
+      serverClass: KiteServer.transport.SockJS,
+      logLevel,
+    })
+
+    let squareApi = new KiteApi({
+      auth: false,
+      methods: {
+        square: function(x, callback) {
+          callback(null, x * x)
+        },
+      },
+    })
+
+    let cubeApi = new KiteApi({
+      auth: false,
+      methods: {
+        cube: function(x, callback) {
+          callback(null, x * x * x)
+        },
+      },
+    })
+
+    math.setApi(squareApi)
+
+    kite
+      .tell('square', 5)
+      .then(res => expect(res).toBe(25))
+      .finally(() => {
+        math.setApi(cubeApi)
+
+        kite.disconnect(true)
+        kite.on('open', () => {
+          kite
+            .tell('cube', 5)
+            .then(res => expect(res).toBe(125))
+            .finally(() => {
+              math.close()
+              done()
+            })
+        })
+      })
 
     math.listen(7780)
     kite.connect()
