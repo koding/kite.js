@@ -22,7 +22,7 @@ function asObjectOf(list) {
     return events;
   }, {});
 }
-var Version = exports.Version = '1.0.10';
+var Version = exports.Version = '1.0.11';
 var KnownEvents = exports.KnownEvents = ['backOffFailed', 'tokenExpired', 'tokenSet', 'register', 'message', 'request', 'critical', 'notice', 'error', 'warn', 'info', 'open', 'close', 'debug'];
 
 var Event = exports.Event = asObjectOf(KnownEvents);
@@ -283,23 +283,12 @@ var BaseKite = function (_emitter2$default) {
 
     _this.readyState = _constants.State.NOTREADY;
 
-    _this.api = new _kiteapi2.default({
+    _this.setApi(new _kiteapi2.default({
       // to be backwards compatible we don't allow client apis to be
       // authenticated.
       auth: false,
-      methods: _wrap2.default.call(_this, _this.options.api)
-    });
-
-    _this.proto = (0, _dnodeProtocol2.default)(_this.api.methods);
-    _this.messageScrubber = new _messagescrubber2.default({ kite: _this });
-
-    _this.proto.on(_constants.Event.request, function (req) {
-      var message = JSON.stringify(req);
-      _this.ready(function () {
-        return _this.ws.send(message);
-      });
-      _this.logger.debug('Sending:', message);
-    });
+      methods: _this.options.api
+    }));
 
     var _this$options = _this.options,
         connection = _this$options.connection,
@@ -329,6 +318,29 @@ var BaseKite = function (_emitter2$default) {
   }
 
   _createClass(BaseKite, [{
+    key: 'setApi',
+    value: function setApi(api) {
+      var _this2 = this;
+
+      if (api instanceof _kiteapi2.default) {
+        this.api = api;
+        this.api.methods = _wrap2.default.call(this, this.api.methods);
+
+        this.proto = (0, _dnodeProtocol2.default)(this.api.methods);
+        this.messageScrubber = new _messagescrubber2.default({ kite: this });
+
+        this.proto.on(_constants.Event.request, function (req) {
+          var message = JSON.stringify(req);
+          _this2.ready(function () {
+            return _this2.ws.send(message);
+          });
+          _this2.logger.debug('Sending:', message);
+        });
+      } else {
+        throw new Error('A valid KiteApi instance is required!');
+      }
+    }
+  }, {
     key: 'getToken',
     value: function getToken() {
       return this.options.auth.key;
@@ -385,14 +397,14 @@ var BaseKite = function (_emitter2$default) {
   }, {
     key: 'addConnectionHandlers',
     value: function addConnectionHandlers(connection) {
-      var _this2 = this;
+      var _this3 = this;
 
       connection.addEventListener(_constants.Event.open, this.bound('onOpen'));
       connection.addEventListener(_constants.Event.close, this.bound('onClose'));
       connection.addEventListener(_constants.Event.message, this.bound('onMessage'));
       connection.addEventListener(_constants.Event.error, this.bound('onError'));
       connection.addEventListener(_constants.Event.info, function (info) {
-        return _this2.logger.info(info);
+        return _this3.logger.info(info);
       });
     }
   }, {
@@ -455,7 +467,7 @@ var BaseKite = function (_emitter2$default) {
   }, {
     key: 'onClose',
     value: function onClose(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       this.readyState = _constants.State.CLOSED;
       this.emit(_constants.Event.close, event);
@@ -464,7 +476,7 @@ var BaseKite = function (_emitter2$default) {
       // enable below to autoReconnect when the socket has been closed
       if (this.canReconnect()) {
         process.nextTick(function () {
-          return _this3.setBackoffTimeout(_this3.bound('connect'));
+          return _this4.setBackoffTimeout(_this4.bound('connect'));
         });
         dcInfo += ', trying to reconnect...';
       }
