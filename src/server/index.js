@@ -69,12 +69,6 @@ class KiteServer extends Emitter {
     return this.currentToken
   }
 
-  getServerClass() {
-    return this.options.serverClass != null
-      ? this.options.serverClass
-      : WebSocketServer
-  }
-
   getPrefix() {
     let { prefix } = this.options
     if (prefix == null) {
@@ -93,7 +87,7 @@ class KiteServer extends Emitter {
     this.port = port
     const prefix = this.getPrefix()
     const { name, logLevel } = this.options
-    const Server = this.getServerClass()
+    const Server = this.options.transportClass || WebSocketServer
     this.server = new Server({ port, prefix, name, logLevel })
     this.server.on('connection', this.bound('onConnection'))
     this.logger.info(`Listening: ${this.server.getAddress()}`)
@@ -126,17 +120,13 @@ class KiteServer extends Emitter {
 
     const id = ws.getId()
 
-    let transportClass = Kite.transport.WebSocket
-    if (this.options.serverClass === SockJSServer) {
-      transportClass = Kite.transport.SockJS
-    }
     ws.kite = new Kite({
       url: id,
       name: `${this.options.name}-remote`,
       logLevel: this.options.logLevel,
       autoConnect: false,
       autoReconnect: false,
-      transportClass,
+      transportClass: this.options.transportClass || Kite.transport.WebSocket,
     })
 
     ws.kite.ws = ws
