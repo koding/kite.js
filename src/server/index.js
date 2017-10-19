@@ -69,6 +69,12 @@ class KiteServer extends Emitter {
     return this.currentToken
   }
 
+  getServerClass() {
+    // serverClass is used for backward compatibility
+    const { serverClass, transportClass } = this.options
+    return serverClass || transportClass || KiteServer.transport.WebSocket
+  }
+
   getPrefix() {
     let { prefix } = this.options
     if (prefix == null) {
@@ -87,7 +93,7 @@ class KiteServer extends Emitter {
     this.port = port
     const prefix = this.getPrefix()
     const { name, logLevel } = this.options
-    const Server = this.options.transportClass || WebSocketServer
+    const Server = this.getServerClass()
     this.server = new Server({ port, prefix, name, logLevel })
     this.server.on('connection', this.bound('onConnection'))
     this.logger.info(`Listening: ${this.server.getAddress()}`)
@@ -120,13 +126,18 @@ class KiteServer extends Emitter {
 
     const id = ws.getId()
 
+    let transportClass = Kite.transport.WebSocket
+    if (this.getServerClass() === KiteServer.transport.SockJS) {
+      transportClass = Kite.transport.SockJS
+    }
+
     ws.kite = new Kite({
       url: id,
       name: `${this.options.name}-remote`,
       logLevel: this.options.logLevel,
       autoConnect: false,
       autoReconnect: false,
-      transportClass: this.options.transportClass || Kite.transport.WebSocket,
+      transportClass,
     })
 
     ws.kite.ws = ws
