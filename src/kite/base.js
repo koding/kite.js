@@ -63,21 +63,14 @@ class BaseKite extends Emitter {
 
     this.readyState = State.NOTREADY
 
-    this.api = new KiteApi({
-      // to be backwards compatible we don't allow client apis to be
-      // authenticated.
-      auth: false,
-      methods: wrap.call(this, this.options.api),
-    })
-
-    this.proto = dnode(this.api.methods)
-    this.messageScrubber = new MessageScrubber({ kite: this })
-
-    this.proto.on(Event.request, req => {
-      const message = JSON.stringify(req)
-      this.ready(() => this.ws.send(message))
-      this.logger.debug('Sending:', message)
-    })
+    this.setApi(
+      new KiteApi({
+        // to be backwards compatible we don't allow client apis to be
+        // authenticated.
+        auth: false,
+        methods: this.options.api,
+      })
+    )
 
     const { connection, autoConnect, autoReconnect } = this.options
 
@@ -100,6 +93,24 @@ class BaseKite extends Emitter {
     } else {
       autoReconnect && this.initBackoff()
       autoConnect && this.connect()
+    }
+  }
+
+  setApi(api) {
+    if (api instanceof KiteApi) {
+      this.api = api
+      this.api.methods = wrap.call(this, this.api.methods)
+
+      this.proto = dnode(this.api.methods)
+      this.messageScrubber = new MessageScrubber({ kite: this })
+
+      this.proto.on(Event.request, req => {
+        const message = JSON.stringify(req)
+        this.ready(() => this.ws.send(message))
+        this.logger.debug('Sending:', message)
+      })
+    } else {
+      throw new Error('A valid KiteApi instance is required!')
     }
   }
 

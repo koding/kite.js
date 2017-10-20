@@ -28,7 +28,7 @@ describe('KiteServer with SockJS', () => {
     const math = new KiteServer({
       name: 'math',
       auth: false,
-      serverClass: KiteServer.transport.SockJS,
+      transportClass: KiteServer.transport.SockJS,
       logLevel,
       api: {
         square: function(x, callback) {
@@ -63,7 +63,7 @@ describe('KiteServer with SockJS', () => {
 
     const math = new KiteServer({
       name: 'math',
-      serverClass: KiteServer.transport.SockJS,
+      transportClass: KiteServer.transport.SockJS,
       logLevel,
     })
 
@@ -114,8 +114,6 @@ describe('KiteServer with WebSocket', () => {
   it('should be able to accept kite connections', done => {
     const kite = new Kite({
       url: 'http://0.0.0.0:7780',
-      serverClass: KiteServer.transport.WebSocket,
-      autoReconnect: false,
       autoConnect: false,
       logLevel,
     })
@@ -214,7 +212,7 @@ describe('KiteServer connection', () => {
       const math = new KiteServer({
         name: 'math',
         auth: false,
-        serverClass: KiteServer.transport.SockJS,
+        transportClass: KiteServer.transport.SockJS,
         logLevel,
         api: {
           square: function(x, callback) {
@@ -296,7 +294,7 @@ describe('KiteServer to Remote Kite connection', () => {
     })
 
     const math = new KiteServer({
-      serverClass: KiteServer.transport.SockJS,
+      transportClass: KiteServer.transport.SockJS,
       name: 'math',
       auth: false,
       logLevel,

@@ -70,9 +70,9 @@ class KiteServer extends Emitter {
   }
 
   getServerClass() {
-    return this.options.serverClass != null
-      ? this.options.serverClass
-      : WebSocketServer
+    // serverClass is used for backward compatibility
+    const { serverClass, transportClass } = this.options
+    return serverClass || transportClass || KiteServer.transport.WebSocket
   }
 
   getPrefix() {
@@ -127,9 +127,10 @@ class KiteServer extends Emitter {
     const id = ws.getId()
 
     let transportClass = Kite.transport.WebSocket
-    if (this.options.serverClass === SockJSServer) {
+    if (this.getServerClass() === KiteServer.transport.SockJS) {
       transportClass = Kite.transport.SockJS
     }
+
     ws.kite = new Kite({
       url: id,
       name: `${this.options.name}-remote`,
