@@ -22,7 +22,7 @@ function asObjectOf(list) {
     return events;
   }, {});
 }
-var Version = exports.Version = '1.0.11';
+var Version = exports.Version = '1.0.12';
 var KnownEvents = exports.KnownEvents = ['backOffFailed', 'tokenExpired', 'tokenSet', 'register', 'message', 'request', 'critical', 'notice', 'error', 'warn', 'info', 'open', 'close', 'debug'];
 
 var Event = exports.Event = asObjectOf(KnownEvents);
@@ -212,10 +212,6 @@ var _backoff = require('./backoff');
 
 var _backoff2 = _interopRequireDefault(_backoff);
 
-var _wrap = require('./wrap');
-
-var _wrap2 = _interopRequireDefault(_wrap);
-
 var _handleIncomingMessage = require('./handleIncomingMessage');
 
 var _handleIncomingMessage2 = _interopRequireDefault(_handleIncomingMessage);
@@ -283,7 +279,7 @@ var BaseKite = function (_emitter2$default) {
 
     _this.readyState = _constants.State.NOTREADY;
 
-    _this.setApi(new _kiteapi2.default({
+    _this.setApi(new _kiteapi2.default(_this, {
       // to be backwards compatible we don't allow client apis to be
       // authenticated.
       auth: false,
@@ -324,7 +320,6 @@ var BaseKite = function (_emitter2$default) {
 
       if (api instanceof _kiteapi2.default) {
         this.api = api;
-        this.api.methods = _wrap2.default.call(this, this.api.methods);
 
         this.proto = (0, _dnodeProtocol2.default)(this.api.methods);
         this.messageScrubber = new _messagescrubber2.default({ kite: this });
@@ -645,7 +640,7 @@ module.exports = exports['default'];
 
 
 }).call(this,require('_process'))
-},{"../constants":2,"../kiteapi":19,"../kitelogger":20,"./backoff":4,"./emitter":9,"./error":10,"./handleIncomingMessage":11,"./messagescrubber":14,"./now":15,"./timeout":16,"./wrap":18,"_process":158,"atob":40,"dnode-protocol":96,"sockjs-client":190,"uuid":250,"ws":25}],6:[function(require,module,exports){
+},{"../constants":2,"../kiteapi":19,"../kitelogger":20,"./backoff":4,"./emitter":9,"./error":10,"./handleIncomingMessage":11,"./messagescrubber":14,"./now":15,"./timeout":16,"_process":158,"atob":40,"dnode-protocol":96,"sockjs-client":190,"uuid":250,"ws":25}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1416,8 +1411,7 @@ exports.default = function () {
     for (var _iterator = Object.keys(userlandApi || {})[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var method = _step.value;
 
-      var fn = userlandApi[method];
-      api[method] = fn;
+      api[method] = userlandApi[method];
     }
   } catch (err) {
     _didIteratorError = true;
@@ -1470,19 +1464,27 @@ Object.defineProperty(exports, "__esModule", {
 
 var _constants = require('./constants');
 
+var _wrap = require('./kite/wrap');
+
+var _wrap2 = _interopRequireDefault(_wrap);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
 var isFunction = function isFunction(thing) {
   return typeof thing === 'function';
 };
 
 var KiteApi = function () {
-  function KiteApi(_ref) {
+  function KiteApi(kite, _ref) {
     var auth = _ref.auth,
         methods = _ref.methods;
 
     _classCallCheck(this, KiteApi);
 
     this.auth = auth;
-    this.methods = this.setMethods(Object.assign({}, _constants.DefaultApi, methods));
+    this.methods = this.setMethods(Object.assign({}, _constants.DefaultApi, _wrap2.default.call(kite, methods)));
     this.methodKeys = Object.keys(this.methods);
   }
 
@@ -1544,7 +1546,7 @@ exports.default = KiteApi;
 module.exports = exports['default'];
 
 
-},{"./constants":2}],20:[function(require,module,exports){
+},{"./constants":2,"./kite/wrap":18}],20:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
