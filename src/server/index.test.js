@@ -67,7 +67,7 @@ describe('KiteServer with SockJS', () => {
       logLevel,
     })
 
-    let squareApi = new KiteApi({
+    let squareApi = new KiteApi(math, {
       auth: false,
       methods: {
         square: function(x, callback) {
@@ -76,7 +76,7 @@ describe('KiteServer with SockJS', () => {
       },
     })
 
-    let cubeApi = new KiteApi({
+    let cubeApi = new KiteApi(math, {
       auth: false,
       methods: {
         cube: function(x, callback) {
