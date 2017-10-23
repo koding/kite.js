@@ -116,7 +116,7 @@ describe('BaseKite', () => {
       expect(kite.api.methods['kite.ping']).toExist()
 
       kite.setApi(
-        new KiteApi({
+        new KiteApi(kite, {
           auth: false,
           methods: {
             foo: function(bar, callback) {
@@ -132,6 +132,38 @@ describe('BaseKite', () => {
       done()
     })
 
+    it('should work with the default api', done => {
+      const kiteServer = new KiteServer({
+        name: 'kite-server',
+        auth: false,
+        logLevel,
+      })
+
+      const kite = new Kite({
+        url: 'http://0.0.0.0:7780',
+        autoConnect: false,
+        logLevel,
+      })
+
+      expect(kite).toExist()
+      expect(kite.api.methods['kite.echo']).toExist()
+
+      kiteServer.listen(7780)
+
+      kiteServer.server.once('connection', connection => {
+        connection.kite
+          .tell('kite.echo', 'foo')
+          .then(res => expect(res).toBe('foo'))
+          .finally(() => {
+            kite.disconnect()
+            kiteServer.close()
+            done()
+          })
+      })
+
+      kite.connect()
+    })
+
     it('should work with the new api', done => {
       const kiteServer = new KiteServer({
         name: 'kite-server',
@@ -139,7 +171,13 @@ describe('BaseKite', () => {
         logLevel,
       })
 
-      let squareApi = new KiteApi({
+      const kite = new Kite({
+        url: 'http://0.0.0.0:7780',
+        autoConnect: false,
+        logLevel,
+      })
+
+      let squareApi = new KiteApi(kite, {
         auth: false,
         methods: {
           square: function(x, callback) {
@@ -148,19 +186,13 @@ describe('BaseKite', () => {
         },
       })
 
-      let cubeApi = new KiteApi({
+      let cubeApi = new KiteApi(kite, {
         auth: false,
         methods: {
           cube: function(x, callback) {
             callback(null, x * x * x)
           },
         },
-      })
-
-      const kite = new Kite({
-        url: 'http://0.0.0.0:7780',
-        autoConnect: false,
-        logLevel,
       })
 
       expect(kite).toExist()
