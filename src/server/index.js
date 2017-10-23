@@ -42,7 +42,7 @@ class KiteServer extends Emitter {
     this.server = null
 
     this.setApi(
-      new KiteApi({
+      new KiteApi(this, {
         auth: this.options.auth,
         methods: this.options.api,
       })

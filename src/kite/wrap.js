@@ -70,8 +70,8 @@ export default function(userlandApi = {}) {
   }
 
   for (let method of Object.keys(userlandApi || {})) {
-    const fn = userlandApi[method]
-    api[method] = fn
+    api[method] = userlandApi[method]
   }
+
   return api
 }

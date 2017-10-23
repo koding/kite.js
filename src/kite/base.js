@@ -4,7 +4,6 @@ import uuid from 'uuid'
 import Emitter from './emitter'
 import now from './now'
 import backoff from './backoff'
-import wrap from './wrap'
 import handleIncomingMessage from './handleIncomingMessage'
 import Timeout from './timeout'
 import KiteError from './error'
@@ -64,7 +63,7 @@ class BaseKite extends Emitter {
     this.readyState = State.NOTREADY
 
     this.setApi(
-      new KiteApi({
+      new KiteApi(this, {
         // to be backwards compatible we don't allow client apis to be
         // authenticated.
         auth: false,
@@ -99,7 +98,6 @@ class BaseKite extends Emitter {
   setApi(api) {
     if (api instanceof KiteApi) {
       this.api = api
-      this.api.methods = wrap.call(this, this.api.methods)
 
       this.proto = dnode(this.api.methods)
       this.messageScrubber = new MessageScrubber({ kite: this })

@@ -1,11 +1,14 @@
 import { DefaultApi } from './constants'
+import wrap from './kite/wrap'
 
 const isFunction = thing => typeof thing === 'function'
 
 export default class KiteApi {
-  constructor({ auth, methods }) {
+  constructor(kite, { auth, methods }) {
     this.auth = auth
-    this.methods = this.setMethods(Object.assign({}, DefaultApi, methods))
+    this.methods = this.setMethods(
+      Object.assign({}, DefaultApi, wrap.call(kite, methods))
+    )
     this.methodKeys = Object.keys(this.methods)
   }
 
