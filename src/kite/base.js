@@ -188,7 +188,7 @@ class BaseKite extends Emitter {
   onOpen() {
     this.readyState = State.READY
 
-    this.emit(Event.notice, `Connected to Kite: ${this.options.url}`)
+    this.logger.notice(`Connected to Kite: ${this.options.url}`)
 
     // FIXME: the following is ridiculous.
     if (typeof this.clearBackoffTimeout === 'function') {
