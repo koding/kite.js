@@ -34,7 +34,6 @@ describe('BaseKite', () => {
 
   describe('constructor', () => {
     it('requires a valid url', () => {
-      expect(() => new BaseKite({})).toThrow(/"url" must be a string/)
       expect(() => new BaseKite({ url: 'foo' })).toThrow(/invalid url/)
       expect(
         () => new BaseKite({ autoConnect: false, url: 'http://localhost' })

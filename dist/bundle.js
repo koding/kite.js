@@ -22,7 +22,7 @@ function asObjectOf(list) {
     return events;
   }, {});
 }
-var Version = exports.Version = '1.0.12';
+var Version = exports.Version = '1.0.13';
 var KnownEvents = exports.KnownEvents = ['backOffFailed', 'tokenExpired', 'tokenSet', 'register', 'message', 'request', 'critical', 'notice', 'error', 'warn', 'info', 'open', 'close', 'debug'];
 
 var Event = exports.Event = asObjectOf(KnownEvents);
@@ -450,7 +450,7 @@ var BaseKite = function (_emitter2$default) {
     value: function onOpen() {
       this.readyState = _constants.State.READY;
 
-      this.emit(_constants.Event.notice, 'Connected to Kite: ' + this.options.url);
+      this.logger.notice('Connected to Kite: ' + this.options.url);
 
       // FIXME: the following is ridiculous.
       if (typeof this.clearBackoffTimeout === 'function') {
@@ -904,7 +904,7 @@ function _interopRequireDefault(obj) {
 function handleIncomingMessage(proto, message) {
   var _this = this;
 
-  this.emit(_constants.Event.debug, 'Receiving: ' + message);
+  this.logger.debug('Receiving: ' + message);
 
   if (typeof message === 'string') {
     message = (0, _tryJsonParse2.default)(message);
@@ -913,12 +913,12 @@ function handleIncomingMessage(proto, message) {
   var req = message;
 
   if (req == null) {
-    this.emit(_constants.Event.warning, new _error2.default('Invalid payload! (' + message + ')'));
+    this.logger.warning('Invalid payload! (' + message + ')');
     return;
   }
 
   if (!isKiteReq(req)) {
-    this.emit(_constants.Event.debug, 'Handling a normal dnode message');
+    this.logger.debug('Handling a normal dnode message');
     return proto.handle(req);
   }
 
@@ -930,10 +930,10 @@ function handleIncomingMessage(proto, message) {
       auth = _parseKiteReq.authentication,
       responseCallback = _parseKiteReq.responseCallback;
 
-  this.emit(_constants.Event.debug, 'Authenticating request');
+  this.logger.debug('Authenticating request');
 
   return (0, _auth2.default)(this, method, auth, this.key).then(function (token) {
-    _this.emit(_constants.Event.debug, 'Authentication passed');
+    _this.logger.debug('Authentication passed');
 
     // set this as the current token for the duration of the synchronous
     // method call.
@@ -943,7 +943,7 @@ function handleIncomingMessage(proto, message) {
     try {
       proto.handle(req);
     } catch (err) {
-      _this.emit(_constants.Event.debug, 'Error processing request', err);
+      _this.logger.debug('Error processing request', err);
       proto.handle(getTraceReq({
         kite: _this.getKiteInfo(),
         err: err,
@@ -956,7 +956,7 @@ function handleIncomingMessage(proto, message) {
     _this.currentToken = null;
     return null;
   }).catch(function (err) {
-    _this.emit(_constants.Event.debug, 'Authentication failed', err);
+    _this.logger.debug('Authentication failed', err);
 
     proto.handle(getTraceReq({
       kite: _this.getKiteInfo(),
